@@ -14,3 +14,6 @@ $reporting_db -e "source $PREFIX/functions.sql \W;" >> $LOG
 
 echo "--> Carico le procedure in ingresso dati" >> $LOG
 $reporting_db -e "source $PREFIX/input.sql \W;" >> $LOG
+
+echo "--> Carico le viste" >> $LOG
+$reporting_db -e "source $PREFIX/view.sql \W;" >> $LOG

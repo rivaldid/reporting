@@ -15,3 +15,5 @@ Note (Code 1305): FUNCTION reporting.get_id_messaggio does not exist
 Note (Code 1305): FUNCTION reporting.dmy2Ymd does not exist
 --> Carico le procedure in ingresso dati
 Note (Code 1305): PROCEDURE reporting.input_winwatch does not exist
+--> Carico le viste
+Note (Code 1051): Unknown table 'reporting.WINWATCH'
