@@ -1,0 +1,19 @@
+--> Carico la base
+Note (Code 1051): Unknown table 'WIN_AZIONI'
+Note (Code 1051): Unknown table 'WIN_MESSAGGI'
+Note (Code 1051): Unknown table 'WIN_REPORT'
+Note (Code 1051): Unknown table 'SER_TESSERE'
+Note (Code 1051): Unknown table 'SER_PERSONE'
+Note (Code 1051): Unknown table 'SER_AZIONI'
+Note (Code 1051): Unknown table 'SER_MESSAGGI'
+Note (Code 1051): Unknown table 'SER_REPORT'
+--> Carico le funzioni
+Note (Code 1305): FUNCTION reporting.test_azione does not exist
+Note (Code 1305): FUNCTION reporting.get_id_azione does not exist
+Note (Code 1305): FUNCTION reporting.test_messaggio does not exist
+Note (Code 1305): FUNCTION reporting.get_id_messaggio does not exist
+Note (Code 1305): FUNCTION reporting.dmy2Ymd does not exist
+--> Carico le procedure in ingresso dati
+Note (Code 1305): PROCEDURE reporting.input_winwatch does not exist
+--> Carico le viste
+Note (Code 1051): Unknown table 'reporting.WINWATCH'
