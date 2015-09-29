@@ -7,7 +7,7 @@ IN in_centrale VARCHAR(45),
 IN in_ora TIME,
 IN in_data DATE,
 IN in_azione VARCHAR(45),
-IN in_messaggio VARCHAR(45)
+IN in_messaggio VARCHAR(100)
 )
 BEGIN
 

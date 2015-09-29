@@ -4,24 +4,25 @@ PREFIX="/home/vilardid/reporting"
 LOG=$PREFIX"/population.log"
 MYARGS="-H -ureporting -preportuser -D reporting"
 
-
 if [ -f $LOG ]; then rm $LOG; fi
 touch $LOG
 
 INPUT="test.csv"
 
-MAIN_FS=$IFS
+iconv -f "windows-1252" -t "UTF-8" $INPUT -o temp.$INPUT
+
 while read line; do
 	while IFS=';' read -ra field; do
-		#centrale=${${field[0]}//[[:blank:]]/}
-		centrale="${field[0]//[[:blank:]]/}"
-		ora="${field[1]//[[:blank:]]/}"
-		data="${field[2]//[[:blank:]]/}"
-		azione="${field[3]//[[:blank:]]/}"
-		messaggio="${field[4]//[[:blank:]]/}"
-	done<<<$line
+		centrale="${field[0]}"
+		ora="${field[1]}"
+		data="${field[2]}"
+		azione="${field[3]}"
+		messaggio="${field[4]}"
+	done <<< $line
+	
 	mycall="CALL input_winwatch('$centrale','$ora','$data','$azione','$messaggio')"
 	echo $mycall
-	#mysql $MYARGS -e "$mycall \W;" >> $LOG
-	IFS=$MAIN_IFS
-done<$INPUT
+	mysql $MYARGS -e "$mycall \W;" >> $LOG
+done < temp.$INPUT
+
+rm temp.$INPUT
