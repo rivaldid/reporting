@@ -21,7 +21,7 @@ while read line; do
 	done <<< $line
 	
 	mycall="CALL input_winwatch('$centrale','$ora','$data','$azione','$messaggio')"
-	echo $mycall
+	#echo $mycall
 	mysql $MYARGS -e "$mycall \W;" >> $LOG
 done < temp.$INPUT
 
