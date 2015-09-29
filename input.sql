@@ -2,6 +2,19 @@ DROP PROCEDURE IF EXISTS `input_winwatch`;
 
 DELIMITER $$
 
+
+CREATE PROCEDURE `input_repo`(
+IN in_tipo VARCHAR(45),
+IN in_filename VARCHAR(45)
+)
+BEGIN
+IF NOT (SELECT test_repo(in_tipo,in_filename)) THEN
+	INSERT INTO REPOSITORY(tipo,filename) VALUES(in_tipo,in_filename);
+END IF;
+END;
+$$
+
+
 CREATE PROCEDURE `input_winwatch`(
 IN in_centrale VARCHAR(45),
 IN in_ora TIME,
@@ -40,3 +53,5 @@ VALUES(in_centrale,in_ora,my_data,my_id_azione,my_id_messaggio);
 
 END;
 $$
+
+DELIMITER ;

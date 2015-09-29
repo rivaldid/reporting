@@ -21,6 +21,10 @@ for file in $(find $REPORT -name "*.csv" -type f); do
 	
 	echo $INPUT >> $LOG
 	echo $TEMP >> $LOG
+	filename="${INPUT##*/}"
+	
+	testvar=$(mysql $MYARGS -se "SELECT test_repo('winwatch','$filename');")
+	echo $testvar >> $LOG
 
 	iconv -f "windows-1252" -t "UTF-8" $INPUT -o $TEMP
 
@@ -51,7 +55,7 @@ for file in $(find $REPORT -name "*.csv" -type f); do
 		
 		mycall="CALL input_winwatch('${centrale[@]}','${ora[@]}','${data[@]}','${azione[@]}','${messaggio[@]}')"
 		echo $mycall >> $LOG
-		mysql $MYARGS -e "$mycall \W;" >> $LOG
+		#mysql $MYARGS -e "$mycall \W;" >> $LOG
 	done < $TEMP
 
 	rm $TEMP

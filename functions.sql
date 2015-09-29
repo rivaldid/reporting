@@ -3,6 +3,8 @@ DROP FUNCTION IF EXISTS `get_id_azione`;
 DROP FUNCTION IF EXISTS `test_messaggio`;
 DROP FUNCTION IF EXISTS `get_id_messaggio`;
 DROP FUNCTION IF EXISTS `dmy2Ymd`;
+DROP FUNCTION IF EXISTS `test_repo`;
+
 
 DELIMITER $$
 
@@ -38,6 +40,14 @@ CREATE FUNCTION `dmy2Ymd`(in_data VARCHAR(45))
 RETURNS DATE
 BEGIN
 RETURN (SELECT DATE_FORMAT(DATE_FORMAT(in_data,'%d-%m-%y'),'%Y-%m-%d'));
+END;
+$$
+
+
+CREATE FUNCTION `test_repo`(in_tipo VARCHAR(45),in_filename VARCHAR(45))
+RETURNS TINYINT(1)
+BEGIN
+RETURN (SELECT EXISTS(SELECT 1 FROM REPOSITORY WHERE tipo=in_tipo AND filename=in_filename));
 END;
 $$
 
