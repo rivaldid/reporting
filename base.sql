@@ -24,8 +24,8 @@ DROP TABLE IF EXISTS `WIN_REPORT`;
 CREATE TABLE `WIN_REPORT` (
   `Wid` int(11) NOT NULL AUTO_INCREMENT,
   `Centrale` varchar(45) DEFAULT NULL,
-  `Ora` time DEFAULT NULL,
-  `Data` date DEFAULT NULL,
+  `Ora` varchar(45) DEFAULT NULL,
+  `Data` varchar(45) DEFAULT NULL,
   `id_azione` int(11) DEFAULT NULL,
   `id_messaggio` int(11) DEFAULT NULL,
   CONSTRAINT localkey UNIQUE 
@@ -108,6 +108,7 @@ CREATE TABLE `SER_REPORT` (
 DROP TABLE IF EXISTS `REPOSITORY`;
 CREATE TABLE `REPOSITORY` (
   `Rid` int(11) NOT NULL AUTO_INCREMENT,
+  `data` datetime NOT NULL,
   `tipo` varchar(45) NOT NULL,
   `filename` varchar(45) NOT NULL,
   CONSTRAINT localkey UNIQUE (`tipo`,`filename`),

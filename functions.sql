@@ -37,9 +37,14 @@ END;
 $$
 
 CREATE FUNCTION `dmy2Ymd`(in_data VARCHAR(45))
-RETURNS DATE
+RETURNS VARCHAR(45)
 BEGIN
-RETURN (SELECT DATE_FORMAT(DATE_FORMAT(in_data,'%d-%m-%y'),'%Y-%m-%d'));
+DECLARE outdate VARCHAR(45);
+SET outdate = (SELECT STR_TO_DATE(in_data,'%d-%m-%y'));
+IF (outdate IS NULL) THEN
+SET outdate = in_data;
+END IF;
+RETURN outdate;
 END;
 $$
 

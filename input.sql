@@ -9,7 +9,7 @@ IN in_filename VARCHAR(45)
 )
 BEGIN
 IF NOT (SELECT test_repo(in_tipo,in_filename)) THEN
-	INSERT INTO REPOSITORY(tipo,filename) VALUES(in_tipo,in_filename);
+	INSERT INTO REPOSITORY(data,tipo,filename) VALUES((SELECT NOW()),in_tipo,in_filename);
 END IF;
 END;
 $$
@@ -17,14 +17,14 @@ $$
 
 CREATE PROCEDURE `input_winwatch`(
 IN in_centrale VARCHAR(45),
-IN in_ora TIME,
-IN in_data DATE,
+IN in_ora VARCHAR(45),
+IN in_data VARCHAR(45),
 IN in_azione VARCHAR(45),
 IN in_messaggio VARCHAR(100)
 )
 BEGIN
 
-DECLARE my_data DATE;
+DECLARE my_data VARCHAR(45);
 DECLARE my_id_azione INT;
 DECLARE my_id_messaggio INT;
 

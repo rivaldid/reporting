@@ -16,49 +16,66 @@ sudo mount $REPORT
 for file in $(find $REPORT -name "*.csv" -type f); do
 
 	INPUT=$file	
-	#TEMP=$PREFIX/"${INPUT##*/}".temp.csv
-	TEMP=$PREFIX/temp.csv
-	
-	echo $INPUT >> $LOG
-	echo $TEMP >> $LOG
 	filename="${INPUT##*/}"
+	TEMP=$PREFIX/$filename.temp.csv
 	
-	testvar=$(mysql $MYARGS -se "SELECT test_repo('winwatch','$filename');")
-	echo $testvar >> $LOG
-
-	iconv -f "windows-1252" -t "UTF-8" $INPUT -o $TEMP
-
-	while read line; do
-		while IFS=';' read -ra field; do
-			
-			centrale="${field[0]}"
-			ora="${field[1]}"
-			data="${field[2]}"
-			azione="${field[3]}"
-			messaggio="${field[4]}"
-			
-			# extra whitespaces
-			centrale=($centrale)
-			ora=($ora)
-			data=($data)
-			azione=($azione)
-			messaggio=($messaggio)
-			
-			# cr
-			centrale=$(echo $centrale|tr -d '\n')
-			ora=$(echo $ora|tr -d '\n')
-			data=$(echo $data|tr -d '\n')
-			azione=$(echo $azione|tr -d '\n')
-			messaggio=$(echo $messaggio|tr -d '\n')
-			
-		done <<< $line
+	#echo $INPUT >> $LOG
+	#echo $TEMP >> $LOG
+	
+	report_done=$(mysql $MYARGS -se "SELECT test_repo('winwatch','$filename');")
+	#echo $report_done >> $LOG
+	
+	if [[ $report_done ]]; then
 		
-		mycall="CALL input_winwatch('${centrale[@]}','${ora[@]}','${data[@]}','${azione[@]}','${messaggio[@]}')"
-		echo $mycall >> $LOG
-		#mysql $MYARGS -e "$mycall \W;" >> $LOG
-	done < $TEMP
+		echo "--> OK $INPUT da aggiungere" >> $LOG
+		echo "--> $TEMP in corso..." >> $LOG
+		
+		echo -n "Working $filename..."
 
-	rm $TEMP
+		iconv -f "windows-1252" -t "UTF-8" $INPUT -o $TEMP
+
+		while read line; do
+		
+			while IFS=';' read -ra field; do
+				
+				centrale="${field[0]}"
+				ora="${field[1]}"
+				data="${field[2]}"
+				azione="${field[3]}"
+				messaggio="${field[4]}"
+				
+				if [ -z "${field[0]}" ];then centrale=NULL; fi
+				if [ -z "${field[1]}" ];then ora=NULL; fi
+				if [ -z "${field[2]}" ];then data=NULL; fi
+				if [ -z "${field[3]}" ];then azione=NULL; fi
+				if [ -z "${field[4]}" ];then messaggio=NULL; fi
+				
+				printf -v centrale $(echo ${centrale[@]} | tr -d '\n')
+				printf -v ora $(echo ${ora[@]} | tr -d '\n')
+				printf -v data $(echo ${data[@]} | tr -d '\n')
+				printf -v azione $(echo ${azione[@]} | tr -d '\n')
+				printf -v messaggio $(echo ${messaggio[@]} | tr -d '\n')
+						
+			done <<< $line
+			
+			mycall="CALL input_winwatch('$centrale','$ora','$data','$azione','$messaggio')"
+			echo $mycall >> $LOG
+			mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
+			
+		done < $TEMP
+		
+		# cleanup
+		mycall="CALL input_repo('winwatch','$filename')"
+		mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
+		rm $TEMP
+		
+		echo "ok!"
+	
+	else 
+		
+		echo "--> NO $INPUT aggiunto" >> $LOG
+			
+	fi
 
 done
 
