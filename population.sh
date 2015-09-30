@@ -11,18 +11,17 @@ touch $LOG
 
 sudo mount $REPORT
 
-#INPUT="test.csv"
-
 for file in $(find $REPORT -name "*.csv" -type f); do
 
 	INPUT=$file	
 	filename="${INPUT##*/}"
+	filereferer="${INPUT#/mnt/REPORT/WinWatch}"
 	TEMP=$PREFIX/$filename.temp.csv
 	
 	#echo $INPUT >> $LOG
 	#echo $TEMP >> $LOG
 	
-	report_done=$(mysql $MYARGS -se "SELECT test_repo('winwatch','$filename');")
+	report_done=$(mysql $MYARGS -se "SELECT test_repo('winwatch','$filereferer');")
 	#echo $report_done >> $LOG
 	
 	if [[ $report_done ]]; then
@@ -30,7 +29,7 @@ for file in $(find $REPORT -name "*.csv" -type f); do
 		echo "--> OK $INPUT da aggiungere" >> $LOG
 		echo "--> $TEMP in corso..." >> $LOG
 		
-		echo -n "Working $filename..."
+		echo -n "Working $filereferer..."
 
 		iconv -f "windows-1252" -t "UTF-8" $INPUT -o $TEMP
 
@@ -65,7 +64,7 @@ for file in $(find $REPORT -name "*.csv" -type f); do
 		done < $TEMP
 		
 		# cleanup
-		mycall="CALL input_repo('winwatch','$filename')"
+		mycall="CALL input_repo('winwatch','$filereferer')"
 		mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
 		rm $TEMP
 		
