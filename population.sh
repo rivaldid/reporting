@@ -21,10 +21,10 @@ for file in $(find $REPORT -name "*.csv" -type f); do
 	#echo $INPUT >> $LOG
 	#echo $TEMP >> $LOG
 	
-	report_done=$(mysql $MYARGS -se "SELECT test_repo('winwatch','$filereferer');")
+	report_done=$(mysql -ureporting -preportuser -D reporting -s -N -e "SELECT test_repo('winwatch','$filereferer');")
 	#echo $report_done >> $LOG
 	
-	if [[ $report_done ]]; then
+	if [ "$report_done" = true ]; then
 		
 		echo "--> OK $INPUT da aggiungere" >> $LOG
 		echo "--> $TEMP in corso..." >> $LOG
