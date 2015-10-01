@@ -48,12 +48,21 @@ for file in $(find $REPORT -name "*.csv" -type f); do
 				if [ -z "${field[2]}" ];then data=NULL; fi
 				if [ -z "${field[3]}" ];then azione=NULL; fi
 				if [ -z "${field[4]}" ];then messaggio=NULL; fi
-				
+								
 				printf -v centrale $(echo ${centrale[@]} | tr -d '\n')
 				printf -v ora $(echo ${ora[@]} | tr -d '\n')
 				printf -v data $(echo ${data[@]} | tr -d '\n')
 				printf -v azione $(echo ${azione[@]} | tr -d '\n')
 				printf -v messaggio $(echo ${messaggio[@]} | tr -d '\n')
+				
+				# fix random wrong position
+				if [ "${centrale:2:1}" == ":" ] && [ "${ora:2:1}" == "-" ]; then
+					printf -v tmp "$data $azione"
+					printf -v azione $tmp
+					printf -v data $ora
+					printf -v ora $centrale
+					printf -v centrale NULL
+				fi
 						
 			done <<< $line
 			

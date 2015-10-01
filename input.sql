@@ -24,12 +24,12 @@ IN in_messaggio VARCHAR(100)
 )
 BEGIN
 
-DECLARE my_data VARCHAR(45);
+DECLARE my_data datetime;
 DECLARE my_id_azione INT;
 DECLARE my_id_messaggio INT;
 
 -- data
-SET my_data = (SELECT dmy2Ymd(in_data));
+SET my_data = (SELECT STR_TO_DATE(CONCAT(in_data,' ',in_ora),'%d-%m-%y %h:%i'));
 
 -- azione
 IF NOT (SELECT test_azione(in_azione)) THEN
@@ -48,8 +48,8 @@ ELSE
 END IF;
 
 -- report
-INSERT INTO WIN_REPORT(Centrale,Ora,Data,id_azione,id_messaggio)
-VALUES(in_centrale,in_ora,my_data,my_id_azione,my_id_messaggio);
+INSERT INTO WIN_REPORT(Centrale,Data,id_azione,id_messaggio)
+VALUES(in_centrale,my_data,my_id_azione,my_id_messaggio);
 
 END;
 $$

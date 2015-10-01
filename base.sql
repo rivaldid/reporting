@@ -24,12 +24,11 @@ DROP TABLE IF EXISTS `WIN_REPORT`;
 CREATE TABLE `WIN_REPORT` (
   `Wid` int(11) NOT NULL AUTO_INCREMENT,
   `Centrale` varchar(45) DEFAULT NULL,
-  `Ora` varchar(45) DEFAULT NULL,
-  `Data` varchar(45) DEFAULT NULL,
+  `Data` datetime DEFAULT NULL,
   `id_azione` int(11) DEFAULT NULL,
   `id_messaggio` int(11) DEFAULT NULL,
   CONSTRAINT localkey UNIQUE 
-  (`Centrale`,`Ora`,`Data`,`id_azione`,`id_messaggio`),
+  (`Centrale`,`Data`,`id_azione`,`id_messaggio`),
   PRIMARY KEY (`Wid`),
   CONSTRAINT FOREIGN KEY (`id_azione`) 
 	REFERENCES WIN_AZIONI(`id_azione`) 

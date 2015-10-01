@@ -36,6 +36,16 @@ RETURN (SELECT id_messaggio FROM WIN_MESSAGGI WHERE messaggio=in_messaggio);
 END;
 $$
 
+
+CREATE FUNCTION `test_repo`(in_tipo VARCHAR(45),in_filename VARCHAR(45))
+RETURNS TINYINT(1)
+BEGIN
+RETURN (SELECT EXISTS(SELECT 1 FROM REPOSITORY WHERE tipo=in_tipo AND filename=in_filename));
+END;
+$$
+
+
+
 CREATE FUNCTION `dmy2Ymd`(in_data VARCHAR(45))
 RETURNS VARCHAR(45)
 BEGIN
@@ -48,12 +58,5 @@ RETURN outdate;
 END;
 $$
 
-
-CREATE FUNCTION `test_repo`(in_tipo VARCHAR(45),in_filename VARCHAR(45))
-RETURNS TINYINT(1)
-BEGIN
-RETURN (SELECT EXISTS(SELECT 1 FROM REPOSITORY WHERE tipo=in_tipo AND filename=in_filename));
-END;
-$$
 
 DELIMITER ;
