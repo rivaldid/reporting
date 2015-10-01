@@ -29,7 +29,7 @@ DECLARE my_id_azione INT;
 DECLARE my_id_messaggio INT;
 
 -- data
-SET my_data = (SELECT STR_TO_DATE(CONCAT(in_data,' ',in_ora),'%d-%m-%y %h:%i'));
+SET my_data = (SELECT STR_TO_DATE(CONCAT(in_data,' ',in_ora),'%d-%m-%y %H:%i'));
 
 -- azione
 IF NOT (SELECT test_azione(in_azione)) THEN
