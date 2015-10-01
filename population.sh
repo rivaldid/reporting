@@ -24,7 +24,7 @@ for file in $(find $REPORT -name "*.csv" -type f); do
 	report_done=$(mysql -ureporting -preportuser -D reporting -s -N -e "SELECT test_repo('winwatch','$filereferer');")
 	#echo $report_done >> $LOG
 	
-	if [ "$report_done" = true ]; then
+	if [ "$report_done" = "0" ]; then
 		
 		echo "--> OK $INPUT da aggiungere" >> $LOG
 		echo "--> $TEMP in corso..." >> $LOG
