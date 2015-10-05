@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 PREFIX="/home/vilardid/reporting"
-LOG=$PREFIX"/db.log"
+LOG=$PREFIX"/make.log"
 MYARGS="-H -ureporting -preportuser -D reporting"
 
 if [ -f $LOG ]; then rm $LOG; fi
