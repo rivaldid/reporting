@@ -2,6 +2,7 @@
 
 PREFIX="/home/vilardid/reporting"
 REPORT="/mnt/REPORT"
+TRASH_PREFIX="/mnt/REPORT/WinWatch"
 
 LOG=$PREFIX"/win_parse.log"
 MYARGS="-H -ureporting -preportuser -D reporting"
@@ -13,16 +14,12 @@ sudo mount $REPORT
 
 for file in $(find $REPORT -name "*.csv" -type f); do
 
-	INPUT=$file	
-	filename="${INPUT##*/}"
-	filereferer="${INPUT#/mnt/REPORT/WinWatch}"
-	TEMP=$PREFIX/$filename.temp.csv
-	
-	#echo $INPUT >> $LOG
-	#echo $TEMP >> $LOG
+	INPUT=$file	# current file from loop
+	filename="${INPUT##*/}" # simple filename.csv
+	filereferer="${INPUT#$TRASH_PREFIX}" # full path without trash prefix
+	TEMP=$PREFIX/$filename.temp.csv # conversion latin to utf (windows to linux)
 	
 	report_done=$(mysql -ureporting -preportuser -D reporting -s -N -e "SELECT test_repo('winwatch','$filereferer');")
-	#echo $report_done >> $LOG
 	
 	if [ "$report_done" = "0" ]; then
 		
