@@ -39,7 +39,9 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 			IFS=''
 			while read -ra line; do
 				
-				echo ${line##UnicodeString}
+				#${foo#*UnicodeString=}
+				foo=$(echo $line | sed "s/\"/ /g" | grep UnicodeString | sed "s/'/ /g" | tr -s ' ' | tr -d '/>')
+				echo ${foo#*UnicodeString=}
 				
 			done < $subfile
 		
