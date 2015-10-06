@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS `WIN_AZIONI`;
 CREATE TABLE `WIN_AZIONI` (
   `id_azione` int(11) NOT NULL AUTO_INCREMENT,
   `azione` varchar(45) NOT NULL,
-  UNIQUE (azione),
+  UNIQUE (`azione`),
   PRIMARY KEY (`id_azione`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -16,7 +16,7 @@ DROP TABLE IF EXISTS `WIN_MESSAGGI`;
 CREATE TABLE `WIN_MESSAGGI` (
   `id_messaggio` int(11) NOT NULL AUTO_INCREMENT,
   `messaggio` varchar(100) NOT NULL,
-  UNIQUE (messaggio),
+  UNIQUE (`messaggio`),
   PRIMARY KEY (`id_messaggio`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -50,20 +50,19 @@ CREATE TABLE `SER_TESSERE` (
   PRIMARY KEY (`id_tessera`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `SER_PERSONE`;
-CREATE TABLE `SER_PERSONE` (
-  `id_persona` int(11) NOT NULL AUTO_INCREMENT,
+DROP TABLE IF EXISTS `SER_OSPITI`;
+CREATE TABLE `SER_OSPITI` (
+  `id_ospite` int(11) NOT NULL AUTO_INCREMENT,
   `nome` varchar(45) NOT NULL,
-  `cognome` varchar(45) NOT NULL,
-  CONSTRAINT nominativo UNIQUE (`nome`,`cognome`),
-  PRIMARY KEY (`id_persona`)
+  UNIQUE (`nome`),
+  PRIMARY KEY (`id_ospite`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `SER_AZIONI`;
 CREATE TABLE `SER_AZIONI` (
   `id_azione` int(11) NOT NULL AUTO_INCREMENT,
   `azione` varchar(45) NOT NULL,
-  UNIQUE (azione),
+  UNIQUE (`azione`),
   PRIMARY KEY (`id_azione`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -71,22 +70,21 @@ DROP TABLE IF EXISTS `SER_MESSAGGI`;
 CREATE TABLE `SER_MESSAGGI` (
   `id_messaggio` int(11) NOT NULL AUTO_INCREMENT,
   `messaggio` varchar(100) NOT NULL,
-  UNIQUE (messaggio),
+  UNIQUE (`messaggio`),
   PRIMARY KEY (`id_messaggio`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `SER_REPORT`;
 CREATE TABLE `SER_REPORT` (
   `Sid` int(11) NOT NULL AUTO_INCREMENT,
-  `Data` date DEFAULT NULL,
-  `Ora` time DEFAULT NULL,
+  `Data` datetime DEFAULT NULL,
   `Centrale` int(11) DEFAULT NULL,
   `id_tessera` int(11) DEFAULT NULL,
   `id_azione` int(11) DEFAULT NULL,
   `id_messaggio` int(11) DEFAULT NULL,
-  `id_persona` int(11) DEFAULT NULL,
+  `id_ospite` int(11) DEFAULT NULL,
   CONSTRAINT localkey UNIQUE 
-  (`Data`,`Ora`,`Centrale`,`id_tessera`,`id_azione`,`id_messaggio`,`id_persona`),
+  (`Data`,`Centrale`,`id_tessera`,`id_azione`,`id_messaggio`,`id_ospite`),
   PRIMARY KEY (`Sid`),
   CONSTRAINT FOREIGN KEY (`id_tessera`) 
 	REFERENCES SER_TESSERE(`id_tessera`) 
@@ -97,8 +95,8 @@ CREATE TABLE `SER_REPORT` (
   CONSTRAINT FOREIGN KEY (`id_messaggio`) 
 	REFERENCES SER_MESSAGGI(`id_messaggio`) 
 	ON DELETE CASCADE,
-  CONSTRAINT FOREIGN KEY (`id_persona`) 
-	REFERENCES SER_PERSONE(`id_persona`) 
+  CONSTRAINT FOREIGN KEY (`id_ospite`) 
+	REFERENCES SER_OSPITI(`id_ospite`) 
 	ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

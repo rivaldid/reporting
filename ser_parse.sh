@@ -39,9 +39,16 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 			IFS=''
 			while read -ra line; do
 				
-				#${foo#*UnicodeString=}
-				foo=$(echo $line | sed "s/\"/ /g" | grep UnicodeString | sed "s/'/ /g" | tr -s ' ' | tr -d '/>')
-				echo ${foo#*UnicodeString=}
+				foo=$(echo "$line" | sed "s/\"/ /g" | grep UnicodeString | sed "s/'/ /g" | tr -s ' ' | tr -d '/>')
+				printf "${foo#*UnicodeString=}"
+				
+				while IFS=' ' read -ra field; do
+				
+				data="${field[0]}"
+				ora="${field[1]}"
+				
+				done <<< "$line"
+				
 				
 			done < $subfile
 		
