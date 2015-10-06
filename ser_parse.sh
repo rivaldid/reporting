@@ -38,15 +38,24 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 			#UnicodeString=
 			while IFS=$'\n' read -ra line; do
 				
-				target=$(echo "$line" | sed "s/\"/ /g" | grep -o "UnicodeString=.*" | sed "s/'/ /g" | tr -s ' ' | tr -d '/>')
+				target=$(echo "$line" | 
+						sed "s/\"/ /g" | 
+						sed "s/'/ /g" | 
+						grep -o "UnicodeString=.*" | 
+						sed -e 's#.*UnicodeString= \(\)#\1#' |
+						tr -s ' ' | 
+						tr -d '/>')
+
 				#target="${target#*UnicodeString=}"
 				
-				echo "$target"
+				if [[ -n "$target" ]]; then
+					echo "$target"
+				fi
 				
 				while IFS=' ' read -ra field; do
 				
-				data="${field[0]}"
-				ora="${field[1]}"
+					data="${field[0]}"
+					ora="${field[1]}"
 				
 				done <<< "$line"
 				
