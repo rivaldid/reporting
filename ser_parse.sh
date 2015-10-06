@@ -36,11 +36,12 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 		
 			#echo $subfile
 			#UnicodeString=
-			IFS=''
-			while read -ra line; do
+			while IFS=$'\n' read -ra line; do
 				
-				foo=$(echo "$line" | sed "s/\"/ /g" | grep UnicodeString | sed "s/'/ /g" | tr -s ' ' | tr -d '/>')
-				printf "${foo#*UnicodeString=}"
+				target=$(echo "$line" | sed "s/\"/ /g" | grep -o "UnicodeString=.*" | sed "s/'/ /g" | tr -s ' ' | tr -d '/>')
+				#target="${target#*UnicodeString=}"
+				
+				echo "$target"
 				
 				while IFS=' ' read -ra field; do
 				
