@@ -3,11 +3,11 @@
 PREFIX="/home/vilardid/reporting"
 
 cd $PREFIX
-echo -n "--> winparse..."
+echo "==> winparse"
 ./win_parse.sh
 if [ $? -eq 0 ]; then
-	echo "ok"
+	echo "--> winparse done"
 else
-	echo "fail"
+	echo "--> winparse fail"
 fi
 

@@ -46,11 +46,11 @@ for file in $(find $REPORT -name "*.csv" -type f); do
 				if [ -z "${field[3]}" ];then azione=NULL; fi
 				if [ -z "${field[4]}" ];then messaggio=NULL; fi
 								
-				centrale="$(echo $centrale | tr -d '\n' | sed "s/'/ /g" | tr -s ' ')"
-				ora="$(echo $ora | tr -d '\n' | sed "s/'/ /g" | tr -s ' ')"
-				data="$(echo $data | tr -d '\n' | sed "s/'/ /g" | tr -s ' ')"
-				azione="$(echo $azione | tr -d '\n' | sed "s/'/ /g" | tr -s ' ')"
-				messaggio="$(echo $messaggio | tr -d '\n' | sed "s/'/ /g" | tr -s ' ')"
+				centrale="$(echo "$centrale" | tr -d '\n' | sed "s/'/ /g" | tr -s ' ')"
+				ora="$(echo "$ora" | tr -d '\n' | sed "s/'/ /g" | tr -s ' ')"
+				data="$(echo "$data" | tr -d '\n' | sed "s/'/ /g" | tr -s ' ')"
+				azione="$(echo "$azione" | tr -d '\n' | sed "s/'/ /g" | tr -s ' ')"
+				messaggio="$(echo "$messaggio" | tr -d '\n' | sed "s/'/ /g" | tr -s ' ')"
 				
 				# fix random wrong position
 				if [ "${centrale:2:1}" == ":" ] && [ "${ora:2:1}" == "-" ]; then
