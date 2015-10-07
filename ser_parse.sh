@@ -36,12 +36,19 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 		
 			while IFS=$'\n' read -ra line; do
 				
+				# target=(stampa riga | 
+				#		sostituisci " con spazio | 
+				#		sostituisci ' con spazio | 
+				#		cerca e togli UnicodeString= |
+				#		togli /> | 
+				#		togli spazi multipli
+						
 				target=$(echo "$line" | 
 						sed "s/\"/ /g" | 
 						sed "s/'/ /g" | 
-						sed -n -e 's/^.*UnicodeString=//p' |
-						tr -s ' ' | 
-						tr -d '/>')
+						sed -n -e 's/^.*UnicodeString= //p' |
+						sed 's/\/>//g' |
+						tr -s ' ')
 
 				# PARSER CORE
 				if [[ -n "$target" ]]; then

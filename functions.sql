@@ -31,14 +31,14 @@ RETURN (SELECT id_azione FROM WIN_AZIONI WHERE azione=in_azione);
 END;
 $$
 
-CREATE FUNCTION `test_win_messaggio`(in_messaggio VARCHAR(45))
+CREATE FUNCTION `test_win_messaggio`(in_messaggio VARCHAR(100))
 RETURNS TINYINT(1)
 BEGIN
 RETURN (SELECT EXISTS(SELECT 1 FROM WIN_MESSAGGI WHERE messaggio=in_messaggio));
 END;
 $$
 
-CREATE FUNCTION `get_win_messaggio`(in_messaggio VARCHAR(45))
+CREATE FUNCTION `get_win_messaggio`(in_messaggio VARCHAR(100))
 RETURNS INT(11)
 BEGIN
 RETURN (SELECT id_messaggio FROM WIN_MESSAGGI WHERE messaggio=in_messaggio);
@@ -83,14 +83,14 @@ RETURN (SELECT id_azione FROM SER_AZIONI WHERE azione=in_azione);
 END;
 $$
 
-CREATE FUNCTION `test_ser_messaggio`(in_messaggio VARCHAR(45))
+CREATE FUNCTION `test_ser_messaggio`(in_messaggio VARCHAR(100))
 RETURNS TINYINT(1)
 BEGIN
 RETURN (SELECT EXISTS(SELECT 1 FROM SER_MESSAGGI WHERE messaggio=in_messaggio));
 END;
 $$
 
-CREATE FUNCTION `get_ser_messaggio`(in_messaggio VARCHAR(45))
+CREATE FUNCTION `get_ser_messaggio`(in_messaggio VARCHAR(100))
 RETURNS INT(11)
 BEGIN
 RETURN (SELECT id_messaggio FROM SER_MESSAGGI WHERE messaggio=in_messaggio);
