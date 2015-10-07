@@ -53,12 +53,12 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 				# PARSER CORE
 				if [[ -n "$target" ]]; then
 					
-					echo "$target"
+					echo "$target" >> $LOG
 				
 					while IFS=' ' read -ra field; do
 					
-						data="${field[0]}"
-						ora="${field[1]}"
+						#data="${field[0]}"
+						#ora="${field[1]}"
 					
 					done <<< "$target"
 				
