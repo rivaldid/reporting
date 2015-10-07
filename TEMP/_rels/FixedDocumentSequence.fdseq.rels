@@ -1,4 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-<Relationship Target="/Metadata/Job_PT.xml" Id="R0" Type="http://schemas.microsoft.com/xps/2005/06/printticket"/>
-</Relationships>
