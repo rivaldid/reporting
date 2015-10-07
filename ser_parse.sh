@@ -34,30 +34,28 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 		
 		for subfile in $(find $TEMP_DIR -name "*.fpage" -type f); do
 		
-			#echo $subfile
-			#UnicodeString=
 			while IFS=$'\n' read -ra line; do
 				
 				target=$(echo "$line" | 
 						sed "s/\"/ /g" | 
 						sed "s/'/ /g" | 
-						grep -o "UnicodeString=.*" | 
-						sed -e 's#.*UnicodeString= \(\)#\1#' |
+						sed -n -e 's/^.*UnicodeString=//p' |
 						tr -s ' ' | 
 						tr -d '/>')
 
-				#target="${target#*UnicodeString=}"
-				
+				# PARSER CORE
 				if [[ -n "$target" ]]; then
+					
 					echo "$target"
+				
+					while IFS=' ' read -ra field; do
+					
+						data="${field[0]}"
+						ora="${field[1]}"
+					
+					done <<< "$target"
+				
 				fi
-				
-				while IFS=' ' read -ra field; do
-				
-					data="${field[0]}"
-					ora="${field[1]}"
-				
-				done <<< "$line"
 				
 				
 			done < $subfile
@@ -65,6 +63,8 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 		done
 		
 		#cleanup
+		mycall="CALL input_repo('serchio','$filereferer')"
+		mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
 		rm -rf $TEMP_DIR
 		
 		echo "ok!"

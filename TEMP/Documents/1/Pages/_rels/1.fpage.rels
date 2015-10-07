@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Target="/Documents/1/Resources/Fonts/25B6AF52-C128-472C-9FE5-5B0038FA42A9.odttf" Id="R0" Type="http://schemas.microsoft.com/xps/2005/06/required-resource"/>
+<Relationship Target="/Documents/1/Resources/Images/1.PNG" Id="R1" Type="http://schemas.microsoft.com/xps/2005/06/required-resource"/>
+</Relationships>
