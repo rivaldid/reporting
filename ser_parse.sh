@@ -51,14 +51,16 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 						tr -s ' ')
 
 				# PARSER CORE
-				if [[ -n "$target" ]]; then
+				if [[ -n "$target" ]] &&
+					[[ ! "$target" =~ "TELEDATA ** Controllo Accessi **" ]] &&
+					[[ ! "$target" =~ "- Stampa Report da" ]]; then
 					
 					echo "$target" >> $LOG
 				
 					while IFS=' ' read -ra field; do
 					
-						#data="${field[0]}"
-						#ora="${field[1]}"
+						data="${field[0]}"
+						ora="${field[1]}"
 					
 					done <<< "$target"
 				
