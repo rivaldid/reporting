@@ -7,8 +7,8 @@ DROP FUNCTION IF EXISTS `test_repo`;
 
 DROP FUNCTION IF EXISTS `test_ser_tessera`;
 DROP FUNCTION IF EXISTS `get_ser_tessera`;
-DROP FUNCTION IF EXISTS `test_ser_azione`;
-DROP FUNCTION IF EXISTS `get_ser_azione`;
+DROP FUNCTION IF EXISTS `test_ser_evento`;
+DROP FUNCTION IF EXISTS `get_ser_evento`;
 DROP FUNCTION IF EXISTS `test_ser_messaggio`;
 DROP FUNCTION IF EXISTS `get_ser_messaggio`;
 DROP FUNCTION IF EXISTS `test_ser_ospite`;
@@ -69,17 +69,17 @@ RETURN (SELECT id_tessera FROM SER_TESSERE WHERE seriale=in_seriale);
 END;
 $$
 
-CREATE FUNCTION `test_ser_azione`(in_azione VARCHAR(45))
+CREATE FUNCTION `test_ser_evento`(in_evento VARCHAR(45))
 RETURNS TINYINT(1)
 BEGIN
-RETURN (SELECT EXISTS(SELECT 1 FROM SER_AZIONI WHERE azione=in_azione));
+RETURN (SELECT EXISTS(SELECT 1 FROM SER_EVENTI WHERE evento=in_evento));
 END;
 $$
 
-CREATE FUNCTION `get_ser_azione`(in_azione VARCHAR(45))
+CREATE FUNCTION `get_ser_evento`(in_evento VARCHAR(45))
 RETURNS INT(11)
 BEGIN
-RETURN (SELECT id_azione FROM SER_AZIONI WHERE azione=in_azione);
+RETURN (SELECT id_evento FROM SER_EVENTI WHERE evento=in_evento);
 END;
 $$
 
