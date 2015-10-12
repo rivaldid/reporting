@@ -4,12 +4,12 @@ CREATE DATABASE IF NOT EXISTS `reporting`
 	DEFAULT COLLATE utf8_general_ci;
 USE `reporting`;
 
-DROP TABLE IF EXISTS `WIN_AZIONI`;
-CREATE TABLE `WIN_AZIONI` (
-  `id_azione` int(11) NOT NULL AUTO_INCREMENT,
-  `azione` varchar(45) NOT NULL,
-  UNIQUE (`azione`),
-  PRIMARY KEY (`id_azione`)
+DROP TABLE IF EXISTS `WIN_EVENTI`;
+CREATE TABLE `WIN_EVENTI` (
+  `id_evento` int(11) NOT NULL AUTO_INCREMENT,
+  `evento` varchar(45) NOT NULL,
+  UNIQUE (`evento`),
+  PRIMARY KEY (`id_evento`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `WIN_MESSAGGI`;
@@ -25,13 +25,13 @@ CREATE TABLE `WIN_REPORT` (
   `Wid` int(11) NOT NULL AUTO_INCREMENT,
   `Centrale` varchar(45) DEFAULT NULL,
   `Data` datetime DEFAULT NULL,
-  `id_azione` int(11) DEFAULT NULL,
+  `id_evento` int(11) DEFAULT NULL,
   `id_messaggio` int(11) DEFAULT NULL,
   CONSTRAINT localkey UNIQUE 
-  (`Centrale`,`Data`,`id_azione`,`id_messaggio`),
+  (`Centrale`,`Data`,`id_evento`,`id_messaggio`),
   PRIMARY KEY (`Wid`),
-  CONSTRAINT FOREIGN KEY (`id_azione`) 
-	REFERENCES WIN_AZIONI(`id_azione`) 
+  CONSTRAINT FOREIGN KEY (`id_evento`) 
+	REFERENCES WIN_EVENTI(`id_evento`) 
 	ON DELETE CASCADE,
   CONSTRAINT FOREIGN KEY (`id_messaggio`) 
 	REFERENCES WIN_MESSAGGI(`id_messaggio`) 
@@ -69,8 +69,8 @@ CREATE TABLE `SER_AZIONI` (
 DROP TABLE IF EXISTS `SER_MESSAGGI`;
 CREATE TABLE `SER_MESSAGGI` (
   `id_messaggio` int(11) NOT NULL AUTO_INCREMENT,
-  `varco` varchar(45) NOT NULL,
-  `direzione` varchar(45) NOT NULL,
+  `varco` varchar(45) DEFAULT NULL,
+  `direzione` varchar(45) DEFAULT NULL,
   CONSTRAINT localkey UNIQUE (`varco`,`direzione`),
   PRIMARY KEY (`id_messaggio`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

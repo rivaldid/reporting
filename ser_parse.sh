@@ -57,12 +57,12 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					
 					echo "$target" >> $LOG
 				
-					while IFS=' ' read -ra field; do
+				#	while IFS=' ' read -ra field; do
 					
-						data="${field[0]}"
-						ora="${field[1]}"
+				#		data="${field[0]}"
+				#		ora="${field[1]}"
 					
-					done <<< "$target"
+				#	done <<< "$target"
 				
 				fi
 				

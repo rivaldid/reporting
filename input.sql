@@ -20,24 +20,24 @@ CREATE PROCEDURE `input_winwatch`(
 IN in_centrale VARCHAR(45),
 IN in_ora VARCHAR(45),
 IN in_data VARCHAR(45),
-IN in_azione VARCHAR(45),
+IN in_evento VARCHAR(45),
 IN in_messaggio VARCHAR(100)
 )
 BEGIN
 
 DECLARE my_data datetime;
-DECLARE my_id_azione INT;
+DECLARE my_id_evento INT;
 DECLARE my_id_messaggio INT;
 
 -- data
 SET my_data = (SELECT STR_TO_DATE(CONCAT(in_data,' ',in_ora),'%d-%m-%y %H:%i'));
 
 -- azione
-IF NOT (SELECT test_win_azione(in_azione)) THEN
-	INSERT INTO WIN_AZIONI(azione) VALUES(in_azione);
-	SET my_id_azione = LAST_INSERT_ID();
+IF NOT (SELECT test_win_evento(in_evento)) THEN
+	INSERT INTO WIN_EVENTI(evento) VALUES(in_evento);
+	SET my_id_evento = LAST_INSERT_ID();
 ELSE
-	SET my_id_azione = (SELECT get_win_azione(in_azione));
+	SET my_id_evento = (SELECT get_win_evento(in_evento));
 END IF;
 
 -- messaggio
@@ -49,8 +49,8 @@ ELSE
 END IF;
 
 -- report
-INSERT INTO WIN_REPORT(Centrale,Data,id_azione,id_messaggio)
-VALUES(in_centrale,my_data,my_id_azione,my_id_messaggio);
+INSERT INTO WIN_REPORT(Centrale,Data,id_evento,id_messaggio)
+VALUES(in_centrale,my_data,my_id_evento,my_id_messaggio);
 
 END;
 $$

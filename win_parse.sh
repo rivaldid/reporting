@@ -37,25 +37,25 @@ for file in $(find $REPORT -name "*.csv" -type f); do
 				centrale="${field[0]}"
 				ora="${field[1]}"
 				data="${field[2]}"
-				azione="${field[3]}"
+				evento="${field[3]}"
 				messaggio="${field[4]}"
 
 				if [ -z "${field[0]}" ];then centrale=NULL; fi
 				if [ -z "${field[1]}" ];then ora=NULL; fi
 				if [ -z "${field[2]}" ];then data=NULL; fi
-				if [ -z "${field[3]}" ];then azione=NULL; fi
+				if [ -z "${field[3]}" ];then evento=NULL; fi
 				if [ -z "${field[4]}" ];then messaggio=NULL; fi
 
-				centrale="$(echo "$centrale" | tr -d '\n' | sed "s/'/ /g" | tr -s ' ')"
-				ora="$(echo "$ora" | tr -d '\n' | sed "s/'/ /g" | tr -s ' ')"
-				data="$(echo "$data" | tr -d '\n' | sed "s/'/ /g" | tr -s ' ')"
-				azione="$(echo "$azione" | tr -d '\n' | sed "s/'/ /g" | tr -s ' ')"
-				messaggio="$(echo "$messaggio" | tr -d '\n' | sed "s/'/ /g" | tr -s ' ')"
+				centrale="$(echo "$centrale" | tr -d '\n' | sed "s/'/ /g" | sed -e 's/^ *//g;s/ *$//g' |tr -s ' ')"
+				ora="$(echo "$ora" | tr -d '\n' | sed "s/'/ /g" | sed -e 's/^ *//g;s/ *$//g' | tr -s ' ')"
+				data="$(echo "$data" | tr -d '\n' | sed "s/'/ /g" | sed -e 's/^ *//g;s/ *$//g' | tr -s ' ')"
+				evento="$(echo "$evento" | tr -d '\n' | sed "s/'/ /g" | sed -e 's/^ *//g;s/ *$//g' | tr -s ' ')"
+				messaggio="$(echo "$messaggio" | tr -d '\n' | sed "s/'/ /g" |sed -e 's/^ *//g;s/ *$//g' | tr -s ' ')"
 
 				# fix random wrong position
 				if [ "${centrale:2:1}" == ":" ] && [ "${ora:2:1}" == "-" ]; then
-					printf -v tmp "$data $azione"
-					printf -v azione "$tmp"
+					printf -v tmp "$data $evento"
+					printf -v evento "$tmp"
 					printf -v data "$ora"
 					printf -v ora "$centrale"
 					printf -v centrale NULL
@@ -63,7 +63,7 @@ for file in $(find $REPORT -name "*.csv" -type f); do
 
 			done <<< $line
 
-			mycall="CALL input_winwatch('$centrale','$ora','$data','$azione','$messaggio')"
+			mycall="CALL input_winwatch('$centrale','$ora','$data','$evento','$messaggio')"
 			echo $mycall >> $LOG
 			mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
 

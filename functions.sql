@@ -1,5 +1,5 @@
-DROP FUNCTION IF EXISTS `test_win_azione`;
-DROP FUNCTION IF EXISTS `get_win_azione`;
+DROP FUNCTION IF EXISTS `test_win_evento`;
+DROP FUNCTION IF EXISTS `get_win_evento`;
 DROP FUNCTION IF EXISTS `test_win_messaggio`;
 DROP FUNCTION IF EXISTS `get_win_messaggio`;
 
@@ -17,17 +17,17 @@ DROP FUNCTION IF EXISTS `get_ser_ospite`;
 
 DELIMITER $$
 
-CREATE FUNCTION `test_win_azione`(in_azione VARCHAR(45))
+CREATE FUNCTION `test_win_evento`(in_evento VARCHAR(45))
 RETURNS TINYINT(1)
 BEGIN
-RETURN (SELECT EXISTS(SELECT 1 FROM WIN_AZIONI WHERE azione=in_azione));
+RETURN (SELECT EXISTS(SELECT 1 FROM WIN_EVENTI WHERE evento=in_evento));
 END;
 $$
 
-CREATE FUNCTION `get_win_azione`(in_azione VARCHAR(45))
+CREATE FUNCTION `get_win_evento`(in_evento VARCHAR(45))
 RETURNS INT(11)
 BEGIN
-RETURN (SELECT id_azione FROM WIN_AZIONI WHERE azione=in_azione);
+RETURN (SELECT id_evento FROM WIN_EVENTI WHERE evento=in_evento);
 END;
 $$
 
