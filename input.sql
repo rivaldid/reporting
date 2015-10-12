@@ -62,7 +62,8 @@ IN in_ora VARCHAR(45),
 IN in_centrale VARCHAR(45),
 IN in_seriale VARCHAR(45),
 IN in_azione VARCHAR(45),
-IN in_messaggio VARCHAR(100),
+IN in_varco VARCHAR(45),
+IN in_direzione VARCHAR(45),
 IN in_ospite VARCHAR(45)
 )
 BEGIN
@@ -93,11 +94,11 @@ ELSE
 END IF;
 
 -- messaggio
-IF NOT (SELECT test_ser_messaggio(in_messaggio)) THEN
-	INSERT INTO SER_MESSAGGI(messaggio) VALUES(in_messaggio);
+IF NOT (SELECT test_ser_messaggio(in_varco,in_direzione)) THEN
+	INSERT INTO SER_MESSAGGI(varco,direzione) VALUES(in_varco,in_direzione);
 	SET my_id_messaggio = LAST_INSERT_ID();
 ELSE
-	SET my_id_messaggio = (SELECT get_ser_messaggio(in_messaggio));
+	SET my_id_messaggio = (SELECT get_ser_messaggio(in_varco,in_direzione));
 END IF;
 
 -- ospite

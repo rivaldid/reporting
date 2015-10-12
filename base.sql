@@ -69,8 +69,9 @@ CREATE TABLE `SER_AZIONI` (
 DROP TABLE IF EXISTS `SER_MESSAGGI`;
 CREATE TABLE `SER_MESSAGGI` (
   `id_messaggio` int(11) NOT NULL AUTO_INCREMENT,
-  `messaggio` varchar(100) NOT NULL,
-  UNIQUE (`messaggio`),
+  `varco` varchar(45) NOT NULL,
+  `direzione` varchar(45) NOT NULL,
+  CONSTRAINT localkey UNIQUE (`varco`,`direzione`),
   PRIMARY KEY (`id_messaggio`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

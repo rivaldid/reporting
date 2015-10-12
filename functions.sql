@@ -83,17 +83,17 @@ RETURN (SELECT id_azione FROM SER_AZIONI WHERE azione=in_azione);
 END;
 $$
 
-CREATE FUNCTION `test_ser_messaggio`(in_messaggio VARCHAR(100))
+CREATE FUNCTION `test_ser_messaggio`(in_varco VARCHAR(45), in_direzione VARCHAR(45))
 RETURNS TINYINT(1)
 BEGIN
-RETURN (SELECT EXISTS(SELECT 1 FROM SER_MESSAGGI WHERE messaggio=in_messaggio));
+RETURN (SELECT EXISTS(SELECT 1 FROM SER_MESSAGGI WHERE varco=in_varco AND direzione=in_direzione));
 END;
 $$
 
-CREATE FUNCTION `get_ser_messaggio`(in_messaggio VARCHAR(100))
+CREATE FUNCTION `get_ser_messaggio`(in_varco VARCHAR(45), in_direzione VARCHAR(45))
 RETURNS INT(11)
 BEGIN
-RETURN (SELECT id_messaggio FROM SER_MESSAGGI WHERE messaggio=in_messaggio);
+RETURN (SELECT id_messaggio FROM SER_MESSAGGI WHERE varco=in_varco AND direzione=in_direzione);
 END;
 $$
 
