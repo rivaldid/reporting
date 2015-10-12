@@ -21,7 +21,8 @@ IN in_centrale VARCHAR(45),
 IN in_ora VARCHAR(45),
 IN in_data VARCHAR(45),
 IN in_evento VARCHAR(45),
-IN in_messaggio VARCHAR(100)
+IN in_messaggio VARCHAR(100),
+IN in_filename VARCHAR(45)
 )
 BEGIN
 
@@ -49,8 +50,29 @@ ELSE
 END IF;
 
 -- report
-INSERT INTO WIN_REPORT(Centrale,Data,id_evento,id_messaggio)
-VALUES(in_centrale,my_data,my_id_evento,my_id_messaggio);
+IF NOT (SELECT test_win_report(in_centrale,my_data,my_id_evento,my_id_messaggio)) THEN
+	
+	INSERT INTO WIN_REPORT(Centrale,Data,id_evento,id_messaggio,duplicati)
+	VALUES(in_centrale,my_data,my_id_evento,my_id_messaggio,'1');
+	-- ON DUPLICATE KEY UPDATE KEY UPDATE duplicati=duplicati+1;
+	
+-- ELSE
+	
+	-- (SELECT get_win_report(in_centrale,my_data,my_id_evento,my_id_messaggio))
+	
+	-- quindi e duplicato
+	-- filename not exists in repository perche sto inserendo ora
+	-- se esiste una doppia wid,rid in duplicati vedi se rid corrisponde a filename
+	-- (se esiste una doppia wid,rid in duplicati rid non corrisponde non e dupllicato ma ridondanza quindi non gestire)
+	-- se non esiste una doppia wid,rid...
+	-- allora il file sara pure nuovo ma i dati potrebbero essere gia inseriti
+	
+	-- temp_wid = (SELECT get_win_report(in_centrale,my_data,my_id_evento,my_id_messaggio));
+	-- temp_rid = (SELECT Rid FROM WIN_REFERER WHERE Wid=temp_wid);
+	-- rid_referer = ()SELECT Rid FROM REPOSITORY WHERE tipo='winwatch' AND filename=in_filename)
+	-- IF (rid_referer == temp_rid) THEN ...
+		
+END IF;
 
 END;
 $$

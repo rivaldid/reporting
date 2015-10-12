@@ -4,6 +4,18 @@ CREATE DATABASE IF NOT EXISTS `reporting`
 	DEFAULT COLLATE utf8_general_ci;
 USE `reporting`;
 
+
+DROP TABLE IF EXISTS `REPOSITORY`;
+CREATE TABLE `REPOSITORY` (
+  `Rid` int(11) NOT NULL AUTO_INCREMENT,
+  `data` datetime NOT NULL,
+  `tipo` varchar(45) NOT NULL,
+  `filename` varchar(45) NOT NULL,
+  CONSTRAINT localkey UNIQUE (`tipo`,`filename`),
+  PRIMARY KEY (`Rid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 DROP TABLE IF EXISTS `WIN_EVENTI`;
 CREATE TABLE `WIN_EVENTI` (
   `id_evento` int(11) NOT NULL AUTO_INCREMENT,
@@ -27,6 +39,7 @@ CREATE TABLE `WIN_REPORT` (
   `Data` datetime DEFAULT NULL,
   `id_evento` int(11) DEFAULT NULL,
   `id_messaggio` int(11) DEFAULT NULL,
+  `duplicati` int(11) DEFAULT NULL,
   CONSTRAINT localkey UNIQUE 
   (`Centrale`,`Data`,`id_evento`,`id_messaggio`),
   PRIMARY KEY (`Wid`),
@@ -101,14 +114,3 @@ CREATE TABLE `SER_REPORT` (
 	ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
-
-DROP TABLE IF EXISTS `REPOSITORY`;
-CREATE TABLE `REPOSITORY` (
-  `Rid` int(11) NOT NULL AUTO_INCREMENT,
-  `data` datetime NOT NULL,
-  `tipo` varchar(45) NOT NULL,
-  `filename` varchar(45) NOT NULL,
-  CONSTRAINT localkey UNIQUE (`tipo`,`filename`),
-  PRIMARY KEY (`Rid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
