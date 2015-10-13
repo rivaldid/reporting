@@ -39,7 +39,8 @@ CREATE TABLE `WIN_REPORT` (
   `Data` datetime DEFAULT NULL,
   `id_evento` int(11) DEFAULT NULL,
   `id_messaggio` int(11) DEFAULT NULL,
-  `duplicati` int(11) DEFAULT NULL,
+  `Rid` int(11) DEFAULT NULL,
+  `contatore` int(11) DEFAULT NULL,
   CONSTRAINT localkey UNIQUE 
   (`Centrale`,`Data`,`id_evento`,`id_messaggio`),
   PRIMARY KEY (`Wid`),
@@ -50,6 +51,15 @@ CREATE TABLE `WIN_REPORT` (
 	REFERENCES WIN_MESSAGGI(`id_messaggio`) 
 	ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- DROP TABLE IF EXISTS `WIN_DUPLICATI`;
+-- CREATE TABLE `WIN_DUPLICATI` (
+--   `Wid` int(11) NOT NULL,
+--   `Rid` int(11) NOT NULL,
+--   `contatore` int(11) NOT NULL,
+--   PRIMARY KEY (`Wid`,`Rid`)
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 
 

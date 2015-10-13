@@ -4,16 +4,16 @@ DROP PROCEDURE IF EXISTS `input_serchio`;
 DELIMITER $$
 
 
-CREATE PROCEDURE `input_repo`(
-IN in_tipo VARCHAR(45),
-IN in_filename VARCHAR(45)
-)
-BEGIN
-IF NOT (SELECT test_repo(in_tipo,in_filename)) THEN
-	INSERT INTO REPOSITORY(data,tipo,filename) VALUES((SELECT NOW()),in_tipo,in_filename);
-END IF;
-END;
-$$
+-- CREATE PROCEDURE `input_repo`(
+-- IN in_tipo VARCHAR(45),
+-- IN in_filename VARCHAR(45)
+-- )
+-- BEGIN
+-- IF NOT (SELECT test_repo(in_tipo,in_filename)) THEN
+-- 	INSERT INTO REPOSITORY(data,tipo,filename) VALUES((SELECT NOW()),in_tipo,in_filename);
+-- END IF;
+-- END;
+-- $$
 
 
 CREATE PROCEDURE `input_winwatch`(
@@ -30,48 +30,45 @@ DECLARE my_data datetime;
 DECLARE my_id_evento INT;
 DECLARE my_id_messaggio INT;
 
+DECLARE my_rid INT;
+DECLARE stored_wid INT;
+DECLARE stored_rid INT;
+
+-- referer
+SET @my_rid = (SELECT input_repo('winwatch',in_filename));
+
 -- data
-SET my_data = (SELECT STR_TO_DATE(CONCAT(in_data,' ',in_ora),'%d-%m-%y %H:%i'));
+SET @my_data = (SELECT STR_TO_DATE(CONCAT(in_data,' ',in_ora),'%d-%m-%y %H:%i'));
 
 -- evento
 IF NOT (SELECT test_win_evento(in_evento)) THEN
 	INSERT INTO WIN_EVENTI(evento) VALUES(in_evento);
-	SET my_id_evento = LAST_INSERT_ID();
+	SET @my_id_evento = LAST_INSERT_ID();
 ELSE
-	SET my_id_evento = (SELECT get_win_evento(in_evento));
+	SET @my_id_evento = (SELECT get_win_evento(in_evento));
 END IF;
 
 -- messaggio
 IF NOT (SELECT test_win_messaggio(in_messaggio)) THEN
 	INSERT INTO WIN_MESSAGGI(messaggio) VALUES(in_messaggio);
-	SET my_id_messaggio = LAST_INSERT_ID();
+	SET @my_id_messaggio = LAST_INSERT_ID();
 ELSE
-	SET my_id_messaggio = (SELECT get_win_messaggio(in_messaggio));
+	SET @my_id_messaggio = (SELECT get_win_messaggio(in_messaggio));
 END IF;
 
 -- report
-IF NOT (SELECT test_win_report(in_centrale,my_data,my_id_evento,my_id_messaggio)) THEN
+IF NOT (SELECT test_win_report(in_centrale,@my_data,@my_id_evento,@my_id_messaggio)) THEN
 	
-	INSERT INTO WIN_REPORT(Centrale,Data,id_evento,id_messaggio,duplicati)
-	VALUES(in_centrale,my_data,my_id_evento,my_id_messaggio,'1');
-	-- ON DUPLICATE KEY UPDATE KEY UPDATE duplicati=duplicati+1;
+	INSERT INTO WIN_REPORT(Centrale,Data,id_evento,id_messaggio,Rid,contatore)
+	VALUES(in_centrale,@my_data,@my_id_evento,@my_id_messaggio,@my_rid,'1');
 	
--- ELSE
+ELSE
 	
-	-- (SELECT get_win_report(in_centrale,my_data,my_id_evento,my_id_messaggio))
+	SET @stored_wid = (SELECT get_win_report(in_centrale,@my_data,@my_id_evento,@my_id_messaggio));
+	SET @stored_rid = (SELECT get_win_rid_duplicati(@stored_wid));
 	
-	-- quindi e duplicato
-	-- filename not exists in repository perche sto inserendo ora
-	-- se esiste una doppia wid,rid in duplicati vedi se rid corrisponde a filename
-	-- (se esiste una doppia wid,rid in duplicati rid non corrisponde non e dupllicato ma ridondanza quindi non gestire)
-	-- se non esiste una doppia wid,rid...
-	-- allora il file sara pure nuovo ma i dati potrebbero essere gia inseriti
-	
-	-- temp_wid = (SELECT get_win_report(in_centrale,my_data,my_id_evento,my_id_messaggio));
-	-- temp_rid = (SELECT Rid FROM WIN_REFERER WHERE Wid=temp_wid);
-	-- rid_referer = ()SELECT Rid FROM REPOSITORY WHERE tipo='winwatch' AND filename=in_filename)
-	-- IF (rid_referer == temp_rid) THEN ...
-		
+	UPDATE WIN_REPORT SET contatore=contatore+1 WHERE Wid=@stored_wid AND @my_rid=@stored_rid;
+			
 END IF;
 
 END;

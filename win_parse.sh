@@ -70,8 +70,8 @@ for file in $(find $REPORT -name "*.csv" -type f); do
 		done < $TEMP
 
 		# cleanup
-		mycall="CALL input_repo('winwatch','$filereferer');"
-		mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
+		#mycall="CALL input_repo('winwatch','$filereferer');"
+		#mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
 		rm $TEMP
 
 		echo "ok!"

@@ -1,5 +1,6 @@
 DROP FUNCTION IF EXISTS `test_repo`;
 DROP FUNCTION IF EXISTS `get_repo`;
+DROP FUNCTION IF EXISTS `input_repo`;
 
 DROP FUNCTION IF EXISTS `test_win_evento`;
 DROP FUNCTION IF EXISTS `get_win_evento`;
@@ -7,6 +8,8 @@ DROP FUNCTION IF EXISTS `test_win_messaggio`;
 DROP FUNCTION IF EXISTS `get_win_messaggio`;
 DROP FUNCTION IF EXISTS `test_win_report`;
 DROP FUNCTION IF EXISTS `get_win_report`;
+DROP FUNCTION IF EXISTS `test_win_duplicati`;
+DROP FUNCTION IF EXISTS `get_win_rid_duplicati`;
 
 DROP FUNCTION IF EXISTS `test_ser_tessera`;
 DROP FUNCTION IF EXISTS `get_ser_tessera`;
@@ -33,6 +36,20 @@ CREATE FUNCTION `get_repo`(in_tipo VARCHAR(45),in_filename VARCHAR(45))
 RETURNS INT(11)
 BEGIN
 RETURN (SELECT Rid FROM REPOSITORY WHERE tipo=in_tipo AND filename=in_filename);
+END;
+$$
+
+CREATE FUNCTION `input_repo`(in_tipo VARCHAR(45),in_filename VARCHAR(45))
+RETURNS INT(11)
+BEGIN
+DECLARE temp_output INT(11);
+IF NOT (SELECT test_repo(in_tipo,in_filename)) THEN
+	INSERT INTO REPOSITORY(data,tipo,filename) VALUES((SELECT NOW()),in_tipo,in_filename);
+	SET temp_output = LAST_INSERT_ID();
+ELSE
+	SET temp_output = (SELECT get_repo(in_tipo,in_filename));
+END IF;
+RETURN temp_output;
 END;
 $$
 
@@ -93,17 +110,17 @@ Centrale=in_centrale AND Data=in_data AND id_evento=in_id_evento AND id_messaggi
 END;
 $$
 
-CREATE FUNCTION `test_win_rduplicati`(in_wid INT(11))
+CREATE FUNCTION `test_win_duplicati`(in_wid INT(11))
 RETURNS TINYINT(1)
 BEGIN
-RETURN (SELECT EXISTS(SELECT 1 FROM WIN_DUPLICATI WHERE Wid=in_wid));
+RETURN (SELECT EXISTS(SELECT 1 FROM WIN_REPORT WHERE Wid=in_wid AND contatore>1));
 END;
 $$
 
-CREATE FUNCTION `get_win_rduplicati`(in_wid INT(11))
+CREATE FUNCTION `get_win_rid_duplicati`(in_wid INT(11))
 RETURNS INT(11)
 BEGIN
-RETURN (SELECT Rid FROM WIN_DUPLICATI WHERE Wid=in_wid);
+RETURN (SELECT Rid FROM WIN_REPORT WHERE Wid=in_wid);
 END;
 $$
 
