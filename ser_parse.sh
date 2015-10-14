@@ -57,15 +57,13 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					
 					echo "$target" >> $LOG
 				
-				#	while IFS=' ' read -ra field; do
+					mycall=$(perl ser_parse_core.pl "$target")
 					
-				#		data="${field[0]}"
-				#		ora="${field[1]}"
+					echo "$sql" >> $LOG
 					
-				#	done <<< "$target"
+					mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
 				
 				fi
-				
 				
 			done < $subfile
 		

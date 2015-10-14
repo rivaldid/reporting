@@ -4,18 +4,6 @@ DROP PROCEDURE IF EXISTS `input_serchio`;
 DELIMITER $$
 
 
--- CREATE PROCEDURE `input_repo`(
--- IN in_tipo VARCHAR(45),
--- IN in_filename VARCHAR(45)
--- )
--- BEGIN
--- IF NOT (SELECT test_repo(in_tipo,in_filename)) THEN
--- 	INSERT INTO REPOSITORY(data,tipo,filename) VALUES((SELECT NOW()),in_tipo,in_filename);
--- END IF;
--- END;
--- $$
-
-
 CREATE PROCEDURE `input_winwatch`(
 IN in_centrale VARCHAR(45),
 IN in_ora VARCHAR(45),
