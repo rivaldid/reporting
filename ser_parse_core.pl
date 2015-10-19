@@ -72,15 +72,7 @@ sub convdate{
 	return "$3-$2-$1";
 }
 
-open UNMATCHED, ">unmatched.txt" or die("Errore open: " . $!);
-
-#my $PREAMBLE = qr!(?<giorno>$DATA)\s(?<ore>$ORA)\s(?<pulsar>$PULSAR)\s{12}(?<concen>$CONCEN)!;
-
-#while IFS=$'\n' read -ra line; do
-#                …
-#done < $subfile
-
-# call input_serchio('01/10/2015','00:35','001','10936818','Transito effettuato','H(04)','USCITA','VOCALE ENZO');
+open UNMATCHED, ">ser_unmatched.log" or die("Errore open: " . $!);
 
 sub g{
 	my $value = shift;
@@ -97,92 +89,63 @@ my ($giorno,$ore,$pulsar,$tessera,$evento,$varco,$verso,$nominativo,$operatore);
 #while(my $row = <$input>){
 my $row = $ARGV[0];
 
-	# given($row){
-		# when(
-			# $EV_VARNCH || $EV_VARCHI ||
-			# $EV_TRANS ||
-			# $EV_NCONS ||
-			# $EV_VARNAP || $EV_SCASSO || 
-			# $EV_TESIN || $EV_TESSO || $EV_TESOR ||
-			# $EV_TAAB || $EV_ALL  || $EV_LINEA || $EV_TESANON || $EV_MINPULSAR || $EV_FINEPROG || $EV_RICPROG || 
-			# $EV_CADUTA || $EV_CSTATO || $EV_TAMPER
-		# ){
-			# $giorno = $+{giorno} ? "'$+{giorno}'" : 'NULL';
-			# $ore = $+{ore} ? "'$+{ore}'" : 'NULL';
-			# $pulsar = $+{pulsar} ? "'$+{pulsar}'" : 'NULL';
-			# $tessera = $+{tessera} ? "'$+{tessera}'" : 'NULL';
-			# $evento = $+{evento} ? "'$+{evento}'" : 'NULL';
-			# $varco = $+{varco} ? "'$+{varco}'" : 'NULL';
-			# $verso = $+{verso} ? "'$+{verso}'" : 'NULL';
-			# $nominativo = $+{nominativo} ? "'$+{nominativo}'" : 'NULL';
-			# $operatore = $+{operatore} ? "'$+{operatore}'" : 'NULL';
-			
-			# print "call input_serchio($giorno,$ore,$pulsar,$tessera,$evento,$varco,$verso,$nominativo);\n";
-		# }
-		
-		# default{
-			# print UNMATCHED "UNABLE TO PARSE: " . $row;
-		# }
-	# }
-
-
 	if($row =~ $EV_TRANS){
-		print "call input_serchio(${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})});\n";
+		print "${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})}";
 
 	}elsif($row =~ $EV_NCONS ){
 		
-		print "call input_serchio(${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})});\n";
+		print "${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})}";
 		
 	}elsif($row =~ $EV_VARNAP || $row =~ $EV_VARNCH || $row =~ $EV_SCASSO || $row =~ $EV_VARCHI || $row =~ $EV_RIPRL
 		|| $row =~ $EV_ALLING || $row =~ $EV_FINETR || $row =~ $EV_RICCAV || $row =~ $EV_APVARC || $row =~ $EV_CODAP
 		|| $row =~ $EV_TRDIS
 		){
 
-		print "call input_serchio(${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})});\n";
+		print "${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})}";
 		
 	}elsif($row =~ $EV_TESIN || $row =~ $EV_TESSO || $row =~ $EV_TESOR){
 
-		print "call input_serchio(${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})});\n";
+		print "${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})}";
 		
 	}elsif( $row =~ $EV_TAAB ){
 
-		print "call input_serchio(${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{operatore})});\n";
+		print "${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{operatore})}";
 		
 	}elsif( $row =~ $EV_ALL ){
 
-		print "call input_serchio(${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})});\n";
+		print "${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})}";
 		
 	}elsif( $row =~ $EV_TAMPER ){
 
-		print "call input_serchio(${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})});\n";
+		print "${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})}";
 		
 	}elsif( $row =~ $EV_CSTATO ){
 
-		print "call input_serchio(${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})});\n";
+		print "${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})}";
 		
 	}elsif( $row =~ $EV_CADUTA ){
 
-		print "call input_serchio(${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})});\n";
+		print "${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})}";
 		
 	}elsif( $row =~ $EV_RICPROG ){
 
-		print "call input_serchio(${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})});\n";
+		print "${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})}";
 		
 	}elsif( $row =~ $EV_FINEPROG ){
 
-		print "call input_serchio(${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})});\n";
+		print "${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})}";
 		
 	}elsif( $row =~ $EV_MINPULSAR ){
 
-		print "call input_serchio(${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})});\n";
+		print "${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})}";
 		
 	}elsif( $row =~ $EV_TESANON ){
 
-		print "call input_serchio(${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})});\n";
+		print "${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})}";
 		
 	}elsif( $row =~ $EV_LINEA ){
 
-		print "call input_serchio(${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})});\n";
+		print "${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})}";
 		
 	}else{
 		print UNMATCHED $row;

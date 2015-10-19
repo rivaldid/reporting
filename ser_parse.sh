@@ -55,11 +55,11 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					[[ ! "$target" =~ "TELEDATA ** Controllo Accessi **" ]] &&
 					[[ ! "$target" =~ "- Stampa Report da" ]]; then
 					
-					echo "$target" >> $LOG
+					#echo "$target" >> $LOG
 				
-					mycall=$(perl ser_parse_core.pl "$target")
+					mycall="CALL input_serchio($(perl ser_parse_core.pl "$target"),'$filereferer');"
 					
-					echo "$sql" >> $LOG
+					echo "$mycall" >> $LOG
 					
 					mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
 				
