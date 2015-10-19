@@ -9,7 +9,7 @@ DROP FUNCTION IF EXISTS `get_win_messaggio`;
 DROP FUNCTION IF EXISTS `test_win_report`;
 DROP FUNCTION IF EXISTS `get_win_report`;
 DROP FUNCTION IF EXISTS `test_win_duplicati`;
-DROP FUNCTION IF EXISTS `get_win_rid_duplicati`;
+DROP FUNCTION IF EXISTS `get_win_referer`;
 
 DROP FUNCTION IF EXISTS `test_ser_tessera`;
 DROP FUNCTION IF EXISTS `get_ser_tessera`;
@@ -19,6 +19,10 @@ DROP FUNCTION IF EXISTS `test_ser_messaggio`;
 DROP FUNCTION IF EXISTS `get_ser_messaggio`;
 DROP FUNCTION IF EXISTS `test_ser_ospite`;
 DROP FUNCTION IF EXISTS `get_ser_ospite`;
+DROP FUNCTION IF EXISTS `test_ser_report`;
+DROP FUNCTION IF EXISTS `get_ser_report`;
+DROP FUNCTION IF EXISTS `test_ser_duplicati`;
+DROP FUNCTION IF EXISTS `get_ser_referer`;
 
 
 DELIMITER $$
@@ -117,7 +121,7 @@ RETURN (SELECT EXISTS(SELECT 1 FROM WIN_REPORT WHERE Wid=in_wid AND contatore>1)
 END;
 $$
 
-CREATE FUNCTION `get_win_rid_duplicati`(in_wid INT(11))
+CREATE FUNCTION `get_win_referer`(in_wid INT(11))
 RETURNS INT(11)
 BEGIN
 RETURN (SELECT Rid FROM WIN_REPORT WHERE Wid=in_wid);
@@ -184,6 +188,49 @@ RETURN (SELECT id_ospite FROM SER_OSPITI WHERE nome=in_ospite);
 END;
 $$
 
+CREATE FUNCTION `test_ser_report`(
+in_centrale VARCHAR(45),
+in_data datetime,
+in_id_tessera INT,
+in_id_evento INT,
+in_id_messaggio INT,
+in_id_ospite INT
+)
+RETURNS TINYINT(1)
+BEGIN
+RETURN (SELECT EXISTS(SELECT 1 FROM SER_REPORT WHERE 
+Centrale=in_centrale AND Data=in_data AND id_tessera=in_id_tessera AND id_evento=in_id_evento AND id_messaggio=in_id_messaggio AND id_ospite=in_id_ospite));
+END;
+$$
+
+CREATE FUNCTION `get_ser_report`(
+in_centrale VARCHAR(45),
+in_data datetime,
+in_id_tessera INT,
+in_id_evento INT,
+in_id_messaggio INT,
+in_id_ospite INT
+)
+RETURNS INT(11)
+BEGIN
+RETURN (SELECT Sid FROM SER_REPORT WHERE 
+Centrale=in_centrale AND Data=in_data AND id_tessera=in_id_tessera AND id_evento=in_id_evento AND id_messaggio=in_id_messaggio AND id_ospite=in_id_ospite);
+END;
+$$
+
+CREATE FUNCTION `test_ser_duplicati`(in_sid INT(11))
+RETURNS TINYINT(1)
+BEGIN
+RETURN (SELECT EXISTS(SELECT 1 FROM SER_REPORT WHERE Sid=in_sid AND contatore>1));
+END;
+$$
+
+CREATE FUNCTION `get_ser_referer`(in_sid INT(11))
+RETURNS INT(11)
+BEGIN
+RETURN (SELECT Rid FROM SER_REPORT WHERE Sid=in_sid);
+END;
+$$
 
 
 DELIMITER ;

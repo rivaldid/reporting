@@ -26,22 +26,30 @@ DECLARE stored_rid INT;
 SET @my_rid = (SELECT input_repo('winwatch',in_filename));
 
 -- data
-SET @my_data = (SELECT STR_TO_DATE(CONCAT(in_data,' ',in_ora),'%d-%m-%y %H:%i'));
+SET @my_data = (SELECT STR_TO_DATE(CONCAT(in_data,' ',COALESCE(in_ora,'00:00')),'%d-%m-%y %H:%i'));
 
 -- evento
-IF NOT (SELECT test_win_evento(in_evento)) THEN
-	INSERT INTO WIN_EVENTI(evento) VALUES(in_evento);
-	SET @my_id_evento = LAST_INSERT_ID();
+IF (in_evento IS NOT NULL) THEN
+	IF NOT (SELECT test_win_evento(in_evento)) THEN
+		INSERT INTO WIN_EVENTI(evento) VALUES(in_evento);
+		SET @my_id_evento = LAST_INSERT_ID();
+	ELSE
+		SET @my_id_evento = (SELECT get_win_evento(in_evento));
+	END IF;
 ELSE
-	SET @my_id_evento = (SELECT get_win_evento(in_evento));
+	SET @my_id_evento = NULL;
 END IF;
 
 -- messaggio
-IF NOT (SELECT test_win_messaggio(in_messaggio)) THEN
-	INSERT INTO WIN_MESSAGGI(messaggio) VALUES(in_messaggio);
-	SET @my_id_messaggio = LAST_INSERT_ID();
+IF (in_messaggio IS NOT NULL) THEN
+	IF NOT (SELECT test_win_messaggio(in_messaggio)) THEN
+		INSERT INTO WIN_MESSAGGI(messaggio) VALUES(in_messaggio);
+		SET @my_id_messaggio = LAST_INSERT_ID();
+	ELSE
+		SET @my_id_messaggio = (SELECT get_win_messaggio(in_messaggio));
+	END IF;
 ELSE
-	SET @my_id_messaggio = (SELECT get_win_messaggio(in_messaggio));
+	SET @my_id_messaggio = NULL;
 END IF;
 
 -- report
@@ -53,7 +61,7 @@ IF NOT (SELECT test_win_report(in_centrale,@my_data,@my_id_evento,@my_id_messagg
 ELSE
 	
 	SET @stored_wid = (SELECT get_win_report(in_centrale,@my_data,@my_id_evento,@my_id_messaggio));
-	SET @stored_rid = (SELECT get_win_rid_duplicati(@stored_wid));
+	SET @stored_rid = (SELECT get_win_referer(@stored_wid));
 	
 	UPDATE WIN_REPORT SET contatore=contatore+1 WHERE Wid=@stored_wid AND @my_rid=@stored_rid;
 			
@@ -71,7 +79,8 @@ IN in_seriale VARCHAR(45),
 IN in_evento VARCHAR(45),
 IN in_varco VARCHAR(45),
 IN in_direzione VARCHAR(45),
-IN in_ospite VARCHAR(45)
+IN in_ospite VARCHAR(45),
+IN in_filename VARCHAR(45)
 )
 BEGIN
 
@@ -81,45 +90,79 @@ DECLARE my_id_evento INT;
 DECLARE my_id_messaggio INT;
 DECLARE my_id_ospite INT;
 
+DECLARE my_rid INT;
+DECLARE stored_sid INT;
+DECLARE stored_rid INT;
+
+-- referer
+SET @my_rid = (SELECT input_repo('serchio',in_filename));
+
 -- data
-SET my_data = (SELECT STR_TO_DATE(CONCAT(in_data,' ',in_ora),'%d/%m/%Y %H:%i'));
+SET @my_data = (SELECT STR_TO_DATE(CONCAT(in_data,' ',COALESCE(in_ora,'00:00')),'%d/%m/%Y %H:%i'));
 
 -- tessera
-IF NOT (SELECT test_ser_tessera(in_seriale)) THEN
-	INSERT INTO SER_TESSERE(seriale) VALUES(in_seriale);
-	SET my_id_tessera = LAST_INSERT_ID();
+IF (in_seriale IS NOT NULL) THEN
+	IF NOT (SELECT test_ser_tessera(in_seriale)) THEN
+		INSERT INTO SER_TESSERE(seriale) VALUES(in_seriale);
+		SET @my_id_tessera = LAST_INSERT_ID();
+	ELSE
+		SET @my_id_tessera = (SELECT get_ser_tessera(in_seriale));
+	END IF;
 ELSE
-	SET my_id_tessera = (SELECT get_ser_tessera(in_seriale));
+	SET @my_id_tessera = NULL;
 END IF;
+	
 
 -- evento
-IF NOT (SELECT test_ser_evento(in_evento)) THEN
-	INSERT INTO SER_EVENTI(evento) VALUES(in_evento);
-	SET my_id_evento = LAST_INSERT_ID();
+IF (in_evento IS NOT NULL) THEN
+	IF NOT (SELECT test_ser_evento(in_evento)) THEN
+		INSERT INTO SER_EVENTI(evento) VALUES(in_evento);
+		SET @my_id_evento = LAST_INSERT_ID();
+	ELSE
+		SET @my_id_evento = (SELECT get_ser_evento(in_evento));
+	END IF;
 ELSE
-	SET my_id_evento = (SELECT get_ser_evento(in_evento));
+	SET @my_id_evento = NULL;
 END IF;
 
 -- messaggio
-IF NOT (SELECT test_ser_messaggio(in_varco,in_direzione)) THEN
-	INSERT INTO SER_MESSAGGI(varco,direzione) VALUES(in_varco,in_direzione);
-	SET my_id_messaggio = LAST_INSERT_ID();
+IF (in_varco IS NOT NULL) OR (in_direzione IS NOT NULL) THEN
+	IF NOT (SELECT test_ser_messaggio(in_varco,in_direzione)) THEN
+		INSERT INTO SER_MESSAGGI(varco,direzione) VALUES(in_varco,in_direzione);
+		SET @my_id_messaggio = LAST_INSERT_ID();
+	ELSE
+		SET @my_id_messaggio = (SELECT get_ser_messaggio(in_varco,in_direzione));
+	END IF;
 ELSE
-	SET my_id_messaggio = (SELECT get_ser_messaggio(in_varco,in_direzione));
+	SET @my_id_messaggio = NULL;
 END IF;
 
 -- ospite
-IF NOT (SELECT test_ser_ospite(in_ospite)) THEN
-	INSERT INTO SER_OSPITI(nome) VALUES(in_ospite);
-	SET my_id_ospite = LAST_INSERT_ID();
+IF (in_ospite IS NOT NULL) THEN
+	IF NOT (SELECT test_ser_ospite(in_ospite)) THEN
+		INSERT INTO SER_OSPITI(nome) VALUES(in_ospite);
+		SET @my_id_ospite = LAST_INSERT_ID();
+	ELSE
+		SET @my_id_ospite = (SELECT get_ser_ospite(in_ospite));
+	END IF;
 ELSE
-	SET my_id_ospite = (SELECT get_ser_ospite(in_ospite));
+	SET @my_id_ospite = NULL;
 END IF;
 
 -- report
-INSERT INTO SER_REPORT(Data,Centrale,id_tessera,id_evento,id_messaggio,id_ospite)
-VALUES(my_data,in_centrale,my_id_tessera,my_id_evento,my_id_messaggio,my_id_ospite);
+IF NOT (SELECT test_ser_report(in_centrale,@my_data,@my_id_tessera,@my_id_evento,@my_id_messaggio,@my_id_ospite)) THEN
 
+	INSERT INTO SER_REPORT(Data,Centrale,id_tessera,id_evento,id_messaggio,id_ospite,Rid,contatore)
+	VALUES(@my_data,in_centrale,@my_id_tessera,@my_id_evento,@my_id_messaggio,@my_id_ospite,@my_rid,'1');
+
+ELSE
+
+	SET @stored_sid = (SELECT get_ser_report(in_centrale,@my_data,@my_id_tessera,@my_id_evento,@my_id_messaggio,@my_id_ospite));
+	SET @stored_rid = (SELECT get_ser_referer(@stored_sid));
+	
+	UPDATE SER_REPORT SET contatore=contatore+1 WHERE Sid=@stored_sid AND @my_rid=@stored_rid;
+
+END IF;
 
 END;
 $$
