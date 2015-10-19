@@ -70,8 +70,8 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 		done
 		
 		#cleanup
-		mycall="CALL input_repo('serchio','$filereferer')"
-		mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
+		#mycall="CALL input_repo('serchio','$filereferer')"
+		#mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
 		rm -rf $TEMP_DIR
 		
 		echo "ok!"

@@ -81,13 +81,12 @@ CREATE TABLE `SER_EVENTI` (
   PRIMARY KEY (`id_evento`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `SER_MESSAGGI`;
-CREATE TABLE `SER_MESSAGGI` (
-  `id_messaggio` int(11) NOT NULL AUTO_INCREMENT,
-  `varco` varchar(45) DEFAULT NULL,
-  `direzione` varchar(45) DEFAULT NULL,
-  CONSTRAINT localkey UNIQUE (`varco`,`direzione`),
-  PRIMARY KEY (`id_messaggio`)
+DROP TABLE IF EXISTS `SER_VARCHI`;
+CREATE TABLE `SER_VARCHI` (
+  `id_varco` int(11) NOT NULL AUTO_INCREMENT,
+  `varco` varchar(45) NOT NULL,
+  UNIQUE (`varco`),
+  PRIMARY KEY (`id_varco`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `SER_REPORT`;
@@ -97,12 +96,13 @@ CREATE TABLE `SER_REPORT` (
   `Centrale` int(11) DEFAULT NULL,
   `id_tessera` int(11) DEFAULT NULL,
   `id_evento` int(11) DEFAULT NULL,
-  `id_messaggio` int(11) DEFAULT NULL,
+  `id_varco` int(11) DEFAULT NULL,
+  `direzione` VARCHAR(45) DEFAULT NULL,
   `id_ospite` int(11) DEFAULT NULL,
    `Rid` int(11) DEFAULT NULL,
   `contatore` int(11) DEFAULT NULL,
   CONSTRAINT localkey UNIQUE 
-  (`Data`,`Centrale`,`id_tessera`,`id_evento`,`id_messaggio`,`id_ospite`),
+  (`Data`,`Centrale`,`id_tessera`,`id_evento`,`id_varco`,`direzione`,`id_ospite`),
   PRIMARY KEY (`Sid`),
   CONSTRAINT FOREIGN KEY (`id_tessera`) 
 	REFERENCES SER_TESSERE(`id_tessera`) 
@@ -110,8 +110,8 @@ CREATE TABLE `SER_REPORT` (
   CONSTRAINT FOREIGN KEY (`id_evento`) 
 	REFERENCES SER_EVENTI(`id_evento`) 
 	ON DELETE CASCADE,
-  CONSTRAINT FOREIGN KEY (`id_messaggio`) 
-	REFERENCES SER_MESSAGGI(`id_messaggio`) 
+  CONSTRAINT FOREIGN KEY (`id_varco`) 
+	REFERENCES SER_VARCHI(`id_varco`) 
 	ON DELETE CASCADE,
   CONSTRAINT FOREIGN KEY (`id_ospite`) 
 	REFERENCES SER_OSPITI(`id_ospite`) 

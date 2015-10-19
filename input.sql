@@ -87,7 +87,7 @@ BEGIN
 DECLARE my_data datetime;
 DECLARE my_id_tessera INT;
 DECLARE my_id_evento INT;
-DECLARE my_id_messaggio INT;
+DECLARE my_id_varco INT;
 DECLARE my_id_ospite INT;
 
 DECLARE my_rid INT;
@@ -125,16 +125,16 @@ ELSE
 	SET @my_id_evento = NULL;
 END IF;
 
--- messaggio
-IF (in_varco IS NOT NULL) OR (in_direzione IS NOT NULL) THEN
-	IF NOT (SELECT test_ser_messaggio(in_varco,in_direzione)) THEN
-		INSERT INTO SER_MESSAGGI(varco,direzione) VALUES(in_varco,in_direzione);
-		SET @my_id_messaggio = LAST_INSERT_ID();
+-- varco
+IF (in_varco IS NOT NULL) THEN
+	IF NOT (SELECT test_ser_varco(in_varco)) THEN
+		INSERT INTO SER_VARCHI(varco) VALUES(in_varco);
+		SET @my_id_varco = LAST_INSERT_ID();
 	ELSE
-		SET @my_id_messaggio = (SELECT get_ser_messaggio(in_varco,in_direzione));
+		SET @my_id_varco = (SELECT get_ser_varco(in_varco));
 	END IF;
 ELSE
-	SET @my_id_messaggio = NULL;
+	SET @my_id_varco = NULL;
 END IF;
 
 -- ospite
@@ -150,14 +150,14 @@ ELSE
 END IF;
 
 -- report
-IF NOT (SELECT test_ser_report(in_centrale,@my_data,@my_id_tessera,@my_id_evento,@my_id_messaggio,@my_id_ospite)) THEN
+IF NOT (SELECT test_ser_report(@my_data,in_centrale,@my_id_tessera,@my_id_evento,@my_id_vaco,in_direzione,@my_id_ospite)) THEN
 
-	INSERT INTO SER_REPORT(Data,Centrale,id_tessera,id_evento,id_messaggio,id_ospite,Rid,contatore)
-	VALUES(@my_data,in_centrale,@my_id_tessera,@my_id_evento,@my_id_messaggio,@my_id_ospite,@my_rid,'1');
+	INSERT INTO SER_REPORT(Data,Centrale,id_tessera,id_evento,id_varco,direzione,id_ospite,Rid,contatore)
+	VALUES(@my_data,in_centrale,@my_id_tessera,@my_id_evento,@my_id_varco,in_direzione,@my_id_ospite,@my_rid,'1');
 
 ELSE
 
-	SET @stored_sid = (SELECT get_ser_report(in_centrale,@my_data,@my_id_tessera,@my_id_evento,@my_id_messaggio,@my_id_ospite));
+	SET @stored_sid = (SELECT get_ser_report(@my_data,in_centrale,@my_id_tessera,@my_id_evento,@my_id_varco,in_direzione,@my_id_ospite));
 	SET @stored_rid = (SELECT get_ser_referer(@stored_sid));
 	
 	UPDATE SER_REPORT SET contatore=contatore+1 WHERE Sid=@stored_sid AND @my_rid=@stored_rid;

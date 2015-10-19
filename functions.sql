@@ -15,8 +15,8 @@ DROP FUNCTION IF EXISTS `test_ser_tessera`;
 DROP FUNCTION IF EXISTS `get_ser_tessera`;
 DROP FUNCTION IF EXISTS `test_ser_evento`;
 DROP FUNCTION IF EXISTS `get_ser_evento`;
-DROP FUNCTION IF EXISTS `test_ser_messaggio`;
-DROP FUNCTION IF EXISTS `get_ser_messaggio`;
+DROP FUNCTION IF EXISTS `test_ser_varco`;
+DROP FUNCTION IF EXISTS `get_ser_varco`;
 DROP FUNCTION IF EXISTS `test_ser_ospite`;
 DROP FUNCTION IF EXISTS `get_ser_ospite`;
 DROP FUNCTION IF EXISTS `test_ser_report`;
@@ -160,17 +160,17 @@ RETURN (SELECT id_evento FROM SER_EVENTI WHERE evento=in_evento);
 END;
 $$
 
-CREATE FUNCTION `test_ser_messaggio`(in_varco VARCHAR(45), in_direzione VARCHAR(45))
+CREATE FUNCTION `test_ser_varco`(in_varco VARCHAR(45))
 RETURNS TINYINT(1)
 BEGIN
-RETURN (SELECT EXISTS(SELECT 1 FROM SER_MESSAGGI WHERE varco=in_varco AND direzione=in_direzione));
+RETURN (SELECT EXISTS(SELECT 1 FROM SER_VARCHI WHERE varco=in_varco));
 END;
 $$
 
-CREATE FUNCTION `get_ser_messaggio`(in_varco VARCHAR(45), in_direzione VARCHAR(45))
+CREATE FUNCTION `get_ser_varco`(in_varco VARCHAR(45))
 RETURNS INT(11)
 BEGIN
-RETURN (SELECT id_messaggio FROM SER_MESSAGGI WHERE varco=in_varco AND direzione=in_direzione);
+RETURN (SELECT id_varco FROM SER_VARCHI WHERE varco=in_varco);
 END;
 $$
 
@@ -189,32 +189,34 @@ END;
 $$
 
 CREATE FUNCTION `test_ser_report`(
-in_centrale VARCHAR(45),
 in_data datetime,
+in_centrale VARCHAR(45),
 in_id_tessera INT,
 in_id_evento INT,
-in_id_messaggio INT,
+in_id_varco INT,
+in_direzione VARCHAR(45),
 in_id_ospite INT
 )
 RETURNS TINYINT(1)
 BEGIN
 RETURN (SELECT EXISTS(SELECT 1 FROM SER_REPORT WHERE 
-Centrale=in_centrale AND Data=in_data AND id_tessera=in_id_tessera AND id_evento=in_id_evento AND id_messaggio=in_id_messaggio AND id_ospite=in_id_ospite));
+Data=in_data AND Centrale=in_centrale AND id_tessera=in_id_tessera AND id_evento=in_id_evento AND id_varco=in_id_varco AND direzione=in_direzione AND id_ospite=in_id_ospite));
 END;
 $$
 
 CREATE FUNCTION `get_ser_report`(
-in_centrale VARCHAR(45),
 in_data datetime,
+in_centrale VARCHAR(45),
 in_id_tessera INT,
 in_id_evento INT,
-in_id_messaggio INT,
+in_id_varco INT,
+in_direzione VARCHAR(45),
 in_id_ospite INT
 )
 RETURNS INT(11)
 BEGIN
 RETURN (SELECT Sid FROM SER_REPORT WHERE 
-Centrale=in_centrale AND Data=in_data AND id_tessera=in_id_tessera AND id_evento=in_id_evento AND id_messaggio=in_id_messaggio AND id_ospite=in_id_ospite);
+Data=in_data AND Centrale=in_centrale AND id_tessera=in_id_tessera AND id_evento=in_id_evento AND id_varco=in_id_varco AND direzione=in_direzione AND id_ospite=in_id_ospite);
 END;
 $$
 
