@@ -27,7 +27,7 @@ DROP FUNCTION IF EXISTS `get_ser_referer`;
 
 DELIMITER $$
 
--- generic
+-- utils generic
 
 CREATE FUNCTION `test_repo`(in_tipo VARCHAR(45),in_filename VARCHAR(45))
 RETURNS TINYINT(1)
@@ -43,22 +43,7 @@ RETURN (SELECT Rid FROM REPOSITORY WHERE tipo=in_tipo AND filename=in_filename);
 END;
 $$
 
-CREATE FUNCTION `input_repo`(in_tipo VARCHAR(45),in_filename VARCHAR(45))
-RETURNS INT(11)
-BEGIN
-DECLARE temp_output INT(11);
-IF NOT (SELECT test_repo(in_tipo,in_filename)) THEN
-	INSERT INTO REPOSITORY(data,tipo,filename) VALUES((SELECT NOW()),in_tipo,in_filename);
-	SET temp_output = LAST_INSERT_ID();
-ELSE
-	SET temp_output = (SELECT get_repo(in_tipo,in_filename));
-END IF;
-RETURN temp_output;
-END;
-$$
-
-
--- winwatch
+-- utils winwatch
 
 CREATE FUNCTION `test_win_evento`(in_evento VARCHAR(45))
 RETURNS TINYINT(1)
@@ -128,9 +113,7 @@ RETURN (SELECT Rid FROM WIN_REPORT WHERE Wid=in_wid);
 END;
 $$
 
-
-
--- serchio
+-- utils serchio
 
 CREATE FUNCTION `test_ser_tessera`(in_seriale VARCHAR(45))
 RETURNS TINYINT(1)
@@ -233,6 +216,52 @@ BEGIN
 RETURN (SELECT Rid FROM SER_REPORT WHERE Sid=in_sid);
 END;
 $$
+
+-- insert 
+
+CREATE FUNCTION `input_repo`(in_tipo VARCHAR(45),in_filename VARCHAR(45))
+RETURNS INT(11)
+BEGIN
+DECLARE id_output INT(11);
+IF NOT (SELECT test_repo(in_tipo,in_filename)) THEN
+	INSERT INTO REPOSITORY(data,tipo,filename) VALUES((SELECT NOW()),in_tipo,in_filename);
+	SET @id_output = LAST_INSERT_ID();
+ELSE
+	SET @id_output = (SELECT get_repo(in_tipo,in_filename));
+END IF;
+RETURN @id_output;
+END;
+$$
+
+CREATE FUNCTION `input_tessera`(in_seriale VARCHAR(45),in_numero INT(11),in_tipo VARCHAR(45))
+RETURNS INT(11)
+BEGIN
+DECLARE my_tipo INT(1);
+
+IF (in_tipo IS NOT NULL) THEN
+	CASE
+	WHEN (STRCMP(in_tipo,'ESTERNI')=0) THEN
+		SET @my_tipo='1';
+	WHEN (STRCMP(in_tipo,'POSTE')=0) THEN 
+		SET @my_tipo='2';
+	ELSE
+		SET @my_tipo='0';
+	END CASE;
+ELSE
+	SET @my_tipo=NULL;
+END IF;
+
+IF NOT (SELECT test_ser_tessera(in_seriale)) THEN
+	INSERT INTO SER_TESSERE(tipo,numero,seriale) VALUES(@my_tipo,in_numero,in_seriale);
+	SET @id_output = LAST_INSERT_ID();
+ELSE
+	SET @id_output = (SELECT get_ser_tessera(in_seriale));
+END IF;
+
+RETURN @id_output;
+END;
+$$
+
 
 
 DELIMITER ;

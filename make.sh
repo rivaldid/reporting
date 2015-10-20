@@ -18,3 +18,6 @@ mysql $MYARGS -e "source $PREFIX/input.sql \W;" >> $LOG
 
 echo "--> Carico le viste" >> $LOG
 mysql $MYARGS -e "source $PREFIX/view.sql \W;" >> $LOG
+
+echo "--> Carico alcuni dati " >> $LOG
+mysql $MYARGS -e "source $PREFIX/dati.sql \W;" >> $LOG

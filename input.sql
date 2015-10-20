@@ -1,3 +1,4 @@
+DROP PROCEDURE IF EXISTS `input_tessere`;
 DROP PROCEDURE IF EXISTS `input_winwatch`;
 DROP PROCEDURE IF EXISTS `input_serchio`;
 
@@ -102,12 +103,7 @@ SET @my_data = (SELECT STR_TO_DATE(CONCAT(in_data,' ',COALESCE(in_ora,'00:00')),
 
 -- tessera
 IF (in_seriale IS NOT NULL) THEN
-	IF NOT (SELECT test_ser_tessera(in_seriale)) THEN
-		INSERT INTO SER_TESSERE(seriale) VALUES(in_seriale);
-		SET @my_id_tessera = LAST_INSERT_ID();
-	ELSE
-		SET @my_id_tessera = (SELECT get_ser_tessera(in_seriale));
-	END IF;
+	SET @my_id_tessera = (SELECT input_tessera(in_seriale,NULL,NULL));
 ELSE
 	SET @my_id_tessera = NULL;
 END IF;

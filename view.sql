@@ -8,7 +8,8 @@ LEFT JOIN WIN_MESSAGGI USING(id_messaggio)
 ORDER BY Data DESC;
 
 CREATE VIEW `SERCHIO` AS
-SELECT Data,Centrale,seriale,evento,CONCAT(COALESCE(varco,''),' ',COALESCE(direzione,'')) AS Messaggio,nome AS Ospite,contatore FROM SER_REPORT
+SELECT Data,SER_REPORT.Centrale,seriale,evento,CONCAT(COALESCE(varco,''),' ',COALESCE(direzione,'')) AS Messaggio,nome AS Ospite,contatore 
+FROM SER_REPORT
 LEFT JOIN SER_TESSERE USING(id_tessera)
 LEFT JOIN SER_EVENTI USING(id_evento)
 LEFT JOIN SER_VARCHI USING(id_varco)

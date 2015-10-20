@@ -58,8 +58,8 @@ CREATE TABLE `WIN_REPORT` (
 DROP TABLE IF EXISTS `SER_TESSERE`;
 CREATE TABLE `SER_TESSERE` (
   `id_tessera` int(11) NOT NULL AUTO_INCREMENT,
-  `tipo` varchar(45) NOT NULL,
-  `numero` varchar(45) NOT NULL,
+  `tipo` int(1) DEFAULT NULL,
+  `numero` varchar(45) DEFAULT NULL,
   `seriale` varchar(45) NOT NULL,
   UNIQUE (seriale),
   PRIMARY KEY (`id_tessera`)
@@ -84,7 +84,9 @@ CREATE TABLE `SER_EVENTI` (
 DROP TABLE IF EXISTS `SER_VARCHI`;
 CREATE TABLE `SER_VARCHI` (
   `id_varco` int(11) NOT NULL AUTO_INCREMENT,
+  `centrale` int(11) DEFAULT NULL,
   `varco` varchar(45) NOT NULL,
+  `label` varchar(45) DEFAULT NULL,
   UNIQUE (`varco`),
   PRIMARY KEY (`id_varco`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -99,7 +101,7 @@ CREATE TABLE `SER_REPORT` (
   `id_varco` int(11) DEFAULT NULL,
   `direzione` VARCHAR(45) DEFAULT NULL,
   `id_ospite` int(11) DEFAULT NULL,
-   `Rid` int(11) DEFAULT NULL,
+  `Rid` int(11) DEFAULT NULL,
   `contatore` int(11) DEFAULT NULL,
   CONSTRAINT localkey UNIQUE 
   (`Data`,`Centrale`,`id_tessera`,`id_evento`,`id_varco`,`direzione`,`id_ospite`),
