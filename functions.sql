@@ -175,7 +175,6 @@ $$
 
 CREATE FUNCTION `test_ser_report`(
 in_data datetime,
-in_centrale VARCHAR(45),
 in_id_tessera INT,
 in_id_evento INT,
 in_id_varco INT,
@@ -185,13 +184,12 @@ in_id_ospite INT
 RETURNS TINYINT(1)
 BEGIN
 RETURN (SELECT EXISTS(SELECT 1 FROM SER_REPORT WHERE 
-Data=in_data AND Centrale=in_centrale AND id_tessera=in_id_tessera AND id_evento=in_id_evento AND id_varco=in_id_varco AND direzione=in_direzione AND id_ospite=in_id_ospite));
+Data=in_data AND id_tessera=in_id_tessera AND id_evento=in_id_evento AND id_varco=in_id_varco AND direzione=in_direzione AND id_ospite=in_id_ospite));
 END;
 $$
 
 CREATE FUNCTION `get_ser_report`(
 in_data datetime,
-in_centrale VARCHAR(45),
 in_id_tessera INT,
 in_id_evento INT,
 in_id_varco INT,
@@ -201,7 +199,7 @@ in_id_ospite INT
 RETURNS INT(11)
 BEGIN
 RETURN (SELECT Sid FROM SER_REPORT WHERE 
-Data=in_data AND Centrale=in_centrale AND id_tessera=in_id_tessera AND id_evento=in_id_evento AND id_varco=in_id_varco AND direzione=in_direzione AND id_ospite=in_id_ospite);
+Data=in_data AND id_tessera=in_id_tessera AND id_evento=in_id_evento AND id_varco=in_id_varco AND direzione=in_direzione AND id_ospite=in_id_ospite);
 END;
 $$
 

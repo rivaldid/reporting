@@ -140,14 +140,14 @@ ELSE
 END IF;
 
 -- report
-IF NOT (SELECT test_ser_report(@my_data,in_centrale,@my_id_tessera,@my_id_evento,@my_id_vaco,in_direzione,@my_id_ospite)) THEN
+IF NOT (SELECT test_ser_report(@my_data,@my_id_tessera,@my_id_evento,@my_id_vaco,in_direzione,@my_id_ospite)) THEN
 
 	INSERT INTO SER_REPORT(Data,id_tessera,id_evento,id_varco,direzione,id_ospite,Rid,contatore)
 	VALUES(@my_data,@my_id_tessera,@my_id_evento,@my_id_varco,in_direzione,@my_id_ospite,@my_rid,'1');
 
 ELSE
 
-	SET @stored_sid = (SELECT get_ser_report(@my_data,in_centrale,@my_id_tessera,@my_id_evento,@my_id_varco,in_direzione,@my_id_ospite));
+	SET @stored_sid = (SELECT get_ser_report(@my_data,@my_id_tessera,@my_id_evento,@my_id_varco,in_direzione,@my_id_ospite));
 	SET @stored_rid = (SELECT get_ser_referer(@stored_sid));
 	
 	UPDATE SER_REPORT SET contatore=contatore+1 WHERE Sid=@stored_sid AND @my_rid=@stored_rid;
