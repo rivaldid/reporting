@@ -143,17 +143,17 @@ RETURN (SELECT id_evento FROM SER_EVENTI WHERE evento=in_evento);
 END;
 $$
 
-CREATE FUNCTION `test_ser_varco`(in_varco VARCHAR(45))
+CREATE FUNCTION `test_ser_varco`(in_centrale INT(11),in_varco VARCHAR(45))
 RETURNS TINYINT(1)
 BEGIN
-RETURN (SELECT EXISTS(SELECT 1 FROM SER_VARCHI WHERE varco=in_varco));
+RETURN (SELECT EXISTS(SELECT 1 FROM SER_VARCHI WHERE centrale=in_centrale AND varco=in_varco));
 END;
 $$
 
-CREATE FUNCTION `get_ser_varco`(in_varco VARCHAR(45))
+CREATE FUNCTION `get_ser_varco`(in_centrale INT(11),in_varco VARCHAR(45))
 RETURNS INT(11)
 BEGIN
-RETURN (SELECT id_varco FROM SER_VARCHI WHERE varco=in_varco);
+RETURN (SELECT id_varco FROM SER_VARCHI WHERE centrale=in_centrale AND varco=in_varco);
 END;
 $$
 
@@ -237,6 +237,7 @@ CREATE FUNCTION `input_tessera`(in_seriale VARCHAR(45),in_numero INT(11),in_tipo
 RETURNS INT(11)
 BEGIN
 DECLARE my_tipo INT(1);
+DECLARE id_output INT(11);
 
 IF (in_tipo IS NOT NULL) THEN
 	CASE
@@ -262,6 +263,47 @@ RETURN @id_output;
 END;
 $$
 
+CREATE FUNCTION `input_varco`(
+	in_varco VARCHAR(45),
+	in_centrale INT(11),
+	in_label VARCHAR(45),
+	in_antipanico INT(1),
+	in_perimetrale INT(1),
+	in_tastierino INT(1),
+)
+RETURNS INT(11)
+BEGIN
+DECLARE my_centrale INT(1);
+DECLARE id_output INT(11);
+
+IF (in_centrale IS NOT NULL) THEN
+	CASE
+	WHEN (STRCMP(in_centrale,'PULSAR 1')=0) THEN
+		SET @my_centrale='1';
+	WHEN (STRCMP(in_centrale,'PULSAR 2')=0) THEN 
+		SET @my_centrale='2';
+	WHEN (STRCMP(in_centrale,'1')=0) THEN
+		SET @my_centrale='1';
+	WHEN (STRCMP(in_centrale,'2')=0) THEN 
+		SET @my_centrale='2';
+	ELSE
+		SET @my_centrale='0';
+	END CASE;
+ELSE
+	SET @my_centrale='0';
+END IF;
+
+IF NOT (SELECT test_ser_varco(@my_centrale,in_varco)) THEN
+	INSERT INTO SER_VARCHI(centrale,varco,label,antipanico,perimetrale,tastierino) 
+	VALUES(@my_centrale,in_varco,in_label,in_antipanico,in_perimetrale,in_tastierino);
+	SET @id_output = LAST_INSERT_ID();
+ELSE
+	SET @id_output = (SELECT get_ser_varco(@my_centrale,in_varco));
+END IF;
+
+RETURN @id_output;
+END;
+$$
 
 
 DELIMITER ;

@@ -1,4 +1,3 @@
--- tessere
 SELECT input_tessera('10936692','1','ESTERNI');
 SELECT input_tessera('10936828','2','ESTERNI');
 SELECT input_tessera('10936764','3','ESTERNI');
@@ -98,3 +97,29 @@ SELECT input_tessera('10904029','46','POSTE');
 SELECT input_tessera('10936814','47','POSTE');
 SELECT input_tessera('10936630','48','POSTE');
 
+SELECT input_varco('H(01)','PULSAR 1','LABORATORIO','0','0','0');
+SELECT input_varco('H(01)','PULSAR 2','LOC. SECURITY','1','0','0');
+SELECT input_varco('H(02)','PULSAR 1','MAGAZZINO PORTA1','0','0','0');
+SELECT input_varco('H(02)','PULSAR 2','LOC. GUARDIANIA','1','0','0');
+SELECT input_varco('H(03)','PULSAR 1','MAGAZZINO PORTA2','0','0','0');
+SELECT input_varco('H(03)','PULSAR 2','BUSSOLA INGRESSO','0','0','0');
+SELECT input_varco('H(04)','PULSAR 1','CORR DATACENT2/3','1','0','0');
+SELECT input_varco('H(04)','PULSAR 2','SALA CONTROLLO','1','0','0');
+SELECT input_varco('H(05)','PULSAR 1','DATACENT2 PORTA1','1','0','0');
+SELECT input_varco('H(05)','PULSAR 2','LOC TECNICO 2','1','0','0');
+SELECT input_varco('H(06)','PULSAR 1','DATACENT2 PORTA2','1','0','0');
+SELECT input_varco('H(06)','PULSAR 2','CORR DATAC1/UFF','1','0','0');
+SELECT input_varco('H(07)','PULSAR 1','CARRIER B','1','0','0');
+SELECT input_varco('H(07)','PULSAR 2','USCITA SIC CORPOA','1','1','0');
+SELECT input_varco('H(08)','PULSAR 1','TLC B','1','0','0');
+SELECT input_varco('H(08)','PULSAR 2','FILTRO P-1','0','0','0');
+SELECT input_varco('H(09)','PULSAR 1','DATACENT1 PORTA1','1','0','0');
+SELECT input_varco('H(09)','PULSAR 2','INGR FILTRO P-1','1','1','0');
+SELECT input_varco('H(10)','PULSAR 1','DATACENT2 PORTA3','1','0','0');
+SELECT input_varco('H(10)','PULSAR 2','CORRIDOIO EL P-1','1','1','0');
+SELECT input_varco('H(11)','PULSAR 1','DATACENT1 PORTA2','1','0','0');
+SELECT input_varco('H(12)','PULSAR 1','TLC A','1','0','0');
+SELECT input_varco('H(13)','PULSAR 1','DATACENT2 PORTA4','1','0','0');
+SELECT input_varco('H(14)','PULSAR 1','CARRIER A','1','0','0');
+SELECT input_varco('H(15)','PULSAR 1','CORR DATACENT1/2','1','0','0');
+SELECT input_varco('H(16)','PULSAR 1','BUSSOLA ISOLA 15','0','0','0');

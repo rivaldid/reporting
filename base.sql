@@ -87,7 +87,10 @@ CREATE TABLE `SER_VARCHI` (
   `centrale` int(11) DEFAULT NULL,
   `varco` varchar(45) NOT NULL,
   `label` varchar(45) DEFAULT NULL,
-  UNIQUE (`varco`),
+  `antipanico` int(1) DEFAULT NULL,
+  `perimetrale` int(1) DEFAULT NULL,
+  `tastierino` int(1) DEFAULT NULL,
+  CONSTRAINT localkey UNIQUE (`centrale`,`varco`),
   PRIMARY KEY (`id_varco`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -95,7 +98,6 @@ DROP TABLE IF EXISTS `SER_REPORT`;
 CREATE TABLE `SER_REPORT` (
   `Sid` int(11) NOT NULL AUTO_INCREMENT,
   `Data` datetime DEFAULT NULL,
-  `Centrale` int(11) DEFAULT NULL,
   `id_tessera` int(11) DEFAULT NULL,
   `id_evento` int(11) DEFAULT NULL,
   `id_varco` int(11) DEFAULT NULL,
@@ -104,7 +106,7 @@ CREATE TABLE `SER_REPORT` (
   `Rid` int(11) DEFAULT NULL,
   `contatore` int(11) DEFAULT NULL,
   CONSTRAINT localkey UNIQUE 
-  (`Data`,`Centrale`,`id_tessera`,`id_evento`,`id_varco`,`direzione`,`id_ospite`),
+  (`Data`,`id_tessera`,`id_evento`,`id_varco`,`direzione`,`id_ospite`),
   PRIMARY KEY (`Sid`),
   CONSTRAINT FOREIGN KEY (`id_tessera`) 
 	REFERENCES SER_TESSERE(`id_tessera`) 

@@ -123,12 +123,7 @@ END IF;
 
 -- varco
 IF (in_varco IS NOT NULL) THEN
-	IF NOT (SELECT test_ser_varco(in_varco)) THEN
-		INSERT INTO SER_VARCHI(varco) VALUES(in_varco);
-		SET @my_id_varco = LAST_INSERT_ID();
-	ELSE
-		SET @my_id_varco = (SELECT get_ser_varco(in_varco));
-	END IF;
+	SET @my_id_varco = (SELECT input_varco(in_varco,in_centrale,NULL,NULL,NULL,NULL));
 ELSE
 	SET @my_id_varco = NULL;
 END IF;
@@ -148,8 +143,8 @@ END IF;
 -- report
 IF NOT (SELECT test_ser_report(@my_data,in_centrale,@my_id_tessera,@my_id_evento,@my_id_vaco,in_direzione,@my_id_ospite)) THEN
 
-	INSERT INTO SER_REPORT(Data,Centrale,id_tessera,id_evento,id_varco,direzione,id_ospite,Rid,contatore)
-	VALUES(@my_data,in_centrale,@my_id_tessera,@my_id_evento,@my_id_varco,in_direzione,@my_id_ospite,@my_rid,'1');
+	INSERT INTO SER_REPORT(Data,id_tessera,id_evento,id_varco,direzione,id_ospite,Rid,contatore)
+	VALUES(@my_data,@my_id_tessera,@my_id_evento,@my_id_varco,in_direzione,@my_id_ospite,@my_rid,'1');
 
 ELSE
 
