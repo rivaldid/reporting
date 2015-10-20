@@ -1,6 +1,5 @@
 DROP FUNCTION IF EXISTS `test_repo`;
 DROP FUNCTION IF EXISTS `get_repo`;
-DROP FUNCTION IF EXISTS `input_repo`;
 
 DROP FUNCTION IF EXISTS `test_win_evento`;
 DROP FUNCTION IF EXISTS `get_win_evento`;
@@ -24,6 +23,9 @@ DROP FUNCTION IF EXISTS `get_ser_report`;
 DROP FUNCTION IF EXISTS `test_ser_duplicati`;
 DROP FUNCTION IF EXISTS `get_ser_referer`;
 
+DROP FUNCTION IF EXISTS `input_repo`;
+DROP FUNCTION IF EXISTS `input_tessera`;
+DROP FUNCTION IF EXISTS `input_varco`;
 
 DELIMITER $$
 
@@ -265,11 +267,11 @@ $$
 
 CREATE FUNCTION `input_varco`(
 	in_varco VARCHAR(45),
-	in_centrale INT(11),
+	in_centrale VARCHAR(45),
 	in_label VARCHAR(45),
 	in_antipanico INT(1),
 	in_perimetrale INT(1),
-	in_tastierino INT(1),
+	in_tastierino INT(1)
 )
 RETURNS INT(11)
 BEGIN

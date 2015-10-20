@@ -1,4 +1,3 @@
-DROP PROCEDURE IF EXISTS `input_tessere`;
 DROP PROCEDURE IF EXISTS `input_winwatch`;
 DROP PROCEDURE IF EXISTS `input_serchio`;
 

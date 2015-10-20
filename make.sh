@@ -2,7 +2,7 @@
 
 PREFIX="/home/vilardid/reporting"
 LOG=$PREFIX"/make.log"
-MYARGS="-H -ureporting -preportuser -D reporting"
+MYARGS="-ureporting -preportuser -D reporting"
 
 if [ -f $LOG ]; then rm $LOG; fi
 touch $LOG
