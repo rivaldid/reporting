@@ -1,3 +1,8 @@
+SELECT input_tessera('',NULL,NULL);
+SELECT input_varco('',NULL,NULL,NULL,NULL,NULL);
+SELECT input_evento('');
+SELECT input_ospite('');
+
 SELECT input_tessera('10936692','1','ESTERNI');
 SELECT input_tessera('10936828','2','ESTERNI');
 SELECT input_tessera('10936764','3','ESTERNI');

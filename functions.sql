@@ -24,8 +24,12 @@ DROP FUNCTION IF EXISTS `test_ser_duplicati`;
 DROP FUNCTION IF EXISTS `get_ser_referer`;
 
 DROP FUNCTION IF EXISTS `input_repo`;
+DROP FUNCTION IF EXISTS `input_data_serchio`;
+DROP FUNCTION IF EXISTS `input_data_winwatch`;
 DROP FUNCTION IF EXISTS `input_tessera`;
 DROP FUNCTION IF EXISTS `input_varco`;
+DROP FUNCTION IF EXISTS `input_evento`;
+DROP FUNCTION IF EXISTS `input_ospite`;
 
 DELIMITER $$
 
@@ -184,7 +188,12 @@ in_id_ospite INT
 RETURNS TINYINT(1)
 BEGIN
 RETURN (SELECT EXISTS(SELECT 1 FROM SER_REPORT WHERE 
-Data=in_data AND id_tessera=in_id_tessera AND id_evento=in_id_evento AND id_varco=in_id_varco AND direzione=in_direzione AND id_ospite=in_id_ospite));
+Data=COALESCE(in_data,0) AND 
+id_tessera=COALESCE(in_id_tessera,1) AND 
+id_evento=COALESCE(in_id_evento,1) AND 
+id_varco=COALESCE(in_id_varco,1) AND 
+direzione=in_direzione AND 
+id_ospite=COALESCE(in_id_ospite,1)));
 END;
 $$
 
@@ -199,7 +208,12 @@ in_id_ospite INT
 RETURNS INT(11)
 BEGIN
 RETURN (SELECT Sid FROM SER_REPORT WHERE 
-Data=in_data AND id_tessera=in_id_tessera AND id_evento=in_id_evento AND id_varco=in_id_varco AND direzione=in_direzione AND id_ospite=in_id_ospite);
+Data=COALESCE(in_data,0) AND 
+id_tessera=COALESCE(in_id_tessera,1) AND 
+id_evento=COALESCE(in_id_evento,1) AND 
+id_varco=COALESCE(in_id_varco,1) AND 
+direzione=in_direzione AND 
+id_ospite=COALESCE(in_id_ospite,1));
 END;
 $$
 
@@ -230,6 +244,20 @@ ELSE
 	SET @id_output = (SELECT get_repo(in_tipo,in_filename));
 END IF;
 RETURN @id_output;
+END;
+$$
+
+CREATE FUNCTION `input_data_serchio`(in_data VARCHAR(45),in_ora VARCHAR(45))
+RETURNS DATETIME
+BEGIN
+RETURN (SELECT STR_TO_DATE(CONCAT(in_data,' ',COALESCE(in_ora,'00:00')),'%d/%m/%Y %H:%i'));
+END;
+$$
+
+CREATE FUNCTION `input_data_winwatch`(in_data VARCHAR(45),in_ora VARCHAR(45))
+RETURNS DATETIME
+BEGIN
+RETURN (SELECT STR_TO_DATE(CONCAT(in_data,' ',COALESCE(in_ora,'00:00')),'%d-%m-%y %H:%i'));
 END;
 $$
 
@@ -301,6 +329,34 @@ ELSE
 	SET @id_output = (SELECT get_ser_varco(@my_centrale,in_varco));
 END IF;
 
+RETURN @id_output;
+END;
+$$
+
+CREATE FUNCTION `input_evento`(in_evento VARCHAR(45))
+RETURNS INT(11)
+BEGIN
+DECLARE id_output INT(11);
+IF NOT (SELECT test_ser_evento(in_evento)) THEN
+	INSERT INTO SER_EVENTI(evento) VALUES(in_evento);
+	SET @id_output = LAST_INSERT_ID();
+ELSE
+	SET @id_output = (SELECT get_ser_evento(in_evento));
+END IF;
+RETURN @id_output;
+END;
+$$
+
+CREATE FUNCTION `input_ospite`(in_ospite VARCHAR(45))
+RETURNS INT(11)
+BEGIN
+DECLARE id_output INT(11);
+IF NOT (SELECT test_ser_ospite(in_ospite)) THEN
+	INSERT INTO SER_OSPITI(nome) VALUES(in_ospite);
+	SET @id_output = LAST_INSERT_ID();
+ELSE
+	SET @id_output = (SELECT get_ser_ospite(in_ospite));
+END IF;
 RETURN @id_output;
 END;
 $$

@@ -26,7 +26,7 @@ DECLARE stored_rid INT;
 SET @my_rid = (SELECT input_repo('winwatch',in_filename));
 
 -- data
-SET @my_data = (SELECT STR_TO_DATE(CONCAT(in_data,' ',COALESCE(in_ora,'00:00')),'%d-%m-%y %H:%i'));
+SET @my_data = (SELECT input_data_winwatch(in_data,in_ora));
 
 -- evento
 IF (in_evento IS NOT NULL) THEN
@@ -88,6 +88,7 @@ DECLARE my_data datetime;
 DECLARE my_id_tessera INT;
 DECLARE my_id_evento INT;
 DECLARE my_id_varco INT;
+DECLARE my_direzione VARCHAR(45);
 DECLARE my_id_ospite INT;
 
 DECLARE my_rid INT;
@@ -98,56 +99,56 @@ DECLARE stored_rid INT;
 SET @my_rid = (SELECT input_repo('serchio',in_filename));
 
 -- data
-SET @my_data = (SELECT STR_TO_DATE(CONCAT(in_data,' ',COALESCE(in_ora,'00:00')),'%d/%m/%Y %H:%i'));
+IF (in_data IS NOT NULL) THEN
+	SET @my_data = (SELECT input_data_serchio(in_data,in_ora));
+ELSE
+	SET @my_data = 0;
+END IF;
 
 -- tessera
 IF (in_seriale IS NOT NULL) THEN
 	SET @my_id_tessera = (SELECT input_tessera(in_seriale,NULL,NULL));
 ELSE
-	SET @my_id_tessera = NULL;
+	SET @my_id_tessera = '1';
 END IF;
 	
-
 -- evento
 IF (in_evento IS NOT NULL) THEN
-	IF NOT (SELECT test_ser_evento(in_evento)) THEN
-		INSERT INTO SER_EVENTI(evento) VALUES(in_evento);
-		SET @my_id_evento = LAST_INSERT_ID();
-	ELSE
-		SET @my_id_evento = (SELECT get_ser_evento(in_evento));
-	END IF;
+	SET @my_id_evento = (SELECT input_evento(in_evento));
 ELSE
-	SET @my_id_evento = NULL;
+	SET @my_id_evento = '1';
 END IF;
 
 -- varco
 IF (in_varco IS NOT NULL) THEN
 	SET @my_id_varco = (SELECT input_varco(in_varco,in_centrale,NULL,NULL,NULL,NULL));
 ELSE
-	SET @my_id_varco = NULL;
+	SET @my_id_varco = '1';
 END IF;
 
 -- ospite
 IF (in_ospite IS NOT NULL) THEN
-	IF NOT (SELECT test_ser_ospite(in_ospite)) THEN
-		INSERT INTO SER_OSPITI(nome) VALUES(in_ospite);
-		SET @my_id_ospite = LAST_INSERT_ID();
-	ELSE
-		SET @my_id_ospite = (SELECT get_ser_ospite(in_ospite));
-	END IF;
+	SET @my_id_ospite = (SELECT input_ospite(in_ospite));
 ELSE
-	SET @my_id_ospite = NULL;
+	SET @my_id_ospite = '1';
+END IF;
+
+-- direzione
+IF (in_direzione IS NOT NULL) THEN
+	SET @my_direzione = in_direzione;
+ELSE
+	SET @my_direzione = '';
 END IF;
 
 -- report
-IF NOT (SELECT test_ser_report(@my_data,@my_id_tessera,@my_id_evento,@my_id_vaco,in_direzione,@my_id_ospite)) THEN
+IF NOT (SELECT test_ser_report(@my_data,@my_id_tessera,@my_id_evento,@my_id_varco,@my_direzione,@my_id_ospite)) THEN
 
 	INSERT INTO SER_REPORT(Data,id_tessera,id_evento,id_varco,direzione,id_ospite,Rid,contatore)
-	VALUES(@my_data,@my_id_tessera,@my_id_evento,@my_id_varco,in_direzione,@my_id_ospite,@my_rid,'1');
+	VALUES(@my_data,@my_id_tessera,@my_id_evento,@my_id_varco,@my_direzione,@my_id_ospite,@my_rid,'1');
 
 ELSE
 
-	SET @stored_sid = (SELECT get_ser_report(@my_data,@my_id_tessera,@my_id_evento,@my_id_varco,in_direzione,@my_id_ospite));
+	SET @stored_sid = (SELECT get_ser_report(@my_data,@my_id_tessera,@my_id_evento,@my_id_varco,@my_direzione,@my_id_ospite));
 	SET @stored_rid = (SELECT get_ser_referer(@stored_sid));
 	
 	UPDATE SER_REPORT SET contatore=contatore+1 WHERE Sid=@stored_sid AND @my_rid=@stored_rid;
@@ -156,5 +157,6 @@ END IF;
 
 END;
 $$
+
 
 DELIMITER ;
