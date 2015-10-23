@@ -116,7 +116,7 @@ my $row = $ARGV[0];
 		
 	}elsif( $row =~ $EV_ALL ){
 
-		print "${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{operatore})}";
+		print "${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varchi})},${\g($+{verso})},${\g($+{operatore})}";
 		
 	}elsif( $row =~ $EV_TAMPER ){
 
