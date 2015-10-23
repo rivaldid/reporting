@@ -27,10 +27,7 @@ my $TESSERA =	qr!\d{8}!;
 my $PREAMBLE = qr!(?<giorno>$DATA)\s(?<ore>$ORA)\s$PULSAR\s(?<concen>$CONCEN)!;
 
 my $EV_TAAB = qr!(?<giorno>$DATA)\s(?<ore>$ORA)\s(?<operatore>\w{4,6})\s(?<evento>Tastiera Abilitata)\.\s\[\s(?<operatore>\w{4,6})\s\]!;
-
-#my $EV_ALL = qr!$PREAMBLE\s+(?<evento>Allarmi Acquisiti)(?<varchi>(?:\(H\s\d\d\))|(?:\(H:\d-\d\d\)))!;
 my $EV_ALL = qr!$PREAMBLE\s+(?<evento>Allarmi Acquisiti)(?<varchi>\(H\s\d\d\)|\(H:\d-\d\d\))\.\s\[\s(?<operatore>\w{4,6})\s\]!;
-
 my $EV_TAMPER = qr!$PREAMBLE\s+(?<evento>Allarme Tamper)\s(?<varco>$VARCO)!;
 my $EV_CSTATO = qr!$PREAMBLE\s+(?<evento>Comando Cambio Stato Lettore)\s$VARCO\sABILITATO\s\.\s\[\s(?<operatore>\w{6})\s\]!;
 my $EV_CADUTA = qr!$PREAMBLE\s+(?<evento>Caduta Linea)!;
@@ -39,7 +36,6 @@ my $EV_FINEPROG = qr!$PREAMBLE\s+(?<evento>Fine invio dati di programmazione)!;
 my $EV_MINPULSAR = qr!$PREAMBLE\s+(?<evento>Linea Mini Pulsar)!;
 my $EV_TESANON = qr!$PREAMBLE\s\*{8}\s(?<evento>Transito effettuato)\s\s(?<varco>$VARCO)(?<verso>$VERSO)\s(?<nominativo>.+)!;
 my $EV_LINEA = qr!(?<evento>LINEA (?:ON|OFF))!;
-
 
 my $EV_TRANS =	qr!$PREAMBLE\s(?<tessera>$TESSERA|\*{8})\s(?<evento>Transito effettuato)\s{1,2}(?<varco>$VARCO)((?<verso>$VERSO)\s)?(?<nominativo>.+)?!;
 my $EV_TRDIS = qr!$PREAMBLE\s(?<tessera>$TESSERA|\*{8})\s(?<evento>Transito lettore disabilitato)\s{1,2}(?<varco>$VARCO)((?<verso>$VERSO)\s)?(?<nominativo>.+)?!;
