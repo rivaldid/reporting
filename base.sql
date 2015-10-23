@@ -85,7 +85,7 @@ DROP TABLE IF EXISTS `SER_VARCHI`;
 CREATE TABLE `SER_VARCHI` (
   `id_varco` int(11) NOT NULL AUTO_INCREMENT,
   `centrale` int(11) DEFAULT NULL,
-  `varco` varchar(45) NOT NULL,
+  `varco` varchar(45) DEFAULT NULL,
   `label` varchar(45) DEFAULT NULL,
   `antipanico` int(1) DEFAULT NULL,
   `perimetrale` int(1) DEFAULT NULL,

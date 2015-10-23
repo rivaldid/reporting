@@ -27,7 +27,10 @@ my $TESSERA =	qr!\d{8}!;
 my $PREAMBLE = qr!(?<giorno>$DATA)\s(?<ore>$ORA)\s$PULSAR\s(?<concen>$CONCEN)!;
 
 my $EV_TAAB = qr!(?<giorno>$DATA)\s(?<ore>$ORA)\s(?<operatore>\w{4,6})\s(?<evento>Tastiera Abilitata)\.\s\[\s(?<operatore>\w{4,6})\s\]!;
-my $EV_ALL = qr!$PREAMBLE\s+(?<evento>Allarmi Acquisiti)(?<varchi>(?:\(H\s\d\d\))|(?:\(H:\d-\d\d\)))!;
+
+#my $EV_ALL = qr!$PREAMBLE\s+(?<evento>Allarmi Acquisiti)(?<varchi>(?:\(H\s\d\d\))|(?:\(H:\d-\d\d\)))!;
+my $EV_ALL = qr!$PREAMBLE\s+(?<evento>Allarmi Acquisiti)(?<varchi>\(H\s\d\d\)|\(H:\d-\d\d\))\.\s\[\s(?<operatore>\w{4,6})\s\]!;
+
 my $EV_TAMPER = qr!$PREAMBLE\s+(?<evento>Allarme Tamper)\s(?<varco>$VARCO)!;
 my $EV_CSTATO = qr!$PREAMBLE\s+(?<evento>Comando Cambio Stato Lettore)\s$VARCO\sABILITATO\s\.\s\[\s(?<operatore>\w{6})\s\]!;
 my $EV_CADUTA = qr!$PREAMBLE\s+(?<evento>Caduta Linea)!;
@@ -113,7 +116,7 @@ my $row = $ARGV[0];
 		
 	}elsif( $row =~ $EV_ALL ){
 
-		print "${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{nominativo})}";
+		print "${\g($+{giorno})},${\g($+{ore})},${\g($+{pulsar})},${\g($+{tessera})},${\g($+{evento})},${\g($+{varco})},${\g($+{verso})},${\g($+{operatore})}";
 		
 	}elsif( $row =~ $EV_TAMPER ){
 

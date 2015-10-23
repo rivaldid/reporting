@@ -123,7 +123,11 @@ END IF;
 IF (in_varco IS NOT NULL) THEN
 	SET @my_id_varco = (SELECT input_varco(in_varco,in_centrale,NULL,NULL,NULL,NULL));
 ELSE
-	SET @my_id_varco = '1';
+	IF (in_centrale IS NOT NULL) THEN
+		SET @my_id_varco = (SELECT input_varco(NULL,in_centrale,,NULL,NULL,NULL,NULL));
+	ELSE
+		SET @my_id_varco = '1';
+	END IF;
 END IF;
 
 -- ospite
