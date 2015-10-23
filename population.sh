@@ -1,21 +1,28 @@
 #!/usr/bin/bash
 
 PREFIX="/home/vilardid/reporting"
+LOG=$PREFIX"/population.log"
 
 cd $PREFIX
+if [ -f $LOG ]; then rm $LOG; fi
+touch $LOG
 
-echo "==> winparse"
-time ./win_parse.sh
+echo "*** BEGIN ***" >> $LOG
+
+echo "==> winparse" >> $LOG
+time ./win_parse.sh >> $LOG
 if [ $? -eq 0 ]; then
-	echo "--> winparse done"
+	echo "--> winparse done" >> $LOG
 else
-	echo "--> winparse fail"
+	echo "--> winparse fail" >> $LOG
 fi
 
-echo "==> serparse"
-time ./ser_parse.sh
+echo "==> serparse" >> $LOG
+time ./ser_parse.sh >> $LOG
 if [ $? -eq 0 ]; then
-	echo "--> serparse done"
+	echo "--> serparse done" >> $LOG
 else
-	echo "--> serparse fail"
+	echo "--> serparse fail" >> $LOG
 fi
+
+echo "*** END ***" >> $LOG
