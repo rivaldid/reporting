@@ -10,7 +10,7 @@ touch $LOG
 echo "*** BEGIN ***" >> $LOG
 
 echo "==> winparse" >> $LOG
-time ./win_parse.sh >> $LOG
+{ time ./win_parse.sh >> $LOG; } 2>> $LOG
 if [ $? -eq 0 ]; then
 	echo "--> winparse done" >> $LOG
 else
@@ -18,7 +18,7 @@ else
 fi
 
 echo "==> serparse" >> $LOG
-time ./ser_parse.sh >> $LOG
+{ time ./ser_parse.sh >> $LOG; } 2>> $LOG
 if [ $? -eq 0 ]; then
 	echo "--> serparse done" >> $LOG
 else
