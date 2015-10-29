@@ -7,7 +7,7 @@ cd $PREFIX
 if [ -f $LOG ]; then rm $LOG; fi
 touch $LOG
 
-echo "*** BEGIN ***" >> $LOG
+echo "*** BEGIN " $(date) "***" >> $LOG
 
 echo "==> winparse" >> $LOG
 { time ./win_parse.sh >> $LOG; } 2>> $LOG
@@ -25,4 +25,6 @@ else
 	echo "--> serparse fail" >> $LOG
 fi
 
-echo "*** END ***" >> $LOG
+echo "*** END " $(date) "***" >> $LOG
+
+cat $LOG | mail -s "script population" vilardid@localhost
