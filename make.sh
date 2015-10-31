@@ -5,14 +5,19 @@ LOG=$PREFIX"/make.log"
 DUMPFILE=$PREFIX"/dumpfile.sql"
 MYARGS="-ureporting -preportuser -D reporting"
 
+reset=false;
+[ "$1" == "--reset" ] && reset=true
+
 cd $PREFIX
 if [ -f $LOG ]; then rm $LOG; fi
 touch $LOG
 
 echo "*** BEGIN " $(date) "***" >> $LOG
 
-#echo "--> Dumping del db" >> $LOG
-#mysqldump -ureporting -preportuser reporting > $DUMPFILE
+if [ $reset = false ]; then
+	echo "--> Dumping del db" >> $LOG
+	mysqldump -ureporting -preportuser reporting > $DUMPFILE
+fi
 
 echo "--> Carico la base" >> $LOG
 mysql $MYARGS -e "source $PREFIX/base.sql \W;" >> $LOG
@@ -29,9 +34,11 @@ mysql $MYARGS -e "source $PREFIX/view.sql \W;" >> $LOG
 echo "--> Carico alcuni dati " >> $LOG
 mysql $MYARGS -e "source $PREFIX/dati.sql \W;" >> $LOG
 
-#echo "--> Ripristino il dump" >> $LOG
-#mysql $MYARGS -e "source $DUMPFILE \W;" >> $LOG
-#rm $DUMPFILE
+if [ $reset = false ]; then
+	echo "--> Ripristino il dump" >> $LOG
+	mysql $MYARGS -e "source $DUMPFILE \W;" >> $LOG
+	rm $DUMPFILE
+fi
 
 echo "*** END " $(date) "***" >> $LOG
 
