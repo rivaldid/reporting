@@ -27,4 +27,4 @@ fi
 
 echo "*** END " $(date) "***" >> $LOG
 
-cat $LOG | mail -s "script population" vilardid@localhost
+cat $LOG | mail -s "script population reporting db" vilardid@localhost

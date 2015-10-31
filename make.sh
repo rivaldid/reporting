@@ -5,11 +5,14 @@ LOG=$PREFIX"/make.log"
 DUMPFILE=$PREFIX"/dumpfile.sql"
 MYARGS="-ureporting -preportuser -D reporting"
 
+cd $PREFIX
 if [ -f $LOG ]; then rm $LOG; fi
 touch $LOG
 
-echo "--> Dumping del db" >> $LOG
-mysqldump -ureporting -preportuser reporting > $DUMPFILE
+echo "*** BEGIN " $(date) "***" >> $LOG
+
+#echo "--> Dumping del db" >> $LOG
+#mysqldump -ureporting -preportuser reporting > $DUMPFILE
 
 echo "--> Carico la base" >> $LOG
 mysql $MYARGS -e "source $PREFIX/base.sql \W;" >> $LOG
@@ -26,6 +29,10 @@ mysql $MYARGS -e "source $PREFIX/view.sql \W;" >> $LOG
 echo "--> Carico alcuni dati " >> $LOG
 mysql $MYARGS -e "source $PREFIX/dati.sql \W;" >> $LOG
 
-echo "--> Ripristino il dump" >> $LOG
-mysql $MYARGS -e "source $DUMPFILE \W;" >> $LOG
-rm $DUMPFILE
+#echo "--> Ripristino il dump" >> $LOG
+#mysql $MYARGS -e "source $DUMPFILE \W;" >> $LOG
+#rm $DUMPFILE
+
+echo "*** END " $(date) "***" >> $LOG
+
+cat $LOG | mail -s "script make reporting db" vilardid@localhost

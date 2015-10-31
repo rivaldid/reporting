@@ -85,3 +85,5 @@ for file in $(find $REPORT -name "*.csv" -type f); do
 done
 
 sudo umount $REPORT
+
+cat $LOG | mail -s "script win_parse reporting db" vilardid@localhost

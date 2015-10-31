@@ -85,3 +85,5 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 done
 
 sudo umount $REPORT
+
+cat $LOG | mail -s "script ser_parse reporting db" vilardid@localhost
