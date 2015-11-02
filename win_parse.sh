@@ -7,6 +7,8 @@ TRASH_PREFIX="/mnt/REPORT/WinWatch"
 LOG=$PREFIX"/win_parse.log"
 MYARGS="-H -ureporting -preportuser -D reporting"
 
+trovato=true
+
 if [ -f $LOG ]; then rm $LOG; fi
 touch $LOG
 
@@ -78,7 +80,8 @@ for file in $(find $REPORT -name "*.csv" -type f); do
 
 	else
 
-		echo "--> NO $INPUT aggiunto" >> $LOG
+		#echo "--> NO $INPUT aggiunto" >> $LOG
+		trovato=false
 
 	fi
 
@@ -86,4 +89,10 @@ done
 
 sudo umount $REPORT
 
-cat $LOG | mail -s "script win_parse reporting db" vilardid@localhost
+if [ $trovato = false ]; then
+	#echo "--> Nessun report analizzato" >> $LOG
+	exit 1
+else
+	cat $LOG | mail -s "script win_parse reporting db" vilardid@localhost
+	exit 0
+fi
