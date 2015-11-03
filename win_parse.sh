@@ -89,10 +89,5 @@ done
 
 sudo umount $REPORT
 
-if [ $trovato = false ]; then
-	#echo "--> Nessun report analizzato" >> $LOG
-	exit 1
-else
-	cat $LOG | mail -s "script win_parse reporting db" vilardid@localhost
-	exit 0
-fi
+if [ $trovato = false ]; then exit 1; fi
+

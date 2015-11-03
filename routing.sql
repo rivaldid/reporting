@@ -51,10 +51,11 @@ DECLARE sub_id_varco INT;
 DECLARE sub_direzione VARCHAR(45);
 
 DECLARE done INT DEFAULT FALSE;
-DECLARE query CURSOR FOR SELECT Data,id_tessera,id_ospite,id_evento,id_varco,direzione FROM SER_REPORT WHERE Data>=in_start AND id_evento IN (4,7,11,20,24,25);
+-- DECLARE query CURSOR FOR SELECT Data,id_tessera,id_ospite,id_evento,id_varco,direzione FROM SER_REPORT WHERE Data>=in_start AND id_evento IN (4,7,11,20,24,25);
+DECLARE query CURSOR FOR SELECT Data,id_tessera,id_ospite,id_evento,id_varco,direzione FROM SER_REPORT WHERE Data>=in_start AND id_tessera <> 1;
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-CREATE TEMPORARY TABLE TRANSITI(
+CREATE TEMPORARY TABLE PASSAGGI(
 data datetime,
 durata int,
 ospite varchar(135),
@@ -69,7 +70,7 @@ myloop: LOOP
 	SELECT Data,id_evento,id_varco,direzione INTO sub_data,sub_id_evento,sub_id_varco,sub_direzione 
 	FROM SER_REPORT  WHERE Data>main_data AND id_tessera=main_id_tessera ANd id_ospite=main_id_ospite LIMIT 1;
 	
-	INSERT INTO TRANSITI(data,durata,ospite,provenienza,destinazione) VALUES(
+	INSERT INTO PASSAGGI(data,durata,ospite,provenienza,destinazione) VALUES(
 	main_data,
 	TIMESTAMPDIFF(MINUTE,main_data,sub_data),
 	CONCAT_WS(' ',
@@ -92,8 +93,8 @@ myloop: LOOP
 END LOOP myloop;
 CLOSE query;
 
-SELECT * FROM TRANSITI;
-DROP TEMPORARY TABLE TRANSITI;
+SELECT * FROM PASSAGGI;
+DROP TEMPORARY TABLE PASSAGGI;
 
 END;
 $$
