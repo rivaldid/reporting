@@ -40,6 +40,9 @@ if [ $reset = false ]; then
 	rm $DUMPFILE
 fi
 
+echo "--> Carico il routing" >> $LOG
+mysql $MYARGS -e "source $PREFIX/routing.sql \W;" >> $LOG
+
 echo "*** END " $(date) "***" >> $LOG
 
 cat $LOG | mail -s "script make reporting db" vilardid@localhost
