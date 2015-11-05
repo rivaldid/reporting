@@ -68,7 +68,7 @@ myloop: LOOP
 	FETCH query INTO main_data,main_id_tessera,main_id_ospite,main_id_evento,main_id_varco,main_direzione;
 	
 	SELECT Data,id_evento,id_varco,direzione INTO sub_data,sub_id_evento,sub_id_varco,sub_direzione 
-	FROM SER_REPORT  WHERE Data>main_data AND id_tessera=main_id_tessera ANd id_ospite=main_id_ospite LIMIT 1;
+	FROM SER_REPORT WHERE Data>main_data AND id_tessera=main_id_tessera ANd id_ospite=main_id_ospite LIMIT 1;
 	
 	INSERT INTO PASSAGGI(data,durata,ospite,provenienza,destinazione) VALUES(
 	main_data,

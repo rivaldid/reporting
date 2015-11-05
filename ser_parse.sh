@@ -8,8 +8,6 @@ TEMP_DIR=$PREFIX/"TEMP"
 LOG=$PREFIX"/ser_parse.log"
 MYARGS="-H -ureporting -preportuser -D reporting"
 
-trovato=true
-
 if [ -f $LOG ]; then rm $LOG; fi
 touch $LOG
 
@@ -78,15 +76,12 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 
 		echo "ok!"
 
-	else
+	#else
 
 		#echo "--> NO $INPUT aggiunto" >> $LOG
-		trovato=false
 
 	fi
 
 done
 
 sudo umount $REPORT
-
-if [ $trovato = false ]; then exit 1; fi

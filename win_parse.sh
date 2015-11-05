@@ -7,8 +7,6 @@ TRASH_PREFIX="/mnt/REPORT/WinWatch"
 LOG=$PREFIX"/win_parse.log"
 MYARGS="-H -ureporting -preportuser -D reporting"
 
-trovato=true
-
 if [ -f $LOG ]; then rm $LOG; fi
 touch $LOG
 
@@ -78,16 +76,12 @@ for file in $(find $REPORT -name "*.csv" -type f); do
 
 		echo "ok!"
 
-	else
+	#else
 
 		#echo "--> NO $INPUT aggiunto" >> $LOG
-		trovato=false
 
 	fi
 
 done
 
 sudo umount $REPORT
-
-if [ $trovato = false ]; then exit 1; fi
-
