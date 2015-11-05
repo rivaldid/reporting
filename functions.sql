@@ -24,12 +24,35 @@ DROP FUNCTION IF EXISTS `test_ser_duplicati`;
 DROP FUNCTION IF EXISTS `get_ser_referer`;
 
 DROP FUNCTION IF EXISTS `input_repo`;
-DROP FUNCTION IF EXISTS `input_data_serchio`;
-DROP FUNCTION IF EXISTS `input_data_winwatch`;
-DROP FUNCTION IF EXISTS `input_tessera`;
-DROP FUNCTION IF EXISTS `input_varco`;
-DROP FUNCTION IF EXISTS `input_evento`;
-DROP FUNCTION IF EXISTS `input_ospite`;
+
+DROP FUNCTION IF EXISTS `input_ser_data`;
+DROP FUNCTION IF EXISTS `input_ser_tessera`;
+DROP FUNCTION IF EXISTS `input_ser_varco`;
+DROP FUNCTION IF EXISTS `input_ser_evento`;
+DROP FUNCTION IF EXISTS `input_ser_ospite`;
+
+DROP FUNCTION IF EXISTS `input_win_data`;
+DROP FUNCTION IF EXISTS `input_win_evento`;
+DROP FUNCTION IF EXISTS `input_win_messaggio`;
+
+-- schema function input_foo_bar
+-- begin
+-- if not test_foo_bar
+--	insert FOO_BAR(bar)
+--	set @id_output = last insert id
+-- else
+--	set @id_output = select get_foo_bar(bar)
+-- end if
+-- return @id_output
+-- end
+
+-- uso interfacce tabelle atomiche
+-- SET my_id_bar = (SELECT input_foo_bar(bar));
+
+-- INPUT
+--	WINWATCH: win_data, win_evento, win_messaggio
+--	SERCHIO: ser_data, ser_tessera, ser_evento, ser_varco, ser_ospite
+
 
 DELIMITER $$
 
@@ -87,7 +110,7 @@ in_id_messaggio INT
 )
 RETURNS TINYINT(1)
 BEGIN
-RETURN (SELECT EXISTS(SELECT 1 FROM WIN_REPORT WHERE 
+RETURN (SELECT EXISTS(SELECT 1 FROM WIN_REPORT WHERE
 Centrale=in_centrale AND Data=in_data AND id_evento=in_id_evento AND id_messaggio=in_id_messaggio));
 END;
 $$
@@ -100,7 +123,7 @@ in_id_messaggio INT
 )
 RETURNS INT(11)
 BEGIN
-RETURN (SELECT Wid FROM WIN_REPORT WHERE 
+RETURN (SELECT Wid FROM WIN_REPORT WHERE
 Centrale=in_centrale AND Data=in_data AND id_evento=in_id_evento AND id_messaggio=in_id_messaggio);
 END;
 $$
@@ -187,12 +210,12 @@ in_id_ospite INT
 )
 RETURNS TINYINT(1)
 BEGIN
-RETURN (SELECT EXISTS(SELECT 1 FROM SER_REPORT WHERE 
-Data=COALESCE(in_data,0) AND 
-id_tessera=COALESCE(in_id_tessera,1) AND 
-id_evento=COALESCE(in_id_evento,1) AND 
-id_varco=COALESCE(in_id_varco,1) AND 
-direzione=in_direzione AND 
+RETURN (SELECT EXISTS(SELECT 1 FROM SER_REPORT WHERE
+Data=COALESCE(in_data,0) AND
+id_tessera=COALESCE(in_id_tessera,1) AND
+id_evento=COALESCE(in_id_evento,1) AND
+id_varco=COALESCE(in_id_varco,1) AND
+direzione=in_direzione AND
 id_ospite=COALESCE(in_id_ospite,1)));
 END;
 $$
@@ -207,12 +230,12 @@ in_id_ospite INT
 )
 RETURNS INT(11)
 BEGIN
-RETURN (SELECT Sid FROM SER_REPORT WHERE 
-Data=COALESCE(in_data,0) AND 
-id_tessera=COALESCE(in_id_tessera,1) AND 
-id_evento=COALESCE(in_id_evento,1) AND 
-id_varco=COALESCE(in_id_varco,1) AND 
-direzione=in_direzione AND 
+RETURN (SELECT Sid FROM SER_REPORT WHERE
+Data=COALESCE(in_data,0) AND
+id_tessera=COALESCE(in_id_tessera,1) AND
+id_evento=COALESCE(in_id_evento,1) AND
+id_varco=COALESCE(in_id_varco,1) AND
+direzione=in_direzione AND
 id_ospite=COALESCE(in_id_ospite,1));
 END;
 $$
@@ -231,7 +254,7 @@ RETURN (SELECT Rid FROM SER_REPORT WHERE Sid=in_sid);
 END;
 $$
 
--- insert 
+-- insert
 
 CREATE FUNCTION `input_repo`(in_tipo VARCHAR(45),in_filename VARCHAR(45))
 RETURNS INT(11)
@@ -247,21 +270,21 @@ RETURN @id_output;
 END;
 $$
 
-CREATE FUNCTION `input_data_serchio`(in_data VARCHAR(45),in_ora VARCHAR(45))
+CREATE FUNCTION `input_ser_data`(in_data VARCHAR(45),in_ora VARCHAR(45))
 RETURNS DATETIME
 BEGIN
 RETURN (SELECT STR_TO_DATE(CONCAT(in_data,' ',COALESCE(in_ora,'00:00')),'%d/%m/%Y %H:%i'));
 END;
 $$
 
-CREATE FUNCTION `input_data_winwatch`(in_data VARCHAR(45),in_ora VARCHAR(45))
+CREATE FUNCTION `input_win_data`(in_data VARCHAR(45),in_ora VARCHAR(45))
 RETURNS DATETIME
 BEGIN
 RETURN (SELECT STR_TO_DATE(CONCAT(in_data,' ',COALESCE(in_ora,'00:00')),'%d-%m-%y %H:%i'));
 END;
 $$
 
-CREATE FUNCTION `input_tessera`(in_seriale VARCHAR(45),in_numero INT(11),in_tipo VARCHAR(45))
+CREATE FUNCTION `input_ser_tessera`(in_seriale VARCHAR(45),in_numero INT(11),in_tipo VARCHAR(45))
 RETURNS INT(11)
 BEGIN
 DECLARE my_tipo INT(1);
@@ -271,7 +294,7 @@ IF (in_tipo IS NOT NULL) THEN
 	CASE
 	WHEN (STRCMP(in_tipo,'ESTERNI')=0) THEN
 		SET @my_tipo='1';
-	WHEN (STRCMP(in_tipo,'POSTE')=0) THEN 
+	WHEN (STRCMP(in_tipo,'POSTE')=0) THEN
 		SET @my_tipo='2';
 	ELSE
 		SET @my_tipo='0';
@@ -291,7 +314,7 @@ RETURN @id_output;
 END;
 $$
 
-CREATE FUNCTION `input_varco`(
+CREATE FUNCTION `input_ser_varco`(
 	in_varco VARCHAR(45),
 	in_centrale VARCHAR(45),
 	in_label VARCHAR(45),
@@ -308,11 +331,11 @@ IF (in_centrale IS NOT NULL) THEN
 	CASE
 	WHEN (STRCMP(in_centrale,'PULSAR 1')=0) THEN
 		SET @my_centrale='1';
-	WHEN (STRCMP(in_centrale,'PULSAR 2')=0) THEN 
+	WHEN (STRCMP(in_centrale,'PULSAR 2')=0) THEN
 		SET @my_centrale='2';
 	WHEN (STRCMP(in_centrale,'1')=0) THEN
 		SET @my_centrale='1';
-	WHEN (STRCMP(in_centrale,'2')=0) THEN 
+	WHEN (STRCMP(in_centrale,'2')=0) THEN
 		SET @my_centrale='2';
 	ELSE
 		SET @my_centrale='0';
@@ -322,7 +345,7 @@ ELSE
 END IF;
 
 IF NOT (SELECT test_ser_varco(@my_centrale,in_varco)) THEN
-	INSERT INTO SER_VARCHI(centrale,varco,label,antipanico,perimetrale,tastierino) 
+	INSERT INTO SER_VARCHI(centrale,varco,label,antipanico,perimetrale,tastierino)
 	VALUES(@my_centrale,in_varco,in_label,in_antipanico,in_perimetrale,in_tastierino);
 	SET @id_output = LAST_INSERT_ID();
 ELSE
@@ -333,7 +356,7 @@ RETURN @id_output;
 END;
 $$
 
-CREATE FUNCTION `input_evento`(in_evento VARCHAR(45))
+CREATE FUNCTION `input_ser_evento`(in_evento VARCHAR(45))
 RETURNS INT(11)
 BEGIN
 DECLARE id_output INT(11);
@@ -347,7 +370,7 @@ RETURN @id_output;
 END;
 $$
 
-CREATE FUNCTION `input_ospite`(in_ospite VARCHAR(45))
+CREATE FUNCTION `input_ser_ospite`(in_ospite VARCHAR(45))
 RETURNS INT(11)
 BEGIN
 DECLARE id_output INT(11);
@@ -356,6 +379,35 @@ IF NOT (SELECT test_ser_ospite(in_ospite)) THEN
 	SET @id_output = LAST_INSERT_ID();
 ELSE
 	SET @id_output = (SELECT get_ser_ospite(in_ospite));
+END IF;
+RETURN @id_output;
+END;
+$$
+
+CREATE FUNCTION `input_win_evento`(in_evento VARCHAR(45))
+RETURNS INT(11)
+BEGIN
+DECLARE id_output INT(11);
+IF NOT (SELECT test_win_evento(in_evento)) THEN
+	INSERT INTO WIN_EVENTI(evento) VALUES(in_evento);
+	SET @id_output = LAST_INSERT_ID();
+ELSE
+	SET @id_output = (SELECT get_win_evento(in_evento));
+END IF;
+
+RETURN @id_output;
+END;
+$$
+
+CREATE FUNCTION `input_win_messaggio`(in_messaggio VARCHAR(45))
+RETURNS INT(11)
+BEGIN
+DECLARE id_output INT(11);
+IF NOT (SELECT test_win_messaggio(in_messaggio)) THEN
+	INSERT INTO WIN_MESSAGGI(messaggio) VALUES(in_messaggio);
+	SET @id_output = LAST_INSERT_ID();
+ELSE
+	SET @id_output = (SELECT get_win_messaggio(in_messaggio));
 END IF;
 RETURN @id_output;
 END;

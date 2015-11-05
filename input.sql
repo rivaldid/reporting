@@ -30,41 +30,31 @@ SET @my_data = (SELECT input_data_winwatch(in_data,in_ora));
 
 -- evento
 IF (in_evento IS NOT NULL) THEN
-	IF NOT (SELECT test_win_evento(in_evento)) THEN
-		INSERT INTO WIN_EVENTI(evento) VALUES(in_evento);
-		SET @my_id_evento = LAST_INSERT_ID();
-	ELSE
-		SET @my_id_evento = (SELECT get_win_evento(in_evento));
-	END IF;
+	SET @my_id_evento = (SELECT input_win_evento(in_evento));
 ELSE
 	SET @my_id_evento = NULL;
 END IF;
 
 -- messaggio
 IF (in_messaggio IS NOT NULL) THEN
-	IF NOT (SELECT test_win_messaggio(in_messaggio)) THEN
-		INSERT INTO WIN_MESSAGGI(messaggio) VALUES(in_messaggio);
-		SET @my_id_messaggio = LAST_INSERT_ID();
-	ELSE
-		SET @my_id_messaggio = (SELECT get_win_messaggio(in_messaggio));
-	END IF;
+	SET @my_id_messaggio = (SELECT input_win_messaggio(in_messaggio));
 ELSE
 	SET @my_id_messaggio = NULL;
 END IF;
 
 -- report
 IF NOT (SELECT test_win_report(in_centrale,@my_data,@my_id_evento,@my_id_messaggio)) THEN
-	
+
 	INSERT INTO WIN_REPORT(Centrale,Data,id_evento,id_messaggio,Rid,contatore)
 	VALUES(in_centrale,@my_data,@my_id_evento,@my_id_messaggio,@my_rid,'1');
-	
+
 ELSE
-	
+
 	SET @stored_wid = (SELECT get_win_report(in_centrale,@my_data,@my_id_evento,@my_id_messaggio));
 	SET @stored_rid = (SELECT get_win_referer(@stored_wid));
-	
+
 	UPDATE WIN_REPORT SET contatore=contatore+1 WHERE Wid=@stored_wid AND @my_rid=@stored_rid;
-			
+
 END IF;
 
 END;
@@ -100,31 +90,31 @@ SET @my_rid = (SELECT input_repo('serchio',in_filename));
 
 -- data
 IF (in_data IS NOT NULL) THEN
-	SET @my_data = (SELECT input_data_serchio(in_data,in_ora));
+	SET @my_data = (SELECT input_ser_data(in_data,in_ora));
 ELSE
 	SET @my_data = 0;
 END IF;
 
 -- tessera
 IF (in_seriale IS NOT NULL) THEN
-	SET @my_id_tessera = (SELECT input_tessera(in_seriale,NULL,NULL));
+	SET @my_id_tessera = (SELECT input_ser_tessera(in_seriale,NULL,NULL));
 ELSE
 	SET @my_id_tessera = '1';
 END IF;
-	
+
 -- evento
 IF (in_evento IS NOT NULL) THEN
-	SET @my_id_evento = (SELECT input_evento(in_evento));
+	SET @my_id_evento = (SELECT input_ser_evento(in_evento));
 ELSE
 	SET @my_id_evento = '1';
 END IF;
 
 -- varco
 IF (in_varco IS NOT NULL) THEN
-	SET @my_id_varco = (SELECT input_varco(in_varco,in_centrale,NULL,NULL,NULL,NULL));
+	SET @my_id_varco = (SELECT input_ser_varco(in_varco,in_centrale,NULL,NULL,NULL,NULL));
 ELSE
 	IF (in_centrale IS NOT NULL) THEN
-		SET @my_id_varco = (SELECT input_varco(NULL,in_centrale,NULL,NULL,NULL,NULL));
+		SET @my_id_varco = (SELECT input_ser_varco(NULL,in_centrale,NULL,NULL,NULL,NULL));
 	ELSE
 		SET @my_id_varco = '1';
 	END IF;
@@ -132,7 +122,7 @@ END IF;
 
 -- ospite
 IF (in_ospite IS NOT NULL) THEN
-	SET @my_id_ospite = (SELECT input_ospite(in_ospite));
+	SET @my_id_ospite = (SELECT input_ser_ospite(in_ospite));
 ELSE
 	SET @my_id_ospite = '1';
 END IF;
@@ -154,7 +144,7 @@ ELSE
 
 	SET @stored_sid = (SELECT get_ser_report(@my_data,@my_id_tessera,@my_id_evento,@my_id_varco,@my_direzione,@my_id_ospite));
 	SET @stored_rid = (SELECT get_ser_referer(@stored_sid));
-	
+
 	UPDATE SER_REPORT SET contatore=contatore+1 WHERE Sid=@stored_sid AND @my_rid=@stored_rid;
 
 END IF;
