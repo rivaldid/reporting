@@ -19,7 +19,7 @@ $$
 
 CREATE FUNCTION `id2ospite`(in_id_ospite INT) RETURNS VARCHAR(45)
 BEGIN
-RETURN (SELECT nome FROM SER_OSPITI WHERE id_ospite=in_id_ospite);
+RETURN (SELECT HTML_UnEncode(nome) FROM SER_OSPITI WHERE id_ospite=in_id_ospite);
 END;
 $$
 
@@ -38,7 +38,9 @@ $$
 CREATE PROCEDURE `routing`(IN in_start datetime)
 BEGIN
 
+DECLARE main_sid INT;
 DECLARE main_data datetime;
+DECLARE main_datafile datetime;
 DECLARE main_id_tessera INT;
 DECLARE main_id_ospite INT;
 DECLARE main_id_evento INT;
@@ -52,10 +54,11 @@ DECLARE sub_direzione VARCHAR(45);
 
 DECLARE done INT DEFAULT FALSE;
 -- DECLARE query CURSOR FOR SELECT Data,id_tessera,id_ospite,id_evento,id_varco,direzione FROM SER_REPORT WHERE Data>=in_start AND id_evento IN (4,7,11,20,24,25);
-DECLARE query CURSOR FOR SELECT Data,id_tessera,id_ospite,id_evento,id_varco,direzione FROM SER_REPORT WHERE Data>=in_start AND id_tessera <> 1;
+DECLARE query CURSOR FOR SELECT Sid,SER_REPORT.Data,REPOSITORY.data AS datafile,id_tessera,id_ospite,id_evento,id_varco,direzione FROM SER_REPORT JOIN REPOSITORY USING(Rid) WHERE SER_REPORT.Data>=in_start AND id_tessera <> 1;
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 CREATE TEMPORARY TABLE PASSAGGI(
+sid int,
 data datetime,
 durata int,
 ospite varchar(135),
@@ -65,12 +68,18 @@ destinazione varchar(135));
 OPEN query;
 myloop: LOOP
 
-	FETCH query INTO main_data,main_id_tessera,main_id_ospite,main_id_evento,main_id_varco,main_direzione;
+	FETCH query INTO main_sid,main_data,main_datafile,main_id_tessera,main_id_ospite,main_id_evento,main_id_varco,main_direzione;
 	
-	SELECT Data,id_evento,id_varco,direzione INTO sub_data,sub_id_evento,sub_id_varco,sub_direzione 
-	FROM SER_REPORT WHERE Data>main_data AND id_tessera=main_id_tessera ANd id_ospite=main_id_ospite LIMIT 1;
+	SELECT SER_REPORT.Data,id_evento,id_varco,direzione INTO sub_data,sub_id_evento,sub_id_varco,sub_direzione 
+	FROM SER_REPORT JOIN REPOSITORY USING(Rid) WHERE 
+	REPOSITORY.data>=main_datafile AND 
+	SER_REPORT.Data>=main_data AND 
+	Sid>main_sid AND 
+	id_tessera=main_id_tessera ANd 
+	id_ospite=main_id_ospite LIMIT 1;
 	
-	INSERT INTO PASSAGGI(data,durata,ospite,provenienza,destinazione) VALUES(
+	INSERT INTO PASSAGGI(sid,data,durata,ospite,provenienza,destinazione) VALUES(
+	main_sid,
 	main_data,
 	TIMESTAMPDIFF(MINUTE,main_data,sub_data),
 	CONCAT_WS(' ',
@@ -93,7 +102,7 @@ myloop: LOOP
 END LOOP myloop;
 CLOSE query;
 
-SELECT * FROM PASSAGGI;
+SELECT data,durata,ospite,provenienza,destinazione FROM PASSAGGI ORDER BY Sid;
 DROP TEMPORARY TABLE PASSAGGI;
 
 END;

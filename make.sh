@@ -22,6 +22,9 @@ fi
 echo "--> Carico la base" >> $LOG
 mysql $MYARGS -e "source $PREFIX/base.sql \W;" >> $LOG
 
+echo "--> Carico il decoder html" >> $LOG
+mysql $MYARGS -e "source $PREFIX/myhtmldecode.sql \W;" >> $LOG
+
 echo "--> Carico le funzioni" >> $LOG
 mysql $MYARGS -e "source $PREFIX/functions.sql \W;" >> $LOG
 
