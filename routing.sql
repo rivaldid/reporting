@@ -42,7 +42,7 @@ DECLARE main_sid INT;
 DECLARE main_data datetime;
 DECLARE main_datafile datetime;
 DECLARE main_id_tessera INT;
-DECLARE main_id_ospite INT;
+DECLARE main_ospite VARCHAR(45);
 DECLARE main_id_evento INT;
 DECLARE main_id_varco INT;
 DECLARE main_direzione VARCHAR(45);
@@ -53,30 +53,36 @@ DECLARE sub_id_varco INT;
 DECLARE sub_direzione VARCHAR(45);
 
 DECLARE done INT DEFAULT FALSE;
+
 -- DECLARE query CURSOR FOR SELECT Data,id_tessera,id_ospite,id_evento,id_varco,direzione FROM SER_REPORT WHERE Data>=in_start AND id_evento IN (4,7,11,20,24,25);
-DECLARE query CURSOR FOR SELECT Sid,SER_REPORT.Data,REPOSITORY.data AS datafile,id_tessera,id_ospite,id_evento,id_varco,direzione FROM SER_REPORT JOIN REPOSITORY USING(Rid) WHERE SER_REPORT.Data>=in_start AND id_tessera <> 1;
+
+DECLARE query CURSOR FOR 
+SELECT Sid,SER_REPORT.Data,REPOSITORY.data,id_tessera,HTML_UnEncode(SER_OSPITI.nome),id_evento,id_varco,direzione
+FROM SER_REPORT JOIN REPOSITORY USING(Rid) JOIN SER_OSPITI USING(id_ospite)
+WHERE SER_REPORT.Data>=in_start AND id_tessera <> 1;
+
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 CREATE TEMPORARY TABLE PASSAGGI(
 sid int,
 data datetime,
 durata int,
-ospite varchar(135),
-provenienza varchar(135),
-destinazione varchar(135));
+ospite varchar(150),
+provenienza varchar(150),
+destinazione varchar(150));
 
 OPEN query;
 myloop: LOOP
 
-	FETCH query INTO main_sid,main_data,main_datafile,main_id_tessera,main_id_ospite,main_id_evento,main_id_varco,main_direzione;
+	FETCH query INTO main_sid,main_data,main_datafile,main_id_tessera,main_ospite,main_id_evento,main_id_varco,main_direzione;
 	
 	SELECT SER_REPORT.Data,id_evento,id_varco,direzione INTO sub_data,sub_id_evento,sub_id_varco,sub_direzione 
-	FROM SER_REPORT JOIN REPOSITORY USING(Rid) WHERE 
+	FROM SER_REPORT JOIN REPOSITORY USING(Rid) JOIN SER_OSPITI USING(id_ospite) WHERE 
 	REPOSITORY.data>=main_datafile AND 
 	SER_REPORT.Data>=main_data AND 
 	Sid>main_sid AND 
-	id_tessera=main_id_tessera ANd 
-	id_ospite=main_id_ospite LIMIT 1;
+	id_tessera=main_id_tessera AND
+	SUBSTRING(HTML_UnEncode(SER_OSPITI.nome),1,13)=SUBSTRING(main_ospite,1,13) LIMIT 1;
 	
 	INSERT INTO PASSAGGI(sid,data,durata,ospite,provenienza,destinazione) VALUES(
 	main_sid,
@@ -84,7 +90,7 @@ myloop: LOOP
 	TIMESTAMPDIFF(MINUTE,main_data,sub_data),
 	CONCAT_WS(' ',
 	(SELECT id2tessera(main_id_tessera)),
-	(SELECT id2ospite(main_id_ospite))),
+	main_ospite),
 	CONCAT_WS(' ',
 	(SELECT id2evento(main_id_evento)),
 	(SELECT id2varco(main_id_varco)),
