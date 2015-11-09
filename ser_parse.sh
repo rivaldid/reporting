@@ -19,7 +19,7 @@ sudo mount $REPORT
 for file in $(find $REPORT -name "*.xps" -type f); do
 
 	INPUT=$file	# current file from loop
-	filename="${INPUT##*/}" # simple filename.csv
+	filename="${INPUT##*/}" # simple filename.ext
 	filereferer="${INPUT#$TRASH_PREFIX}" # full path without trash prefix
 
 	checksum=$(md5sum ${INPUT} | awk '{ print $1 }')

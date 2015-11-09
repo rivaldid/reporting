@@ -40,14 +40,14 @@ CREATE TABLE `WIN_REPORT` (
   `id_messaggio` int(11) DEFAULT NULL,
   `Rid` int(11) DEFAULT NULL,
   `contatore` int(11) DEFAULT NULL,
-  CONSTRAINT localkey UNIQUE 
+  CONSTRAINT localkey UNIQUE
   (`Centrale`,`Data`,`id_evento`,`id_messaggio`),
   PRIMARY KEY (`Wid`),
-  CONSTRAINT FOREIGN KEY (`id_evento`) 
-	REFERENCES WIN_EVENTI(`id_evento`) 
+  CONSTRAINT FOREIGN KEY (`id_evento`)
+	REFERENCES WIN_EVENTI(`id_evento`)
 	ON DELETE CASCADE,
-  CONSTRAINT FOREIGN KEY (`id_messaggio`) 
-	REFERENCES WIN_MESSAGGI(`id_messaggio`) 
+  CONSTRAINT FOREIGN KEY (`id_messaggio`)
+	REFERENCES WIN_MESSAGGI(`id_messaggio`)
 	ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -104,20 +104,20 @@ CREATE TABLE `SER_REPORT` (
   `id_ospite` int(11) DEFAULT NULL,
   `Rid` int(11) DEFAULT NULL,
   `contatore` int(11) DEFAULT NULL,
-  CONSTRAINT localkey UNIQUE 
+  CONSTRAINT localkey UNIQUE
   (`Data`,`id_tessera`,`id_evento`,`id_varco`,`direzione`,`id_ospite`),
   PRIMARY KEY (`Sid`),
-  CONSTRAINT FOREIGN KEY (`id_tessera`) 
-	REFERENCES SER_TESSERE(`id_tessera`) 
+  CONSTRAINT FOREIGN KEY (`id_tessera`)
+	REFERENCES SER_TESSERE(`id_tessera`)
 	ON DELETE CASCADE,
-  CONSTRAINT FOREIGN KEY (`id_evento`) 
-	REFERENCES SER_EVENTI(`id_evento`) 
+  CONSTRAINT FOREIGN KEY (`id_evento`)
+	REFERENCES SER_EVENTI(`id_evento`)
 	ON DELETE CASCADE,
-  CONSTRAINT FOREIGN KEY (`id_varco`) 
-	REFERENCES SER_VARCHI(`id_varco`) 
+  CONSTRAINT FOREIGN KEY (`id_varco`)
+	REFERENCES SER_VARCHI(`id_varco`)
 	ON DELETE CASCADE,
-  CONSTRAINT FOREIGN KEY (`id_ospite`) 
-	REFERENCES SER_OSPITI(`id_ospite`) 
+  CONSTRAINT FOREIGN KEY (`id_ospite`)
+	REFERENCES SER_OSPITI(`id_ospite`)
 	ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
