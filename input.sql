@@ -10,7 +10,7 @@ IN in_ora VARCHAR(45),
 IN in_data VARCHAR(45),
 IN in_evento VARCHAR(45),
 IN in_messaggio VARCHAR(100),
-IN in_filename VARCHAR(45)
+IN in_checksum CHAR(32)
 )
 BEGIN
 
@@ -23,10 +23,10 @@ DECLARE stored_wid INT;
 DECLARE stored_rid INT;
 
 -- referer
-SET @my_rid = (SELECT input_repo('winwatch',in_filename));
+SET @my_rid = (SELECT input_repo(in_checksum));
 
 -- data
-SET @my_data = (SELECT input_data_winwatch(in_data,in_ora));
+SET @my_data = (SELECT input_win_data(in_data,in_ora));
 
 -- evento
 IF (in_evento IS NOT NULL) THEN
@@ -70,7 +70,7 @@ IN in_evento VARCHAR(45),
 IN in_varco VARCHAR(45),
 IN in_direzione VARCHAR(45),
 IN in_ospite VARCHAR(45),
-IN in_filename VARCHAR(45)
+IN in_checksum CHAR(32)
 )
 BEGIN
 
@@ -86,7 +86,7 @@ DECLARE stored_sid INT;
 DECLARE stored_rid INT;
 
 -- referer
-SET @my_rid = (SELECT input_repo('serchio',in_filename));
+SET @my_rid = (SELECT input_repo(in_checksum));
 
 -- data
 IF (in_data IS NOT NULL) THEN

@@ -22,7 +22,9 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 	filename="${INPUT##*/}" # simple filename.csv
 	filereferer="${INPUT#$TRASH_PREFIX}" # full path without trash prefix
 
-	report_done=$(mysql -ureporting -preportuser -D reporting -s -N -e "SELECT test_repo('serchio','$filereferer');")
+	checksum=$(md5sum ${INPUT} | awk '{ print $1 }')
+
+	report_done=$(mysql -ureporting -preportuser -D reporting -s -N -e "SELECT test_repo('$checksum');")
 
 	if [ "$report_done" = "0" ]; then
 
@@ -56,8 +58,7 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					[[ ! "$target" =~ "- Stampa Report da" ]]; then
 
 					#echo "$target" >> $LOG
-
-					mycall="CALL input_serchio($(perl ser_parse_core.pl "$target"),'$filereferer');"
+					mycall="CALL input_serchio($(perl ser_parse_core.pl "$target"),'$checksum');"
 
 					echo "$mycall" >> $LOG
 

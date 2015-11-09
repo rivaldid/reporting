@@ -19,7 +19,9 @@ for file in $(find $REPORT -name "*.csv" -type f); do
 	filereferer="${INPUT#$TRASH_PREFIX}" # full path without trash prefix
 	TEMP=$PREFIX/$filename.temp.csv # conversion latin to utf (windows to linux)
 
-	report_done=$(mysql -ureporting -preportuser -D reporting -s -N -e "SELECT test_repo('winwatch','$filereferer');")
+	checksum=$(md5sum ${INPUT} | awk '{ print $1 }')
+
+	report_done=$(mysql -ureporting -preportuser -D reporting -s -N -e "SELECT test_repo('$checksum');")
 
 	if [ "$report_done" = "0" ]; then
 
@@ -63,7 +65,7 @@ for file in $(find $REPORT -name "*.csv" -type f); do
 
 			done <<< $line
 
-			mycall="CALL input_winwatch('$centrale','$ora','$data','$evento','$messaggio','$filereferer');"
+			mycall="CALL input_winwatch('$centrale','$ora','$data','$evento','$messaggio','$checksum');"
 			echo $mycall >> $LOG
 			mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
 

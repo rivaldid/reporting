@@ -9,9 +9,8 @@ DROP TABLE IF EXISTS `REPOSITORY`;
 CREATE TABLE `REPOSITORY` (
   `Rid` int(11) NOT NULL AUTO_INCREMENT,
   `data` datetime NOT NULL,
-  `tipo` varchar(45) NOT NULL,
-  `filename` varchar(45) NOT NULL,
-  CONSTRAINT localkey UNIQUE (`tipo`,`filename`),
+  `checksum` char(32) NOT NULL,
+  UNIQUE (`checksum`),
   PRIMARY KEY (`Rid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

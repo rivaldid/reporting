@@ -58,17 +58,17 @@ DELIMITER $$
 
 -- utils generic
 
-CREATE FUNCTION `test_repo`(in_tipo VARCHAR(45),in_filename VARCHAR(45))
+CREATE FUNCTION `test_repo`(in_checksum CHAR(32))
 RETURNS TINYINT(1)
 BEGIN
-RETURN (SELECT EXISTS(SELECT 1 FROM REPOSITORY WHERE tipo=in_tipo AND filename=in_filename));
+RETURN (SELECT EXISTS(SELECT 1 FROM REPOSITORY WHERE checksum=in_checksum));
 END;
 $$
 
-CREATE FUNCTION `get_repo`(in_tipo VARCHAR(45),in_filename VARCHAR(45))
+CREATE FUNCTION `get_repo`(in_checksum CHAR(32))
 RETURNS INT(11)
 BEGIN
-RETURN (SELECT Rid FROM REPOSITORY WHERE tipo=in_tipo AND filename=in_filename);
+RETURN (SELECT Rid FROM REPOSITORY WHERE checksum=in_checksum);
 END;
 $$
 
@@ -256,15 +256,15 @@ $$
 
 -- insert
 
-CREATE FUNCTION `input_repo`(in_tipo VARCHAR(45),in_filename VARCHAR(45))
+CREATE FUNCTION `input_repo`(in_checksum CHAR(32))
 RETURNS INT(11)
 BEGIN
 DECLARE id_output INT(11);
-IF NOT (SELECT test_repo(in_tipo,in_filename)) THEN
-	INSERT INTO REPOSITORY(data,tipo,filename) VALUES((SELECT NOW()),in_tipo,in_filename);
+IF NOT (SELECT test_repo(in_checksum)) THEN
+	INSERT INTO REPOSITORY(data,checksum) VALUES((SELECT NOW()),in_checksum);
 	SET @id_output = LAST_INSERT_ID();
 ELSE
-	SET @id_output = (SELECT get_repo(in_tipo,in_filename));
+	SET @id_output = (SELECT get_repo(in_checksum));
 END IF;
 RETURN @id_output;
 END;
