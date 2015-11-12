@@ -10,14 +10,19 @@ MYARGS="-H -ureporting -preportuser -D reporting"
 if [ -f $LOG ]; then rm $LOG; fi
 touch $LOG
 
-sudo mount $REPORT
+if grep -qs "$REPORT" /proc/mounts; then
+    echo "--> $REPORT mounted."
+else
+    echo "--> $REPORT not mounted."
+	sudo mount "$REPORT"
+fi
 
 for file in $(find $REPORT -name "*.csv" -type f); do
 
 	INPUT=$file	# current file from loop
 	filename="${INPUT##*/}" # simple filename.ext
 	filereferer="${INPUT#$TRASH_PREFIX}" # full path without trash prefix
-	TEMP=$PREFIX/$filename.temp.csv # conversion latin to utf (windows to linux)
+	TEMP="$PREFIX/$filename.temp.csv" # conversion latin to utf (windows to linux)
 
 	checksum=$(md5sum ${INPUT} | awk '{ print $1 }')
 

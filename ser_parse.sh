@@ -14,7 +14,12 @@ touch $LOG
 if [ -d $TEMP_DIR ]; then rm -rf $TEMP_DIR; fi
 mkdir -p $TEMP_DIR
 
-sudo mount $REPORT
+if grep -qs "$REPORT" /proc/mounts; then
+    echo "--> $REPORT mounted."
+else
+    echo "--> $REPORT not mounted."
+	sudo mount "$REPORT"
+fi
 
 for file in $(find $REPORT -name "*.xps" -type f); do
 
