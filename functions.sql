@@ -399,7 +399,7 @@ RETURN @id_output;
 END;
 $$
 
-CREATE FUNCTION `input_win_messaggio`(in_messaggio VARCHAR(45))
+CREATE FUNCTION `input_win_messaggio`(in_messaggio VARCHAR(100))
 RETURNS INT(11)
 BEGIN
 DECLARE id_output INT(11);

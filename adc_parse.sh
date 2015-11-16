@@ -39,22 +39,26 @@ for file in $(find $REPORT -name "*TO1*.xls" -type f); do
 		# converto e codifico
 		convertxls2csv_altsep -x "$INPUT" -b WINDOWS-1252 -c "$TEMP" -a UTF-8
 		
+		#awk -F'~' 'BEGIN {i=0} {for (i=1;i<=NF;i++) print $i}' "$TEMP" |tr -d '"'
+		
 		#fields=()
-		i=0
+		#i=0
 		while read line; do
 		
-			j=0
-			while IFS='~' read -ra field; do
+			echo "$line"
+		
+			#j=0
+			#while IFS='~' read -ra field; do
 				#echo "valore: $field"
-				output[$j]="${field[@]:$i:1}"
-			done <<< "$line"
+				#output[$j]="${field[@]:$i:1}"
+			#done <<< "$line"
 		
 			#fields[$i]=$(grep -o "~" <<< "$line" | wc -l)
-			i=$i+1
+			#i=$i+1
 			
-			echo ${output[@]}
+			#echo ${output[@]}
 			
-		done < $TEMP
+		done < "$TEMP"
 
 		#echo "numero campi per colonne: ${fields[@]}"
 		#echo "numero righe: ${#fields[@]}"
