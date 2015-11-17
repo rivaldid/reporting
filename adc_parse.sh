@@ -41,27 +41,61 @@ for file in $(find $REPORT -name "*TO1*.xls" -type f); do
 		
 		#awk -F'~' 'BEGIN {i=0} {for (i=1;i<=NF;i++) print $i}' "$TEMP" |tr -d '"'
 		
-		#fields=()
-		#i=0
-		while read line; do
+		for ((i=0; i<=$(wc -l "$TEMP" | cut -f1 -d' '); i++)); do
 		
-			echo "$line"
+			#echo "--> riga $i-esima"
+			output=()
+			j=0
 		
-			#j=0
-			#while IFS='~' read -ra field; do
-				#echo "valore: $field"
-				#output[$j]="${field[@]:$i:1}"
-			#done <<< "$line"
-		
-			#fields[$i]=$(grep -o "~" <<< "$line" | wc -l)
-			#i=$i+1
+			while read line; do
 			
-			#echo ${output[@]}
+				while IFS='~' read -ra field; do
+					
+					if [ -z "${field[$i]}" ]; then 
+						valore=NULL
+					else
+						valore="${field[$i]}"
+						valore="$(printf "$valore" | tr -d '\011\012\015' | sed -e 's/^ *//g;s/ *$//g' | tr -d '"')"
+					fi
+				
+					case "$j" in
+						0) cognome="$valore";;
+						1) nome="$valore";;
+						2) societa="$valore";;
+						3) tipo_doc="$valore";;
+						4) num_doc="$valore";;
+						5) scad_doc="$valore";;
+						6) decorrenza="$valore";;
+						7) scadenza="$valore";;
+						8) badge="$valore";;
+						9) gruppo="$valore";;
+						10) note="$valore";;
+						11) struttura="$valore";;
+						12) profilo="$valore";;
+						13) cf="$valore";;
+						14) data_di_nascita="$valore";;
+						15) nazionalita="$valore";;
+						#15 autorizzazione temporanea
+						#16 telefono
+						#17 badge pi
+						#18 badge to
+						#19 data center
+						21) locali="$valore";;
+					esac
+					
+					let "j++"
+					
+					#echo $valore
+					
+				done <<< "$line"
+				
+				#echo "${output[@]}"
+				
+			done < "$TEMP"
 			
-		done < "$TEMP"
+			echo "CALL input_adc('$cognome','$nome','$societa','$tipo_doc','$num_doc','$scad_doc','$decorrenza','$scadenza','$badge','$gruppo','$note','$struttura','$profilo','$cf','$data_di_nascita','$nazionalita','$locali','$checksum');"
 
-		#echo "numero campi per colonne: ${fields[@]}"
-		#echo "numero righe: ${#fields[@]}"
+		done
 		
 		#cleanup
 		rm $TEMP
