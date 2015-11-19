@@ -23,6 +23,17 @@ DROP FUNCTION IF EXISTS `get_ser_report`;
 DROP FUNCTION IF EXISTS `test_ser_duplicati`;
 DROP FUNCTION IF EXISTS `get_ser_referer`;
 
+DROP FUNCTION IF EXISTS `test_adc_ospite`;
+DROP FUNCTION IF EXISTS `get_adc_ospite`;
+DROP FUNCTION IF EXISTS `test_adc_ospite_cf`;
+DROP FUNCTION IF EXISTS `test_adc_ospite_nazionalita`;
+DROP FUNCTION IF EXISTS `test_adc_documento`;
+DROP FUNCTION IF EXISTS `get_adc_documento`;
+DROP FUNCTION IF EXISTS `test_adc_struttura`;
+DROP FUNCTION IF EXISTS `get_adc_struttura`;
+DROP FUNCTION IF EXISTS `test_adc_profilo`;
+DROP FUNCTION IF EXISTS `get_adc_profilo`;
+
 DROP FUNCTION IF EXISTS `input_repo`;
 
 DROP FUNCTION IF EXISTS `input_ser_data`;
@@ -34,6 +45,11 @@ DROP FUNCTION IF EXISTS `input_ser_ospite`;
 DROP FUNCTION IF EXISTS `input_win_data`;
 DROP FUNCTION IF EXISTS `input_win_evento`;
 DROP FUNCTION IF EXISTS `input_win_messaggio`;
+
+DROP FUNCTION IF EXISTS `input_adc_ospite`;
+DROP FUNCTION IF EXISTS `input_adc_documento`;
+DROP FUNCTION IF EXISTS `input_adc_struttura`;
+DROP FUNCTION IF EXISTS `input_adc_profilo`;
 
 -- schema function input_foo_bar
 -- begin
@@ -254,6 +270,50 @@ RETURN (SELECT Rid FROM SER_REPORT WHERE Sid=in_sid);
 END;
 $$
 
+-- utils adc
+
+CREATE FUNCTION `test_adc_ospite`(in_nome VARCHAR(45),in_data_di_nascita date)
+RETURNS TINYINT(1)
+BEGIN
+RETURN (SELECT EXISTS(SELECT 1 FROM ADC_OSPITI WHERE nome=in_nome AND data_di_nascita=in_data_di_nascita));
+END;
+$$
+
+CREATE FUNCTION `get_adc_ospite`(in_nome VARCHAR(45),in_data_di_nascita date)
+RETURNS INT(11)
+BEGIN
+RETURN (SELECT id_ospite FROM SER_OSPITI WHERE nome=in_nome AND data_di_nascita=in_data_di_nascita);
+END;
+$$
+
+CREATE FUNCTION `test_adc_ospite_cf`(in_nome VARCHAR(45),in_data_di_nascita date)
+RETURNS TINYINT(1)
+BEGIN
+RETURN (SELECT EXISTS(SELECT 1 FROM ADC_OSPITI WHERE nome=in_nome AND data_di_nascita=in_data_di_nascita AND cf<>'NULL'));
+END;
+$$
+
+CREATE FUNCTION `test_adc_ospite_nazionalita`(in_nome VARCHAR(45),in_data_di_nascita date)
+RETURNS TINYINT(1)
+BEGIN
+RETURN (SELECT EXISTS(SELECT 1 FROM ADC_OSPITI WHERE nome=in_nome AND data_di_nascita=in_data_di_nascita AND nazionalita<>'NULL'));
+END;
+$$
+
+CREATE FUNCTION `test_adc_documento`(in_tipo VARCHAR(45),in_numero VARCHAR(45),in_scadenza date)
+RETURNS TINYINT(1)
+BEGIN
+RETURN (SELECT EXISTS(SELECT 1 FROM ADC_DOCUMENTI WHERE tipo=in_tipo AND numero=in_numero AND scadenza=in_scadenza));
+END;
+$$
+
+CREATE FUNCTION `get_adc_documento`(in_tipo VARCHAR(45),in_numero VARCHAR(45),in_scadenza date)
+RETURNS INT(11)
+BEGIN
+RETURN (SELECT id_documento FROM ADC_DOCUMENTI WHERE WHERE tipo=in_tipo AND numero=in_numero AND scadenza=in_scadenza);
+END;
+$$
+
 -- insert
 
 CREATE FUNCTION `input_repo`(in_checksum CHAR(32))
@@ -413,5 +473,48 @@ RETURN @id_output;
 END;
 $$
 
+CREATE FUNCTION `input_adc_ospite`(
+in_cognome VARCHAR(45),in_nome VARCHAR(45),
+in_cf VARCHAR(45),
+in_data_di_nascita date,
+in_nazionalita VARCHAR(45))
+RETURNS INT(11)
+BEGIN
+DECLARE id_output INT(11);
+IF NOT (SELECT test_adc_ospite(CONCAT(in_cognome,' ',in_nome),in_data_di_nascita)) THEN
+	-- new
+	INSERT INTO ADC_OSPITI(nome,cf,data_di_nascita,nazionalita) VALUES
+	(CONCAT(in_cognome,' ',in_nome),in_cf,in_data_di_nascita,in_nazionalita);
+	-- id
+	SET @id_output = LAST_INSERT_ID();
+ELSE
+	-- cf
+	IF (in_cf IS NOT NULL) THEN
+		UPDATE ADC_OSPITI SET cf=in_cf WHERE nome=CONCAT(in_cognome,' ',in_nome) AND data_di_nascita=in_data_di_nascita;
+	END IF;
+	-- nazionalita
+	IF (in_nazionalita IS NOT NULL) THEN
+		UPDATE ADC_OSPITI SET nazionalita=in_nazionalita WHERE nome=CONCAT(in_cognome,' ',in_nome) AND data_di_nascita=in_data_di_nascita;
+	END IF;
+	-- id
+	SET @id_output = (SELECT get_adc_ospite(CONCAT(in_cognome,' ',in_nome),in_data_di_nascita));
+END IF;
+RETURN @id_output;
+END;
+$$
+
+CREATE FUNCTION `input_adc_documento`(in_tipo VARCHAR(45),in_numero VARCHAR(45),in_scadenza date)
+RETURNS INT(11)
+BEGIN
+DECLARE id_output INT(11);
+IF NOT (SELECT test_adc_documento(in_tipo,in_numero,in_scadenza)) THEN
+	INSERT INTO ADC_DOCUMENTI(tipo,numero,scadenza) VALUES (in_tipo,in_numero_in_scadenza);
+	SET @id_output = LAST_INSERT_ID();
+ELSE
+	SET @id_output = (SELECT get_adc_documento(in_tipo,in_numero,in_scadenza));
+END IF;
+RETURN @id_output;
+END;
+$$
 
 DELIMITER ;
