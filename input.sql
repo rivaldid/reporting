@@ -1,5 +1,22 @@
 DROP PROCEDURE IF EXISTS `input_winwatch`;
 DROP PROCEDURE IF EXISTS `input_serchio`;
+DROP PROCEDURE IF EXISTS `input_adc`;
+
+-- schema procedure input
+-- begin
+-- 1) set @myrid from input_repo(checksum)
+-- 2) set @mydata
+-- 3winwatch) set @myevento/@mymessaggio
+-- 3serchio) set @myseriale/@myevento/@myvarco/@myospite
+-- 4) REPORT
+--	if not(test exists)
+--		insert
+--	else
+--		get stored id
+--		get stored rid
+--		update contatore++ where id,rid
+--	end if		
+-- end
 
 DELIMITER $$
 
@@ -149,6 +166,31 @@ ELSE
 
 END IF;
 
+END;
+$$
+
+
+CREATE PROCEDURE `input_adc`(
+IN in_cognome VARCHAR(45),
+IN in_nome VARCHAR(45),
+IN in_societa VARCHAR(45),
+IN in_tipo_doc VARCHAR(45),
+IN in_num_doc VARCHAR(45),
+IN in_scad_doc VARCHAR(45),
+IN in_decorrenza VARCHAR(45),
+IN in_scadenza VARCHAR(45),
+IN in_badge VARCHAR(45),
+IN in_gruppo VARCHAR(45),
+IN in_note VARCHAR(45),
+IN in_struttura VARCHAR(45),
+IN in_profilo VARCHAR(45),
+IN in_locali VARCHAR(200)
+)
+BEGIN
+DECLARE my_scad_doc DATE;
+DECLARE my_decorrenza DATE;
+DECLARE my_scadenza DATE;
+DECLARE my_data_di_nascita DATE;
 END;
 $$
 

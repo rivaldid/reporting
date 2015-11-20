@@ -18,7 +18,7 @@ else
 fi
 
 
-for file in $(find $REPORT -name "*TO1*.xls" -type f); do
+for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 	
 	INPUT=$file
 	filename="${INPUT##*/}" # simple filename.ext
