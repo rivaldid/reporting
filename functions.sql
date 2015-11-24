@@ -346,12 +346,12 @@ $$
 
 -- insert
 
-CREATE FUNCTION `input_repo`(in_checksum CHAR(32))
+CREATE FUNCTION `input_repo`(in_data DATETIME,in_checksum CHAR(32))
 RETURNS INT(11)
 BEGIN
 DECLARE id_output INT(11);
 IF NOT (SELECT test_repo(in_checksum)) THEN
-	INSERT INTO REPOSITORY(data,checksum) VALUES((SELECT NOW()),in_checksum);
+	INSERT INTO REPOSITORY(data,checksum) VALUES(in_data,in_checksum);
 	SET @id_output = LAST_INSERT_ID();
 ELSE
 	SET @id_output = (SELECT get_repo(in_checksum));

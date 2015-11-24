@@ -20,10 +20,18 @@ fi
 
 for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 	
-	INPUT=$file
+	INPUT="$file"
 	filename="${INPUT##*/}" # simple filename.ext
 	filereferer="${INPUT#$TRASH_PREFIX}" # full path without trash prefix
 	TEMP="$PREFIX/$filename.temp.csv"
+	
+	#date_container="${filename#ReportGiornaliero_TO1__}"
+	#date_container="${date_container%.xls}"
+	#date_container="$(echo $date_container | tr '_' '/')"
+	
+	data_report="$(printf "%s" "${filename:23:10}" | tr '_' '/')"
+	data_file="$(date -r $INPUT +'%Y-%m-%d %H.%M.%S')"
+	#data_file=$(printf "%d/%d/%d %d" "${date_container:11:2}" "${date_container:13:2}" "${date_container:15:4}" "${date_container:19}")
 	
 	checksum=$(md5sum ${INPUT} | awk '{ print $1 }')
 	
@@ -93,7 +101,7 @@ for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 				
 			done < "$TEMP"
 			
-			echo "CALL input_adc('$cognome','$nome','$societa','$tipo_doc','$num_doc','$scad_doc','$decorrenza','$scadenza','$badge','$gruppo','$note','$struttura','$profilo','$cf','$data_di_nascita','$nazionalita','$locali','$checksum');"
+			echo "CALL input_adc('$cognome','$nome','$societa','$tipo_doc','$num_doc','$scad_doc','$decorrenza','$scadenza','$badge','$gruppo','$note','$struttura','$profilo','$cf','$data_di_nascita','$nazionalita','$locali','$data_report','$checksum','$data_file');"
 
 		done
 		

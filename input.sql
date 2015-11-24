@@ -40,7 +40,7 @@ DECLARE stored_wid INT;
 DECLARE stored_rid INT;
 
 -- referer
-SET @my_rid = (SELECT input_repo(in_checksum));
+SET @my_rid = (SELECT input_repo((SELECT NOW()),in_checksum));
 
 -- data
 SET @my_data = (SELECT input_win_data(in_data,in_ora));
@@ -103,7 +103,7 @@ DECLARE stored_sid INT;
 DECLARE stored_rid INT;
 
 -- referer
-SET @my_rid = (SELECT input_repo(in_checksum));
+SET @my_rid = (SELECT input_repo((SELECT NOW()),in_checksum));
 
 -- data
 IF (in_data IS NOT NULL) THEN
@@ -184,13 +184,63 @@ IN in_gruppo VARCHAR(45),
 IN in_note VARCHAR(45),
 IN in_struttura VARCHAR(45),
 IN in_profilo VARCHAR(45),
-IN in_locali VARCHAR(200)
+IN in_cf VARCHAR(45),
+IN in_data_di_nascita VARCHAR(45),
+IN in_nazionalita VARCHAR(45),
+IN in_locali VARCHAR(200),
+IN in_data_report VARCHAR(45),
+IN in_checksum CHAR(32),
+IN in_data_file VARCHAR(45)
 )
 BEGIN
 DECLARE my_scad_doc DATE;
 DECLARE my_decorrenza DATE;
 DECLARE my_scadenza DATE;
 DECLARE my_data_di_nascita DATE;
+DECLARE my_data_report DATE;
+
+DECLARE my_rid INT;
+
+-- referer
+SET @my_rid = (SELECT input_repo(in_data_file,in_checksum));
+
+-- scad_doc
+IF (in_scad_doc IS NOT NULL) THEN
+	SET @my_scad_doc = (SELECT input_adc_data(in_scad_doc));
+ELSE
+	SET @my_scad_doc = 0;
+END IF;
+
+-- decorrenza
+IF (in_decorrenza IS NOT NULL) THEN
+	SET @my_decorrenza = (SELECT input_adc_data(in_decorrenza));
+ELSE
+	SET @my_decorrenza = 0;
+END IF;
+
+-- scadenza
+IF (in_scadenza IS NOT NULL) THEN
+	SET @my_scadenza = (SELECT input_adc_data(in_scadenza));
+ELSE
+	SET @my_scadenza = 0;
+END IF;
+
+-- data_di_nascita
+IF (in_data_di_nascita IS NOT NULL) THEN
+	SET @my_data_di_nascita = (SELECT input_adc_data(in_data_di_nascita));
+ELSE
+	SET @my_data_di_nascita = 0;
+END IF;
+
+-- data_report
+IF (in_data_report IS NOT NULL) THEN
+	SET @my_data_report = (SELECT input_adc_data(in_data_report));
+ELSE
+	SET @my_data_report = 0;
+END IF;
+
+
+
 END;
 $$
 
