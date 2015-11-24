@@ -174,7 +174,8 @@ CREATE TABLE `ADC_REPORT` (
   `id_struttura` int(11) DEFAULT NULL,
   `id_profilo` int(11) DEFAULT NULL,
   `locali` varchar(200) DEFAULT NULL,
-  `data_report` date NOT NULL,
+  `data_report` date DEFAULT NULL,
+  `Rid` int(11) DEFAULT NULL,
   PRIMARY KEY (`Aid`),
   CONSTRAINT FOREIGN KEY (`id_ospite`)
 	REFERENCES ADC_OSPITI(`id_ospite`)

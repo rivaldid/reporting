@@ -190,7 +190,7 @@ IN in_nazionalita VARCHAR(45),
 IN in_locali VARCHAR(200),
 IN in_data_report VARCHAR(45),
 IN in_checksum CHAR(32),
-IN in_data_file VARCHAR(45)
+IN in_data_file DATETIME
 )
 BEGIN
 DECLARE my_scad_doc DATE;
@@ -199,10 +199,12 @@ DECLARE my_scadenza DATE;
 DECLARE my_data_di_nascita DATE;
 DECLARE my_data_report DATE;
 
-DECLARE my_rid INT;
+DECLARE my_id_ospite INT;
+DECLARE my_id_documento INT;
+DECLARE my_id_struttura INT;
+DECLARE my_id_profilo INT;
 
--- referer
-SET @my_rid = (SELECT input_repo(in_data_file,in_checksum));
+DECLARE my_rid INT;
 
 -- scad_doc
 IF (in_scad_doc IS NOT NULL) THEN
@@ -239,6 +241,31 @@ ELSE
 	SET @my_data_report = 0;
 END IF;
 
+-- clean data from obsolete report
+IF (SELECT test_adc_report(@my_data_report)) THEN
+	-- if stored_data_file < in_data_file
+	IF ((SELECT REPOSITORY.data FROM ADC_REPORT JOIN REPOSITORY USING(Rid) WHERE ADC_REPORT.data_report=in_data_report) < in_data_file) THEN
+		DELETE FROM ADC_REPORT WHERE data_report=@my_data_report;
+	END IF;
+END IF;
+
+-- referer
+SET @my_rid = (SELECT input_repo(in_data_file,in_checksum));
+
+-- ospite
+SET @my_id_ospite = (SELECT input_adc_ospite(CONCAT(in_cognome,' ',in_nome),in_cf,@my_data_di_nascita,in_nazionalita));
+
+-- documento
+SET @my_id_documento = (SELECT input_adc_documento(in_tipo,in_numero,@my_scad_doc));
+
+-- struttura
+SET @my_id_struttura = (SELECT input_adc_struttura(in_struttura));
+
+-- profilo
+SET @my_id_profilo = (SELECT input_adc_profilo(in_profilo));
+
+INSERT INTO ADC_REPORT(id_ospite,societa,id_documento,decorrenza,scadenza,badge,gruppo,note,id_struttura,id_profilo,locali,data_report,Rid)
+VALUES(@my_id_ospite,in_societa,@my_id_documento,@my_decorrenza,@my_scadenza,in_badge,in_gruppo,in_note,@my_id_struttura,@my_id_profilo,in_locali,@my_data_report,@my_rid);
 
 
 END;

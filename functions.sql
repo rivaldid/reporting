@@ -33,6 +33,7 @@ DROP FUNCTION IF EXISTS `test_adc_struttura`;
 DROP FUNCTION IF EXISTS `get_adc_struttura`;
 DROP FUNCTION IF EXISTS `test_adc_profilo`;
 DROP FUNCTION IF EXISTS `get_adc_profilo`;
+DROP FUNCTION IF EXISTS `test_adc_report`;
 
 DROP FUNCTION IF EXISTS `input_repo`;
 
@@ -343,6 +344,14 @@ BEGIN
 RETURN (SELECT id_profilo FROM ADC_PROFILI WHERE label=in_label);
 END;
 $$
+
+CREATE FUNCTION `test_adc_report`(in_data_report DATE)
+RETURNS TINYINT(1)
+BEGIN
+RETURN (SELECT EXISTS(SELECT 1 FROM ADC_REPORT WHERE data_report=in_data_report));
+END;
+$$
+
 
 -- insert
 
