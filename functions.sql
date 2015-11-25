@@ -306,7 +306,7 @@ $$
 CREATE FUNCTION `get_adc_ospite`(in_nome VARCHAR(45),in_data_di_nascita date)
 RETURNS INT(11)
 BEGIN
-RETURN (SELECT id_ospite FROM SER_OSPITI WHERE nome=in_nome AND data_di_nascita=in_data_di_nascita);
+RETURN (SELECT id_ospite FROM ADC_OSPITI WHERE nome=in_nome AND data_di_nascita=in_data_di_nascita);
 END;
 $$
 

@@ -128,3 +128,8 @@ SELECT input_ser_varco('H(13)','PULSAR 1','DATACENT2 PORTA4','1','0','0');
 SELECT input_ser_varco('H(14)','PULSAR 1','CARRIER A','1','0','0');
 SELECT input_ser_varco('H(15)','PULSAR 1','CORR DATACENT1/2','1','0','0');
 SELECT input_ser_varco('H(16)','PULSAR 1','BUSSOLA ISOLA 15','0','0','0');
+
+SELECT input_adc_ospite('',NULL,NULL,NULL);
+SELECT input_adc_documento('','',NULL);
+SELECT input_adc_struttura('');
+SELECT input_adc_profilo('');

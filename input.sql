@@ -242,27 +242,44 @@ ELSE
 END IF;
 
 -- clean data from obsolete data
-IF (SELECT test_adc_report(@my_data_report)) THEN
+DELETE ADC_REPORT.* FROM ADC_REPORT INNER JOIN REPOSITORY USING(Rid) WHERE ADC_REPORT.data_report=@my_data_report AND REPOSITORY.data<in_data_file;
+-- IF (SELECT test_adc_report(@my_data_report)) THEN
 	-- if stored_data_file < in_data_file
-	IF ((SELECT REPOSITORY.data FROM REPOSITORY JOIN ADC_REPORT USING(Rid) WHERE ADC_REPORT.data_report=in_data_report) < in_data_file) THEN
-		DELETE FROM ADC_REPORT WHERE data_report=@my_data_report;
-	END IF;
-END IF;
+	-- IF ((SELECT REPOSITORY.data FROM REPOSITORY JOIN ADC_REPORT USING(Rid) WHERE ADC_REPORT.data_report=in_data_report) < in_data_file) THEN
+		-- DELETE FROM ADC_REPORT WHERE data_report=@my_data_report;
+	-- END IF;
+-- END IF;
 
 -- referer
 SET @my_rid = (SELECT input_repo(in_data_file,in_checksum));
 
 -- ospite
-SET @my_id_ospite = (SELECT input_adc_ospite(CONCAT(in_cognome,' ',in_nome),in_cf,@my_data_di_nascita,in_nazionalita));
+IF (in_cognome IS NOT NULL) THEN
+	SET @my_id_ospite = (SELECT input_adc_ospite(CONCAT(in_cognome,' ',in_nome),in_cf,@my_data_di_nascita,in_nazionalita));
+ELSE
+	SET @my_id_ospite='1';
+END IF;
 
 -- documento
-SET @my_id_documento = (SELECT input_adc_documento(in_tipo_doc,in_num_doc,@my_scad_doc));
+IF (in_num_doc IS NOT NULL) THEN
+	SET @my_id_documento = (SELECT input_adc_documento(in_tipo_doc,in_num_doc,@my_scad_doc));
+ELSE
+	SET @my_id_documento='1';
+END IF;
 
 -- struttura
-SET @my_id_struttura = (SELECT input_adc_struttura(in_struttura));
+IF (in_struttura IS NOT NULL) THEN
+	SET @my_id_struttura = (SELECT input_adc_struttura(in_struttura));
+ELSE
+	SET @my_id_struttura='1';
+END IF;
 
 -- profilo
-SET @my_id_profilo = (SELECT input_adc_profilo(in_profilo));
+IF (in_profilo IS NOT NULL) THEN
+	SET @my_id_profilo = (SELECT input_adc_profilo(in_profilo));
+ELSE
+	SET @my_id_profilo='1';
+END IF;
 
 INSERT INTO ADC_REPORT(id_ospite,societa,id_documento,decorrenza,scadenza,badge,gruppo,note,id_struttura,id_profilo,locali,data_report,Rid)
 VALUES(@my_id_ospite,in_societa,@my_id_documento,@my_decorrenza,@my_scadenza,in_badge,in_gruppo,in_note,@my_id_struttura,@my_id_profilo,in_locali,@my_data_report,@my_rid);
