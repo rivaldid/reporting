@@ -37,9 +37,9 @@ DROP FUNCTION IF EXISTS `test_adc_report`;
 
 DROP FUNCTION IF EXISTS `input_repo`;
 
-DROP FUNCTION IF EXISTS `input_win_data`;
-DROP FUNCTION IF EXISTS `input_ser_data`;
-DROP FUNCTION IF EXISTS `input_adc_data`;
+DROP FUNCTION IF EXISTS `pre_win_data`;
+DROP FUNCTION IF EXISTS `pre_ser_data`;
+DROP FUNCTION IF EXISTS `pre_adc_data`;
 
 DROP FUNCTION IF EXISTS `input_ser_tessera`;
 DROP FUNCTION IF EXISTS `input_ser_varco`;
@@ -88,6 +88,27 @@ CREATE FUNCTION `get_repo`(in_checksum CHAR(32))
 RETURNS INT(11)
 BEGIN
 RETURN (SELECT Rid FROM REPOSITORY WHERE checksum=in_checksum);
+END;
+$$
+
+CREATE FUNCTION `pre_win_data`(in_data VARCHAR(45),in_ora VARCHAR(45))
+RETURNS DATETIME
+BEGIN
+RETURN (SELECT STR_TO_DATE(CONCAT(in_data,' ',COALESCE(in_ora,'00:00')),'%d-%m-%y %H:%i'));
+END;
+$$
+
+CREATE FUNCTION `pre_ser_data`(in_data VARCHAR(45),in_ora VARCHAR(45))
+RETURNS DATETIME
+BEGIN
+RETURN (SELECT STR_TO_DATE(CONCAT(in_data,' ',COALESCE(in_ora,'00:00')),'%d/%m/%Y %H:%i'));
+END;
+$$
+
+CREATE FUNCTION `pre_adc_data`(in_data VARCHAR(45))
+RETURNS DATE
+BEGIN
+RETURN (SELECT STR_TO_DATE(in_data,'%d/%m/%Y'));
 END;
 $$
 
@@ -369,29 +390,6 @@ RETURN @id_output;
 END;
 $$
 
-
-CREATE FUNCTION `input_win_data`(in_data VARCHAR(45),in_ora VARCHAR(45))
-RETURNS DATETIME
-BEGIN
-RETURN (SELECT STR_TO_DATE(CONCAT(in_data,' ',COALESCE(in_ora,'00:00')),'%d-%m-%y %H:%i'));
-END;
-$$
-
-CREATE FUNCTION `input_ser_data`(in_data VARCHAR(45),in_ora VARCHAR(45))
-RETURNS DATETIME
-BEGIN
-RETURN (SELECT STR_TO_DATE(CONCAT(in_data,' ',COALESCE(in_ora,'00:00')),'%d/%m/%Y %H:%i'));
-END;
-$$
-
-CREATE FUNCTION `input_adc_data`(in_data VARCHAR(45))
-RETURNS DATE
-BEGIN
-RETURN (SELECT STR_TO_DATE(in_data,'%d/%m/%Y'));
-END;
-$$
-
-
 CREATE FUNCTION `input_ser_tessera`(in_seriale VARCHAR(45),in_numero INT(11),in_tipo VARCHAR(45))
 RETURNS INT(11)
 BEGIN
@@ -556,7 +554,7 @@ RETURNS INT(11)
 BEGIN
 DECLARE id_output INT(11);
 IF NOT (SELECT test_adc_documento(in_tipo,in_numero,in_scadenza)) THEN
-	INSERT INTO ADC_DOCUMENTI(tipo,numero,scadenza) VALUES (in_tipo,in_numero_in_scadenza);
+	INSERT INTO ADC_DOCUMENTI(tipo,numero,scadenza) VALUES (in_tipo,in_numero,in_scadenza);
 	SET @id_output = LAST_INSERT_ID();
 ELSE
 	IF (in_scadenza IS NOT NULL) THEN

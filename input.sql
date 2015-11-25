@@ -2,7 +2,7 @@ DROP PROCEDURE IF EXISTS `input_winwatch`;
 DROP PROCEDURE IF EXISTS `input_serchio`;
 DROP PROCEDURE IF EXISTS `input_adc`;
 
--- schema procedure input
+-- schema procedure input winwatch-serchio
 -- begin
 -- 1) set @myrid from input_repo(checksum)
 -- 2) set @mydata
@@ -43,7 +43,7 @@ DECLARE stored_rid INT;
 SET @my_rid = (SELECT input_repo((SELECT NOW()),in_checksum));
 
 -- data
-SET @my_data = (SELECT input_win_data(in_data,in_ora));
+SET @my_data = (SELECT pre_win_data(in_data,in_ora));
 
 -- evento
 IF (in_evento IS NOT NULL) THEN
@@ -107,7 +107,7 @@ SET @my_rid = (SELECT input_repo((SELECT NOW()),in_checksum));
 
 -- data
 IF (in_data IS NOT NULL) THEN
-	SET @my_data = (SELECT input_ser_data(in_data,in_ora));
+	SET @my_data = (SELECT pre_ser_data(in_data,in_ora));
 ELSE
 	SET @my_data = 0;
 END IF;
@@ -208,43 +208,43 @@ DECLARE my_rid INT;
 
 -- scad_doc
 IF (in_scad_doc IS NOT NULL) THEN
-	SET @my_scad_doc = (SELECT input_adc_data(in_scad_doc));
+	SET @my_scad_doc = (SELECT pre_adc_data(in_scad_doc));
 ELSE
 	SET @my_scad_doc = 0;
 END IF;
 
 -- decorrenza
 IF (in_decorrenza IS NOT NULL) THEN
-	SET @my_decorrenza = (SELECT input_adc_data(in_decorrenza));
+	SET @my_decorrenza = (SELECT pre_adc_data(in_decorrenza));
 ELSE
 	SET @my_decorrenza = 0;
 END IF;
 
 -- scadenza
 IF (in_scadenza IS NOT NULL) THEN
-	SET @my_scadenza = (SELECT input_adc_data(in_scadenza));
+	SET @my_scadenza = (SELECT pre_adc_data(in_scadenza));
 ELSE
 	SET @my_scadenza = 0;
 END IF;
 
 -- data_di_nascita
 IF (in_data_di_nascita IS NOT NULL) THEN
-	SET @my_data_di_nascita = (SELECT input_adc_data(in_data_di_nascita));
+	SET @my_data_di_nascita = (SELECT pre_adc_data(in_data_di_nascita));
 ELSE
 	SET @my_data_di_nascita = 0;
 END IF;
 
 -- data_report
 IF (in_data_report IS NOT NULL) THEN
-	SET @my_data_report = (SELECT input_adc_data(in_data_report));
+	SET @my_data_report = (SELECT pre_adc_data(in_data_report));
 ELSE
 	SET @my_data_report = 0;
 END IF;
 
--- clean data from obsolete report
+-- clean data from obsolete data
 IF (SELECT test_adc_report(@my_data_report)) THEN
 	-- if stored_data_file < in_data_file
-	IF ((SELECT REPOSITORY.data FROM ADC_REPORT JOIN REPOSITORY USING(Rid) WHERE ADC_REPORT.data_report=in_data_report) < in_data_file) THEN
+	IF ((SELECT REPOSITORY.data FROM REPOSITORY JOIN ADC_REPORT USING(Rid) WHERE ADC_REPORT.data_report=in_data_report) < in_data_file) THEN
 		DELETE FROM ADC_REPORT WHERE data_report=@my_data_report;
 	END IF;
 END IF;
@@ -256,7 +256,7 @@ SET @my_rid = (SELECT input_repo(in_data_file,in_checksum));
 SET @my_id_ospite = (SELECT input_adc_ospite(CONCAT(in_cognome,' ',in_nome),in_cf,@my_data_di_nascita,in_nazionalita));
 
 -- documento
-SET @my_id_documento = (SELECT input_adc_documento(in_tipo,in_numero,@my_scad_doc));
+SET @my_id_documento = (SELECT input_adc_documento(in_tipo_doc,in_num_doc,@my_scad_doc));
 
 -- struttura
 SET @my_id_struttura = (SELECT input_adc_struttura(in_struttura));

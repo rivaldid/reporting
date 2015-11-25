@@ -17,6 +17,8 @@ echo "*** BEGIN " $(date) "***" >> $LOG
 if [ $reset = false ]; then
 	echo "--> Dumping del db" >> $LOG
 	mysqldump -ureporting -preportuser reporting > $DUMPFILE
+else
+	echo "--> NO DUMP DB" >> $LOG
 fi
 
 echo "--> Carico la base" >> $LOG

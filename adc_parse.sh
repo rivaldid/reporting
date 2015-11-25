@@ -17,7 +17,6 @@ else
 	sudo mount "$REPORT"
 fi
 
-
 for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 	
 	INPUT="$file"
@@ -39,17 +38,17 @@ for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 
 	if [ "$report_done" = "0" ]; then
 	
-		echo "==> OK $INPUT da aggiungere"
+		echo "==> OK $INPUT da aggiungere" >> $LOG
 		echo "--> $TEMP in corso..."
 		
-		echo "--> Working $filereferer..."
+		echo -n "--> Working $filereferer..."
 		
 		# converto e codifico
-		convertxls2csv_altsep -x "$INPUT" -b WINDOWS-1252 -c "$TEMP" -a UTF-8
+		convertxls2csv_altsep -x "$INPUT" -b WINDOWS-1252 -c "$TEMP" -a UTF-8 &>/dev/null
 		
 		#awk -F'~' 'BEGIN {i=0} {for (i=1;i<=NF;i++) print $i}' "$TEMP" |tr -d '"'
 		
-		for ((i=0; i<=$(wc -l "$TEMP" | cut -f1 -d' '); i++)); do
+		for ((i=1; i<=$(wc -l "$TEMP" | cut -f1 -d' '); i++)); do
 		
 			#echo "--> riga $i-esima"
 			output=()
@@ -101,14 +100,16 @@ for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 				
 			done < "$TEMP"
 			
-			echo "CALL input_adc('$cognome','$nome','$societa','$tipo_doc','$num_doc','$scad_doc','$decorrenza','$scadenza','$badge','$gruppo','$note','$struttura','$profilo','$cf','$data_di_nascita','$nazionalita','$locali','$data_report','$checksum','$data_file');"
+			mycall="CALL input_adc('$cognome','$nome','$societa','$tipo_doc','$num_doc','$scad_doc','$decorrenza','$scadenza','$badge','$gruppo','$note','$struttura','$profilo','$cf','$data_di_nascita','$nazionalita','$locali','$data_report','$checksum','$data_file');"
+			echo "$mycall" >> $LOG
+			mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
 
 		done
 		
 		#cleanup
 		rm $TEMP
 		
-		echo "--> $filereferer done!"
+		echo "ok!"
 	
 	#else
 
