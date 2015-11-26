@@ -241,15 +241,6 @@ ELSE
 	SET @my_data_report = 0;
 END IF;
 
--- clean obsolete data
--- DELETE ADC_REPORT.* FROM ADC_REPORT INNER JOIN REPOSITORY USING(Rid) WHERE ADC_REPORT.data_report=@my_data_report AND REPOSITORY.data<in_data_file;
--- IF (SELECT test_adc_report(@my_data_report)) THEN
-	-- if stored_data_file < in_data_file
-	-- IF ((SELECT REPOSITORY.data FROM REPOSITORY JOIN ADC_REPORT USING(Rid) WHERE ADC_REPORT.data_report=in_data_report) < in_data_file) THEN
-		-- DELETE FROM ADC_REPORT WHERE data_report=@my_data_report;
-	-- END IF;
--- END IF;
-
 -- referer
 SET @my_rid = (SELECT input_repo(in_data_file,in_checksum));
 

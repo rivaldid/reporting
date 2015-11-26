@@ -34,10 +34,10 @@ for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 	
 	checksum=$(md5sum ${INPUT} | awk '{ print $1 }')
 	
-	report_done=$(mysql -ureporting -preportuser -D reporting -s -N -e "SELECT test_repo('$checksum');")
-	report_obsolete=$(mysql -ureporting -preportuser -D reporting -s -N -e "SELECT test_repo_adc((SELECT pre_adc_data('$data_report')),'$data_file');"))
+	report_not_done=$(mysql -ureporting -preportuser -D reporting -s -N -e "SELECT test_repo('$checksum');")
+	report_not_obsolete=$(mysql -ureporting -preportuser -D reporting -s -N -e "SELECT test_repo_adc((SELECT pre_adc_data('$data_report')),'$data_file');")
 
-	if [ "$report_done" = "0" ]; then
+	if [ "$report_not_done" = "0" ] && [ "$report_not_obsolete" = "0" ]; then
 	
 		echo "==> OK $INPUT da aggiungere" >> $LOG
 		echo "--> $TEMP in corso..."
