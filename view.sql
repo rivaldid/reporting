@@ -20,8 +20,32 @@ ORDER BY Data DESC;
 CREATE VIEW `BADGES` AS
 SELECT CONCAT_WS(' ',
 CASE tipo WHEN 1 THEN (SELECT 'ESTERNI') WHEN 2 THEN (SELECT 'POSTE') ELSE (SELECT 'SCONOSCIUTO') END,
-IF(NULLIF(numero,NULL),(SELECT CONCAT('numero ',numero)),NULL),
-'con',seriale) AS Badges
+IF(NULLIF(numero,NULL),(SELECT CONCAT(' ',numero)),NULL),
+' | ',seriale) AS Badges
 FROM SER_TESSERE
 WHERE seriale<>''
 ORDER BY tipo DESC,LENGTH(numero),numero;
+
+CREATE VIEW `ADC` AS
+SELECT 
+ADC_REPORT.data_report AS Data,
+ADC_OSPITI.nome AS Ospite,
+ADC_REPORT.societa AS Societa,
+CONCAT_WS('|',ADC_DOCUMENTI.tipo,ADC_DOCUMENTI.numero,ADC_DOCUMENTI.scadenza) AS Documento,
+ADC_REPORT.decorrenza AS Decorrenza,
+ADC_REPORT.scadenza AS Scadenza,
+ADC_REPORT.badge AS Badge,
+ADC_REPORT.gruppo AS Gruppo_Badge,
+ADC_REPORT.note AS NOTE,
+ADC_STRUTTURE.label AS Struttura,
+ADC_PROFILI.label AS Profilo,
+ADC_OSPITI.cf AS Codice_Fiscale,
+ADC_OSPITI.data_di_nascita AS Data_di_Nascita,
+ADC_OSPITI.nazionalita AS Nazionalita,
+ADC_REPORT.locali AS Locali
+FROM ADC_REPORT 
+LEFT JOIN ADC_OSPITI USING(id_ospite) 
+LEFT JOIN ADC_DOCUMENTI USING(id_documento) 
+LEFT JOIN ADC_STRUTTURE USING(id_struttura) 
+LEFT JOIN ADC_PROFILI USING(id_profilo)
+ORDER BY ADC_REPORT.data_report,ADC_OSPITI.nome;
