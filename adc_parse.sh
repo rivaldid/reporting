@@ -23,6 +23,7 @@ for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 	filename="${INPUT##*/}" # simple filename.ext
 	filereferer="${INPUT#$TRASH_PREFIX}" # full path without trash prefix
 	TEMP="$PREFIX/$filename.temp.csv"
+	TRANS_TEMP="$PREFIX/$filename.trans.temp.csv"
 	
 	#date_container="${filename#ReportGiornaliero_TO1__}"
 	#date_container="${date_container%.xls}"
@@ -49,16 +50,23 @@ for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 		# converto e codifico
 		convertxls2csv_altsep -x "$INPUT" -b WINDOWS-1252 -c "$TEMP" -a UTF-8 &>/dev/null
 		
-		#awk -F'~' 'BEGIN {i=0} {for (i=1;i<=NF;i++) print $i}' "$TEMP" |tr -d '"'
+		# conta colonne da usare come righe (per la trasposizione)
+		prima_riga="$(head -n 1 "$TEMP" | sed s/\"//g | tr -d '[[:space:]]')"
+		colonne="$(grep -o "[[:alpha:]]~" <<< "$prima_riga" | wc -l)"
+			
+		# conta righe
+		#righe="$(wc -l "$TEMP" | cut -f1 -d' ')"
 		
-		for ((i=1; i<=$(wc -l "$TEMP" | cut -f1 -d' '); i++)); do
+		#for ((i=1; i<=$(wc -l "$TEMP" | cut -f1 -d' '); i++)); do
+		for ((i=1; i<=$colonne; i++)); do
 		
 			#echo "--> riga $i-esima"
-			output=()
 			j=0
 		
 			while read line; do
-			
+				
+				#line_lenght="$(echo $line | cut -d'~' -f 1 | wc -c)"
+				
 				while IFS='~' read -ra field; do
 					
 					if [ -z "${field[$i]}" ]; then 
@@ -98,8 +106,6 @@ for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 					#echo $valore
 					
 				done <<< "$line"
-				
-				#echo "${output[@]}"
 				
 			done < "$TEMP"
 			
