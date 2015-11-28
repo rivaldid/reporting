@@ -72,33 +72,34 @@ for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 					if [ -z "${field[$i]}" ]; then 
 						valore=NULL
 					else
-						valore="${field[$i]}"
-						valore="$(printf "$valore" | tr -d '\011\012\015' | sed -e 's/^ *//g;s/ *$//g' | tr -d '"')"
+						#valore="${field[$i]}"
+						#valore="$(printf "$valore" | tr -d '\011\012\015' | sed -e 's/^ *//g;s/ *$//g' | tr -d '"')"
+						printf -v valore "%s" "$(printf "${field[$i]}" | tr -d '\011\012\015' | sed -e 's/^ *//g;s/ *$//g' | tr -d '"')"
 					fi
 				
 					case "$j" in
-						0) cognome="$valore";;
-						1) nome="$valore";;
-						2) societa="$valore";;
-						3) tipo_doc="$valore";;
-						4) num_doc="$valore";;
-						5) scad_doc="$valore";;
-						6) decorrenza="$valore";;
-						7) scadenza="$valore";;
-						8) badge="$valore";;
-						9) gruppo="$valore";;
-						10) note="$valore";;
-						11) struttura="$valore";;
-						12) profilo="$valore";;
-						13) cf="$valore";;
-						14) data_di_nascita="$valore";;
-						15) nazionalita="$valore";;
-						#15 autorizzazione temporanea
-						#16 telefono
-						#17 badge pi
-						#18 badge to
-						#19 data center
-						21) locali="$valore";;
+						0) printf -v cognome "%s" "$valore";;
+						1) printf -v nome "%s" "$valore";;
+						2) printf -v societa "%s" "$valore";;
+						3) printf -v tipo_doc "%s" "$valore";;
+						4) printf -v num_doc "%s" "$valore";;
+						5) printf -v scad_doc "%s" "$valore";;
+						6) printf -v decorrenza "%s" "$valore";;
+						7) printf -v scadenza "%s" "$valore";;
+						8) printf -v badge "%s" "$valore";;
+						9) printf -v gruppo "%s" "$valore";;
+						10) printf -v note "%s" "$valore";;
+						11) printf -v struttura "%s" "$valore";;
+						12) printf -v profilo "%s" "$valore";;
+						13) printf -v cf "%s" "$valore";;
+						14) printf -v data_di_nascita "%s" "$valore";;
+						15) printf -v nazionalita "%s" "$valore";;
+						#16 autorizzazione temporanea
+						#17 telefono
+						#18 badge pi
+						#19 badge to
+						#20 data center
+						21) printf -v locali "%s" "$valore";;
 					esac
 					
 					let "j++"
@@ -109,8 +110,8 @@ for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 				
 			done < "$TEMP"
 			
-			mycall="CALL input_adc('$cognome','$nome','$societa','$tipo_doc','$num_doc','$scad_doc','$decorrenza','$scadenza','$badge','$gruppo','$note','$struttura','$profilo','$cf','$data_di_nascita','$nazionalita','$locali','$data_report','$checksum','$data_file');"
-			echo "$mycall" >> $LOG
+			printf -v mycall "CALL input_adc('$cognome','$nome','$societa','$tipo_doc','$num_doc','$scad_doc','$decorrenza','$scadenza','$badge','$gruppo','$note','$struttura','$profilo','$cf','$data_di_nascita','$nazionalita','$locali','$data_report','$checksum','$data_file');"
+			printf "$mycall" >> $LOG
 			mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
 
 		done
