@@ -3,7 +3,12 @@
 PREFIX="/home/vilardid/reporting"
 REPORT="/mnt/REPORT"
 TRASH_PREFIX="/mnt/REPORT/Serchio"
-TEMP_DIR=$PREFIX/"TEMP"
+TEMP_DIR=$PREFIX"/TEMP"
+
+mask_data="^[0-9]{2}/[0-9]{2}/[0-9]{4}$"
+mask_ora="^[0-9]{2}:[0-9]{2}$"
+mask_centrale="^PULSAR[[:space:]][0-9]{1}$"
+mask_concentratore="^([0-9]{3})$"
 
 LOG=$PREFIX"/ser_parse.log"
 MYARGS="-H -ureporting -preportuser -D reporting"
@@ -62,12 +67,32 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					[[ ! "$target" =~ "TELEDATA ** Controllo Accessi **" ]] &&
 					[[ ! "$target" =~ "- Stampa Report da" ]]; then
 
-					#echo "$target" >> $LOG
-					mycall="CALL input_serchio($(perl ser_parse_core.pl "$target"),'$checksum');"
+					echo "$target" >> $LOG
+					
+					trash=""
+					
+					#while IFS=' ' read -ra field; do
+					for field in ${target[@]}; do
 
+						if 	 [[ $field =~ $mask_data ]]; 		then printf -v data "$field"
+						elif [[ $field =~ $mask_ora ]]; 		then printf -v ora "$field"
+						elif [[ $field =~ $mask_centrale ]]; 	then printf -v centrale "$field"
+						
+						else trash+="$field "
+						fi
+						
+						echo "A"$field"B"
+						
+					done
+					
+					echo $mycall
+					
+					mycall="CALL input_serchio('$data','$ora','$centrale','$seriale','$evento','$varco','$direzione','$ospite','$checksum');"
+					#mycall="CALL input_serchio($(perl ser_parse_core.pl "$target"),'$checksum');"
+					
 					echo "$mycall" >> $LOG
-
-					mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
+					echo "--> unmatched: $trash" >> $LOG
+					#mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
 
 				fi
 
