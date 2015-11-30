@@ -1,12 +1,20 @@
 #!/usr/bin/bash
+# USAGE ./make.sh --reset --history
+# --history force reload data after --reset
 
 PREFIX="/home/vilardid/reporting"
 LOG=$PREFIX"/make.log"
 DUMPFILE=$PREFIX"/dumpfile.sql"
 MYARGS="-ureporting -preportuser -D reporting"
 
-reset=false;
+# history 2015-11-29
+WIN_HISTORY=$PREFIX"/win_parse.history.log"
+SER_HISTORY=$PREFIX"/ser_parse.history.log"
+
+reset=false
+history=false
 [ "$1" == "--reset" ] && reset=true
+[ "$2" == "--history" ] && history=true
 
 cd $PREFIX
 if [ -f $LOG ]; then rm $LOG; fi
@@ -43,6 +51,12 @@ if [ $reset = false ]; then
 	echo "--> Ripristino il dump" >> $LOG
 	mysql $MYARGS -e "source $DUMPFILE \W;" >> $LOG
 	rm $DUMPFILE
+fi
+
+if [ $history = true ]; then
+	echo "--> Ricarico gli archivi" >> $LOG
+	mysql $MYARGS -e "source $WIN_HISTORY \W;" >> $LOG
+	mysql $MYARGS -e "source $SER_HISTORY \W;" >> $LOG
 fi
 
 echo "--> Carico il routing" >> $LOG

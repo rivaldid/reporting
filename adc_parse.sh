@@ -74,32 +74,32 @@ for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 					else
 						#valore="${field[$i]}"
 						#valore="$(printf "$valore" | tr -d '\011\012\015' | sed -e 's/^ *//g;s/ *$//g' | tr -d '"')"
-						printf -v valore "%s" "$(printf "${field[$i]}" | tr -d '\011\012\015' | sed -e 's/^ *//g;s/ *$//g' | tr -d '"')"
+						printf -v valore "%s" "$(echo "${field[$i]}" | tr -d '\011\012\015' | sed -e 's/^ *//g;s/ *$//g' | tr -d '"')"
 					fi
 				
 					case "$j" in
-						0) printf -v cognome "%s" "$valore";;
-						1) printf -v nome "%s" "$valore";;
-						2) printf -v societa "%s" "$valore";;
-						3) printf -v tipo_doc "%s" "$valore";;
-						4) printf -v num_doc "%s" "$valore";;
-						5) printf -v scad_doc "%s" "$valore";;
-						6) printf -v decorrenza "%s" "$valore";;
-						7) printf -v scadenza "%s" "$valore";;
-						8) printf -v badge "%s" "$valore";;
-						9) printf -v gruppo "%s" "$valore";;
-						10) printf -v note "%s" "$valore";;
-						11) printf -v struttura "%s" "$valore";;
-						12) printf -v profilo "%s" "$valore";;
-						13) printf -v cf "%s" "$valore";;
-						14) printf -v data_di_nascita "%s" "$valore";;
-						15) printf -v nazionalita "%s" "$valore";;
+						0) printf -v cognome "$valore";;
+						1) printf -v nome "$valore";;
+						2) printf -v societa "$valore";;
+						3) printf -v tipo_doc "$valore";;
+						4) printf -v num_doc "$valore";;
+						5) printf -v scad_doc "$valore";;
+						6) printf -v decorrenza "$valore";;
+						7) printf -v scadenza "$valore";;
+						8) printf -v badge "$valore";;
+						9) printf -v gruppo "$valore";;
+						10) printf -v note "$valore";;
+						11) printf -v struttura "$valore";;
+						12) printf -v profilo "$valore";;
+						13) printf -v cf "$valore";;
+						14) printf -v data_di_nascita "$valore";;
+						15) printf -v nazionalita "$valore";;
 						#16 autorizzazione temporanea
 						#17 telefono
 						#18 badge pi
 						#19 badge to
 						#20 data center
-						21) printf -v locali "%s" "$valore";;
+						21) printf -v locali "$valore";;
 					esac
 					
 					let "j++"
