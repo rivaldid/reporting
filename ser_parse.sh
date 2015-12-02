@@ -5,16 +5,37 @@ REPORT="/mnt/REPORT"
 TRASH_PREFIX="/mnt/REPORT/Serchio"
 TEMP_DIR=$PREFIX"/TEMP"
 
-mask_data="^[0-9]{2}/[0-9]{2}/[0-9]{4}$"
-mask_ora="^[0-9]{2}:[0-9]{2}$"
-mask_centrale="^PULSAR[[:space:]][0-9]{1}$"
-mask_concentratore="^([0-9]{3})$"
-
 LOG=$PREFIX"/ser_parse.log"
+TODO=$PREFIX"/ser_parse_unmatched.log"
+
 MYARGS="-H -ureporting -preportuser -D reporting"
+
+nospace() { printf "$1" | sed -e 's/^[[:space:]]*//'; }
+
+
+# regex
+mask_data="^[0-9]{2}/[0-9]{2}/[0-9]{4}[[:space:]][0-9]{2}:[0-9]{2}$"
+mask_centrale="^[[:space:]]PULSAR[[:space:]][0-9]{1}$"
+mask_concentratore="^[[:space:]]\([0-9]{3}\)$"
+mask_varco="^[[:space:]]H\([0-9]{2}\)$"
+mask_seriale="^[[:space:]][0-9]{8}$"
+
+mask_evento="^
+[[[:space:]]Scasso[[:space:]]varco]?
+[[[:space:]]Varco[[:space:]]chiuso]?
+[[[:space:]]Varco[[:space:]]non[[:space:]]chiuso]?
+[[[:space:]]Transito[[:space:]]effettuato]?
+[[[:space:]]Tessera[[:space:]]inesistente]?
+[[[:space:]]Caduta[[:space:]]linea.]?$"
+
+# /regex
+
 
 if [ -f $LOG ]; then rm $LOG; fi
 touch $LOG
+
+if [ -f $TODO ]; then rm $TODO; fi
+touch $TODO
 
 if [ -d $TEMP_DIR ]; then rm -rf $TEMP_DIR; fi
 mkdir -p $TEMP_DIR
@@ -28,7 +49,7 @@ fi
 
 for file in $(find $REPORT -name "*.xps" -type f); do
 
-	INPUT=$file	# current file from loop
+	INPUT="$file"	# current file from loop
 	filename="${INPUT##*/}" # simple filename.ext
 	filereferer="${INPUT#$TRASH_PREFIX}" # full path without trash prefix
 
@@ -67,31 +88,49 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					[[ ! "$target" =~ "TELEDATA ** Controllo Accessi **" ]] &&
 					[[ ! "$target" =~ "- Stampa Report da" ]]; then
 
-					echo "$target" >> $LOG
+					#echo "$target"
 					
 					trash=""
+					buffer=""
+					i=0
+					
+					# PSEUDO
+					# while read char; do
+					# buffer <-- char; i++
+					# if buffer is mask_myvar; then myvar = buffer; i=i - buffer_lenght; buffer = buffer - iesimi chars
+					# elif buffer is other_mask_myvar; then SAME_STATEMENT_WITH_OTHER_MYVAR
+					# fi; done
 					
 					#while IFS=' ' read -ra field; do
-					for field in ${target[@]}; do
-
-						if 	 [[ $field =~ $mask_data ]]; 		then printf -v data "$field"
-						elif [[ $field =~ $mask_ora ]]; 		then printf -v ora "$field"
-						elif [[ $field =~ $mask_centrale ]]; 	then printf -v centrale "$field"
+					#for field in ${target[@]}; do
+					while IFS= read -r -N 1 char; do
 						
-						else trash+="$field "
+						buffer+="$char"; let "i++"
+
+						if   [[ $buffer =~ $mask_data ]]; then printf -v data "$(nospace "$buffer")"; i=$(( $i - ${#buffer} )); buffer="${buffer::-$i}"
+						elif [[ $buffer =~ $mask_centrale ]]; then printf -v centrale "$(nospace "$buffer")"; i=$(( $i - ${#buffer} )); buffer="${buffer::-$i}"
+						elif [[ $buffer =~ $mask_seriale ]]; then printf -v seriale "$(nospace "$buffer")"; i=$(( $i - ${#buffer} )); buffer="${buffer::-$i}"
+						elif [[ $buffer =~ $mask_evento ]]; then printf -v evento "$(nospace "$buffer")"; i=$(( $i - ${#buffer} )); buffer="${buffer::-$i}"
+						elif [[ $buffer =~ $mask_varco ]]; then printf -v varco "$(nospace "$buffer")"; i=$(( $i - ${#buffer} )); buffer="${buffer::-$i}"
+						
+						elif [[ $buffer =~ $mask_concentratore ]]; then i=$(( $i - ${#buffer} )); buffer="${buffer::-$i}"
+						
 						fi
 						
-						echo "A"$field"B"
-						
-					done
+					done <<< "$target"
 					
-					echo $mycall
-					
-					mycall="CALL input_serchio('$data','$ora','$centrale','$seriale','$evento','$varco','$direzione','$ospite','$checksum');"
+					mycall="CALL input_serchio('$data','$centrale','$seriale','$evento','$varco','$direzione','$ospite','$checksum');"
 					#mycall="CALL input_serchio($(perl ser_parse_core.pl "$target"),'$checksum');"
 					
 					echo "$mycall" >> $LOG
-					echo "--> unmatched: $trash" >> $LOG
+					
+					if [ ! -z "$(nospace "$buffer")" ]; then
+						echo "==> $filereferer" >> $TODO
+						echo "$target" >> $TODO
+						echo "$buffer" >> $TODO
+						echo "--> unmatched: $buffer" >> $LOG
+					fi
+					
 					#mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
 
 				fi
@@ -101,8 +140,6 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 		done
 
 		#cleanup
-		#mycall="CALL input_repo('serchio','$filereferer')"
-		#mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
 		rm -rf $TEMP_DIR
 
 		echo "ok!"
