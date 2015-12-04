@@ -10,23 +10,23 @@ TODO=$PREFIX"/ser_parse_unmatched.log"
 
 MYARGS="-H -ureporting -preportuser -D reporting"
 
-nospace() { printf "$1" | sed -e 's/^[[:space:]]*//'; }
+unspace() { printf "$1" | sed -e 's/^[[:space:]]*//'; }
 
 
 # regex
-mask_data="^[0-9]{2}/[0-9]{2}/[0-9]{4}[[:space:]][0-9]{2}:[0-9]{2}$"
-mask_centrale="^[[:space:]]PULSAR[[:space:]][0-9]{1}$"
-mask_concentratore="^[[:space:]]\([0-9]{3}\)$"
-mask_varco="^[[:space:]]H\([0-9]{2}\)$"
-mask_seriale="^[[:space:]][0-9]{8}$"
+rdata='(.*)([0-9]{2}/[0-9]{2}/[0-9]{4}[[:space:]][0-9]{2}:[0-9]{2})(.*)'
+rcentrale='(.*)(PULSAR[[:space:]][0-9])(.*)'
+rconcentratore='(.*)(\([0-9]{3}\))(.*)'
+rseriale='(.*)([0-9]{8})(.*)'
+rvarco='(.*)(H\([0-9]{2}\))(.*)'
 
-mask_evento="^
-[[[:space:]]Scasso[[:space:]]varco]?
-[[[:space:]]Varco[[:space:]]chiuso]?
-[[[:space:]]Varco[[:space:]]non[[:space:]]chiuso]?
-[[[:space:]]Transito[[:space:]]effettuato]?
-[[[:space:]]Tessera[[:space:]]inesistente]?
-[[[:space:]]Caduta[[:space:]]linea.]?$"
+reventi='(.*)('
+reventi+='(Scasso[[:space:]]varco)?'
+reventi+='(Varco[[:space:]]chiuso)?'
+reventi+='(Varco[[:space:]]non[[:space:]]chiuso)?'
+reventi+='(Transito[[:space:]]effettuato)?'
+reventi+='(Tessera[[:space:]]inesistente)?'
+reventi+=')(.*)'
 
 # /regex
 
@@ -88,43 +88,26 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					[[ ! "$target" =~ "TELEDATA ** Controllo Accessi **" ]] &&
 					[[ ! "$target" =~ "- Stampa Report da" ]]; then
 
-					#echo "$target"
+					echo "$target"
+					printf -v buffer "$target"
 					
-					trash=""
-					buffer=""
-					i=0
+					[[ $buffer =~ $rdata ]] && data=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
+					[[ $buffer =~ $rcentrale ]] && centrale=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
+					[[ $buffer =~ $rconcentratore ]] && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
+					[[ $buffer =~ $rseriale ]] && seriale=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
+					[[ $buffer =~ $rvarco ]] && varco=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					
-					# PSEUDO
-					# while read char; do
-					# buffer <-- char; i++
-					# if buffer is mask_myvar; then myvar = buffer; i=i - buffer_lenght; buffer = buffer - iesimi chars
-					# elif buffer is other_mask_myvar; then SAME_STATEMENT_WITH_OTHER_MYVAR
-					# fi; done
-					
-					#while IFS=' ' read -ra field; do
-					#for field in ${target[@]}; do
-					while IFS= read -r -N 1 char; do
-						
-						buffer+="$char"; let "i++"
-
-						if   [[ $buffer =~ $mask_data ]]; then printf -v data "$(nospace "$buffer")"; i=$(( $i - ${#buffer} )); buffer="${buffer::-$i}"
-						elif [[ $buffer =~ $mask_centrale ]]; then printf -v centrale "$(nospace "$buffer")"; i=$(( $i - ${#buffer} )); buffer="${buffer::-$i}"
-						elif [[ $buffer =~ $mask_seriale ]]; then printf -v seriale "$(nospace "$buffer")"; i=$(( $i - ${#buffer} )); buffer="${buffer::-$i}"
-						elif [[ $buffer =~ $mask_evento ]]; then printf -v evento "$(nospace "$buffer")"; i=$(( $i - ${#buffer} )); buffer="${buffer::-$i}"
-						elif [[ $buffer =~ $mask_varco ]]; then printf -v varco "$(nospace "$buffer")"; i=$(( $i - ${#buffer} )); buffer="${buffer::-$i}"
-						
-						elif [[ $buffer =~ $mask_concentratore ]]; then i=$(( $i - ${#buffer} )); buffer="${buffer::-$i}"
-						
-						fi
-						
-					done <<< "$target"
-					
+					[[ $buffer =~ $reventi ]] && evento=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
+										
 					mycall="CALL input_serchio('$data','$centrale','$seriale','$evento','$varco','$direzione','$ospite','$checksum');"
 					#mycall="CALL input_serchio($(perl ser_parse_core.pl "$target"),'$checksum');"
 					
 					echo "$mycall" >> $LOG
 					
-					if [ ! -z "$(nospace "$buffer")" ]; then
+					echo "$mycall"
+					echo "$buffer"
+					
+					if [ ! -z "$(unspace "$buffer")" ]; then
 						echo "==> $filereferer" >> $TODO
 						echo "$target" >> $TODO
 						echo "$buffer" >> $TODO
