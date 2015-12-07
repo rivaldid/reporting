@@ -20,13 +20,13 @@ rconcentratore='(.*)(\([0-9]{3}\))(.*)'
 rseriale='(.*)([0-9]{8})(.*)'
 rvarco='(.*)(H\([0-9]{2}\))(.*)'
 
-reventi='(.*)('
-reventi+='(Scasso[[:space:]]varco)?'
-reventi+='(Varco[[:space:]]chiuso)?'
-reventi+='(Varco[[:space:]]non[[:space:]]chiuso)?'
-reventi+='(Transito[[:space:]]effettuato)?'
-reventi+='(Tessera[[:space:]]inesistente)?'
-reventi+=')(.*)'
+reventi='(.*)(' # 1-2
+reventi+='(Scasso[[:space:]]varco)|' #3
+reventi+='(Varco[[:space:]]chiuso)|' #4
+reventi+='(Varco[[:space:]]non[[:space:]]chiuso)|' #5
+reventi+='(Transito[[:space:]]effettuato)|' #6
+reventi+='(Tessera[[:space:]]inesistente)' #7
+reventi+=')(.*)' #8
 
 # /regex
 
@@ -88,7 +88,7 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					[[ ! "$target" =~ "TELEDATA ** Controllo Accessi **" ]] &&
 					[[ ! "$target" =~ "- Stampa Report da" ]]; then
 
-					echo "$target"
+					#echo "$target"
 					printf -v buffer "$target"
 					
 					[[ $buffer =~ $rdata ]] && data=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
@@ -97,21 +97,23 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					[[ $buffer =~ $rseriale ]] && seriale=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					[[ $buffer =~ $rvarco ]] && varco=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					
-					[[ $buffer =~ $reventi ]] && evento=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
+					[[ $buffer =~ $reventi ]] && evento=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[8]}
 										
 					mycall="CALL input_serchio('$data','$centrale','$seriale','$evento','$varco','$direzione','$ospite','$checksum');"
 					#mycall="CALL input_serchio($(perl ser_parse_core.pl "$target"),'$checksum');"
 					
 					echo "$mycall" >> $LOG
-					
-					echo "$mycall"
-					echo "$buffer"
-					
+									
 					if [ ! -z "$(unspace "$buffer")" ]; then
 						echo "==> $filereferer" >> $TODO
 						echo "$target" >> $TODO
 						echo "$buffer" >> $TODO
 						echo "--> unmatched: $buffer" >> $LOG
+						
+						echo "$target"
+						echo "$mycall"
+						echo "$buffer"
+						
 					fi
 					
 					#mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
