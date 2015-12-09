@@ -40,6 +40,7 @@ reventi_abilitato='(.*)(ABILITATO)(.*)'
 reventi_dis='(.*)(DIS)(.*)'
 
 reventi_durata='(.*)([[:graph:]]durata[[:space:]][[:alnum:]]{2,4}[[:punct:]]{1,2}[[:alnum:]]{2,3}[[:punct:]]{1,2}[[:alnum:]]{2,3}[[:graph:]])(.*)'
+reventi_statolettore='(.*)(Stato[[:space:]]Lettore)(.*)'
 
 reventi='(.*)(' # 1-2
 reventi+='(Scasso[[:space:]]varco)|' #3
@@ -58,16 +59,15 @@ reventi+='(Allarme[[:space:]]Tamper)|' #14
 
 reventi+='(Richiesta[[:space:]]Invio[[:space:]]Programmazione[[:space:]][[:punct:]][[:space:]])|' #15
 reventi+='(Fine[[:space:]]invio[[:space:]]dati[[:space:]]di[[:space:]]programmazione[[:punct:]])|' #16
-reventi+='(Comando[[:space:]]Cambio[[:space:]]Stato[[:space:]]Lettore)|' #17
+reventi+='(Comando[[:space:]]Cambio)|' #17
 reventi+='(Richiesta[[:space:]]Comando[[:space:]]Apertura[[:space:]]Varco)|' #18
 reventi+='(Apertura[[:space:]]varco[[:space:]]Console[[:punct:]])|' #19
 reventi+='(Allarme[[:space:]]ingresso[[:space:]][0-9])|' #20
-reventi+='(Stato[[:space:]]Lettore)|' #21
-reventi+='(Fine[[:space:]]transito)|' #22
-reventi+='(Ripristino[[:space:]]Linea)|' #23
-reventi+='(Tastiera[[:space:]]Abilitata[[:punct:]])' #24
-reventi+=')(.*)' #25
-reventi_max=25
+reventi+='(Fine[[:space:]]transito)|' #21
+reventi+='(Ripristino[[:space:]]Linea)|' #22
+reventi+='(Tastiera[[:space:]]Abilitata[[:punct:]])' #23
+reventi+=')(.*)' #24
+reventi_max=24
 
 # /regex
 
@@ -130,7 +130,7 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					[[ ! "$target" =~ "- Stampa Report da" ]]; then
 
 					#echo "$target"
-					unset buffer data centrale seriale evento varco direzione ospite eventi_dis eventi_abilitato eventi_durata utenza
+					unset buffer data centrale seriale evento varco direzione ospite eventi_dis eventi_abilitato eventi_durata utenza eventi_statolettore
 					printf -v buffer "$target"
 					
 					# trash
@@ -144,6 +144,7 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					[[ $buffer =~ $reventi_dis ]] && eventi_dis=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					
 					[[ $buffer =~ $reventi_durata ]] && eventi_durata=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
+					[[ $buffer =~ $reventi_statolettore ]] && eventi_statolettore=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					
 					# contents
 					[[ $buffer =~ $rdata ]] && data=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
@@ -158,6 +159,7 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					elif [[ -n $eventi_abilitato ]]; then 
 						printf -v evento "%s %s" "$evento" "$eventi_abilitato"
 					fi
+					[[ -n $eventi_statolettore ]] && printf -v evento "%s %s" "$evento" "$eventi_statolettore"
 					[[ -n $eventi_durata ]] && printf -v evento "%s %s" "$evento" "$eventi_durata"
 					[[ -n $eventi_utenza ]] && printf -v evento "%s %s" "$evento" $(echo "$utenza" | tr -d '[|]')
 									
