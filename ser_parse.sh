@@ -130,7 +130,7 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					[[ ! "$target" =~ "- Stampa Report da" ]]; then
 
 					#echo "$target"
-					unset buffer data centrale seriale evento varco direzione ospite eventi_nable eventi_durata utenza
+					unset buffer data centrale seriale evento varco direzione ospite eventi_dis eventi_abilitato eventi_durata utenza
 					printf -v buffer "$target"
 					
 					# trash
