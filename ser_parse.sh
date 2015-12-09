@@ -10,8 +10,10 @@ TODO=$PREFIX"/ser_parse_unmatched.log"
 
 MYARGS="-H -ureporting -preportuser -D reporting"
 
-unspace() { printf "$1" | sed -e 's/^[[:space:]]*//'; }
-
+leading_whitespace() { printf "$1" | sed -e 's/^[[:space:]]*//'; }
+trailing_whitespace() { printf "$1" | sed -e 's/[[:space:]]*$//'; }
+combined_whitespace() { leading_whitespace $(trailing_whitespace "$1"); }
+remove_punctuation() { printf "$1" | tr -d '[:punct:]'; }
 
 # regex
 rdata='(.*)([0-9]{2}/[0-9]{2}/[0-9]{4}[[:space:]][0-9]{2}:[0-9]{2})(.*)'
@@ -20,9 +22,24 @@ rconcentratore='(.*)(\([0-9]{3}\))(.*)'
 rseriale='(.*)([0-9]{8})(.*)'
 rvarco='(.*)(H\([0-9]{2}\))(.*)'
 
-reventi_qutenzaq='(.*)([[:graph:]][[:space:]].*[[:space:]][[:graph:]])(.*)'
-reventi_nable='(.*)([[:alpha:]]{1,3}]BILITATO)(.*)'
-reventi_durata='(.*)([[:graph:]]durata.*[[:graph:]])(.*)'
+qutenzeq='(.*)(' #1-2
+qutenzeq+='([[:graph:]][[:space:]]ADMIN1[[:space:]][[:graph:]])|' #3
+qutenzeq+='([[:graph:]][[:space:]]ADMIN2[[:space:]][[:graph:]])|' #4
+qutenzeq+='([[:graph:]][[:space:]]VISUAL[[:space:]][[:graph:]])' #5
+qutenzeq+=')(.*)' #6
+qutenzeq_max=6
+
+utenze='(.*)(' #1-2
+utenze+='(ADMIN1)|' #3
+utenze+='(ADMIN2)|' #4
+utenze+='(VISUAL)' #5
+utenze+=')(.*)' #6
+utenze_max=6
+
+reventi_abilitato='(.*)(ABILITATO)(.*)'
+reventi_dis='(.*)(DIS)(.*)'
+
+reventi_durata='(.*)([[:graph:]]durata[[:space:]][[:alnum:]]{2,4}[[:punct:]]{1,2}[[:alnum:]]{2,3}[[:punct:]]{1,2}[[:alnum:]]{2,3}[[:graph:]])(.*)'
 
 reventi='(.*)(' # 1-2
 reventi+='(Scasso[[:space:]]varco)|' #3
@@ -31,25 +48,24 @@ reventi+='(Varco[[:space:]]non[[:space:]]chiuso)|' #5
 reventi+='(Varco[[:space:]]non[[:space:]]aperto)|' #6
 reventi+='(Transito[[:space:]]effettuato)|' #7
 reventi+='(Transito[[:space:]]non[[:space:]]consentito)|' #8
-reventi+='(Tessera[[:space:]]inesistente)|' #9
-reventi+='(Caduta[[:space:]]Linea[[:punct:]])|' #10
-reventi+='(Linea[[:space:]]Mini[[:space:]]Pulsar[[:punct:]])|' #11
+reventi+='(Transito[[:space:]]lettore[[:space:]]disabilitato)|' #9
+reventi+='(Tessera[[:space:]]inesistente)|' #10
+reventi+='(Caduta[[:space:]]Linea[[:punct:]]?)|' #11
+reventi+='(Linea[[:space:]]Mini[[:space:]]Pulsar[[:punct:]])|' #12
 
-reventi+='(ADMIN[0-9][[:space:]]Tastiera[[:space:]]Abilitata[[:punct:]][[:space:]])|' #12
-reventi+='(VISUAL[[:space:]]Tastiera[[:space:]]Abilitata[[:punct:]][[:space:]])|' #13
+reventi+='(Allarmi[[:space:]]Acquisiti[[:graph:]].*[[:graph:]]{2}[[:space:]])|' #13
+reventi+='(Allarme[[:space:]]Tamper)|' #14
 
-reventi+='(Allarmi[[:space:]]Acquisiti[[:graph:]].*[[:graph:]]{2}[[:space:]])|' #14
-reventi+='(Allarme[[:space:]]Tamper)|' #15
-
-reventi+='(Richiesta[[:space:]]Invio[[:space:]]Programmazione[[:space:]][[:punct:]][[:space:]])|' #16
-reventi+='(Fine[[:space:]]invio[[:space:]]dati[[:space:]]di[[:space:]]programmazione[[:punct:]])|' #17
-reventi+='(Comando[[:space:]]Cambio[[:space:]]Stato[[:space:]]Lettore)|' #18
-reventi+='(Richiesta[[:space:]]Comando[[:space:]]Apertura[[:space:]]Varco)|' #19
-reventi+='(Apertura[[:space:]]varco[[:space:]]Console[[:punct:]])|' #20
-reventi+='(Allarme[[:space:]]ingresso[[:space:]][0-9])|' #21
-reventi+='(Stato[[:space:]]Lettore)|' #22
-reventi+='(Fine[[:space:]]transito)|' #23
-reventi+='(Ripristino[[:space:]]Linea)' #24
+reventi+='(Richiesta[[:space:]]Invio[[:space:]]Programmazione[[:space:]][[:punct:]][[:space:]])|' #15
+reventi+='(Fine[[:space:]]invio[[:space:]]dati[[:space:]]di[[:space:]]programmazione[[:punct:]])|' #16
+reventi+='(Comando[[:space:]]Cambio[[:space:]]Stato[[:space:]]Lettore)|' #17
+reventi+='(Richiesta[[:space:]]Comando[[:space:]]Apertura[[:space:]]Varco)|' #18
+reventi+='(Apertura[[:space:]]varco[[:space:]]Console[[:punct:]])|' #19
+reventi+='(Allarme[[:space:]]ingresso[[:space:]][0-9])|' #20
+reventi+='(Stato[[:space:]]Lettore)|' #21
+reventi+='(Fine[[:space:]]transito)|' #22
+reventi+='(Ripristino[[:space:]]Linea)|' #23
+reventi+='(Tastiera[[:space:]]Abilitata[[:punct:]])' #24
 reventi+=')(.*)' #25
 reventi_max=25
 
@@ -114,16 +130,20 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					[[ ! "$target" =~ "- Stampa Report da" ]]; then
 
 					#echo "$target"
-					unset data centrale seriale evento varco direzione ospite eventi_nable eventi_durata eventi_utenza
+					unset buffer data centrale seriale evento varco direzione ospite eventi_nable eventi_durata utenza
 					printf -v buffer "$target"
 					
 					# trash
 					[[ $buffer =~ $rconcentratore ]] && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					
-					# componenti
-					[[ $buffer =~ $reventi_nable ]] && eventi_nable=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
+					# componenti evento
+					[[ $buffer =~ $qutenzeq ]] && utenza=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$qutenzeq_max]}
+					[[ $buffer =~ $utenze ]] && utenza=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$utenze_max]}
+					
+					[[ $buffer =~ $reventi_abilitato ]] && eventi_abilitato=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
+					[[ $buffer =~ $reventi_dis ]] && eventi_dis=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
+					
 					[[ $buffer =~ $reventi_durata ]] && eventi_durata=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
-					[[ $buffer =~ $reventi_qutenzaq ]] && eventi_utenza=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					
 					# contents
 					[[ $buffer =~ $rdata ]] && data=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
@@ -133,17 +153,20 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					[[ $buffer =~ $reventi ]] && evento=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$reventi_max]}
 					
 					# concateno i componenti
-					[[ -n $eventi_nable ]] && printf -v evento "%s %s" "$evento" "$eventi_nable"
+					if [[ -n $eventi_dis ]]; then 
+						printf -v evento "%s %s%s" "$evento" "$eventi_dis" "$eventi_abilitato"
+					elif [[ -n $eventi_abilitato ]]; then 
+						printf -v evento "%s %s" "$evento" "$eventi_abilitato"
+					fi
 					[[ -n $eventi_durata ]] && printf -v evento "%s %s" "$evento" "$eventi_durata"
-					[[ -n $eventi_utenza ]] && printf -v ospite "%s %s" "$ospite" $(echo "$eventi_utenza" | tr -d '[|]')
+					[[ -n $eventi_utenza ]] && printf -v evento "%s %s" "$evento" $(echo "$utenza" | tr -d '[|]')
 									
 					mycall="CALL input_serchio('$data','$centrale','$seriale','$evento','$varco','$direzione','$ospite','$checksum');"
-					#printf -v mycall "CALL input_serchio('%s','%s','%s','%s','%s','%s','%s','%s');" $(unspace "$data") $(unspace "$centrale") $(unspace "$seriale") $(unspace "$evento") $(unspace "$varco") $(unspace "$direzione") $(unspace "$ospite") "$checksum"
 					#mycall="CALL input_serchio($(perl ser_parse_core.pl "$target"),'$checksum');"
 					
 					echo "$mycall" >> $LOG
 									
-					if [ ! -z "$(unspace "$buffer")" ]; then
+					if [ ! -z "$(remove_punctuation $(combined_whitespace "$buffer"))" ]; then
 						echo "==> $filereferer" >> $TODO
 						echo "$target" >> $TODO
 						echo "$buffer" >> $TODO
