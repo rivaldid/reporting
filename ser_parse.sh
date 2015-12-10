@@ -70,8 +70,8 @@ reventi+='(Tastiera[[:space:]]Abilitata[[:punct:]])' #23
 reventi+=')(.*)' #24
 reventi_max=24
 
-rdirezione='(.*)((ENTRATA)|(USCITA))(.*)'
-rdirezione_max=4
+rdirezioni='(.*)((ENTRATA)|(USCITA))(.*)'
+rdirezioni_max=4
 
 # /regex
 
@@ -157,6 +157,7 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					[[ $buffer =~ $rseriale_alt ]] && seriale=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					[[ $buffer =~ $rvarco ]] && varco=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					[[ $buffer =~ $reventi ]] && evento=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$reventi_max]}
+					[[ $buffer =~ $rdirezioni ]] && direzione=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$rdirezioni_max]}
 					
 					# concateno i componenti
 					# schema: EVENTO STATOLETTORE [DIS]ABILITATO DURATA
