@@ -20,6 +20,7 @@ rdata='(.*)([0-9]{2}/[0-9]{2}/[0-9]{4}[[:space:]][0-9]{2}:[0-9]{2})(.*)'
 rcentrale='(.*)(PULSAR[[:space:]][0-9])(.*)'
 rconcentratore='(.*)(\([0-9]{3}\))(.*)'
 rseriale='(.*)([0-9]{8})(.*)'
+rseriale_alt='(.*)([[:punct:]][0-9]{7})(.*)'
 rvarco='(.*)(H\([0-9]{2}\))(.*)'
 
 qutenzeq='(.*)(' #1-2
@@ -68,6 +69,9 @@ reventi+='(Ripristino[[:space:]]Linea)|' #22
 reventi+='(Tastiera[[:space:]]Abilitata[[:punct:]])' #23
 reventi+=')(.*)' #24
 reventi_max=24
+
+rdirezione='(.*)((ENTRATA)|(USCITA))(.*)'
+rdirezione_max=4
 
 # /regex
 
@@ -150,25 +154,43 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					[[ $buffer =~ $rdata ]] && data=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					[[ $buffer =~ $rcentrale ]] && centrale=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					[[ $buffer =~ $rseriale ]] && seriale=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
+					[[ $buffer =~ $rseriale_alt ]] && seriale=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					[[ $buffer =~ $rvarco ]] && varco=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					[[ $buffer =~ $reventi ]] && evento=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$reventi_max]}
 					
 					# concateno i componenti
+					# schema: EVENTO STATOLETTORE [DIS]ABILITATO DURATA
+					
+					if [[ -n $utenza ]]; then			
+						if [[ -n $ospite ]]; then
+							printf -v ospite "%s %s" "$ospite" $(echo "$utenza" | tr -d '[|]')
+						else
+							printf -v ospite "%s" $(echo "$utenza" | tr -d '[|]')
+						fi
+					fi
+					
+					[[ -n $eventi_statolettore ]] && printf -v evento "%s %s" "$evento" "$eventi_statolettore"
+					
 					if [[ -n $eventi_dis ]]; then 
 						printf -v evento "%s %s%s" "$evento" "$eventi_dis" "$eventi_abilitato"
 					elif [[ -n $eventi_abilitato ]]; then 
 						printf -v evento "%s %s" "$evento" "$eventi_abilitato"
 					fi
-					[[ -n $eventi_statolettore ]] && printf -v evento "%s %s" "$evento" "$eventi_statolettore"
+					
 					[[ -n $eventi_durata ]] && printf -v evento "%s %s" "$evento" "$eventi_durata"
-					[[ -n $eventi_utenza ]] && printf -v evento "%s %s" "$evento" $(echo "$utenza" | tr -d '[|]')
+					
+					# clean buffer from punctuation and whitespaces
+					echo -n "buffer before: length"${#buffer}" ["$buffer"] <----> " >> $TODO
+					printf -v buffer "%s" "$(remove_punctuation $(combined_whitespace "$buffer"))"
 									
 					mycall="CALL input_serchio('$data','$centrale','$seriale','$evento','$varco','$direzione','$ospite','$checksum');"
+					echo "after: length"${#buffer}" ["$buffer"] | "$target" | "$mycall"" >> $TODO
+					
 					#mycall="CALL input_serchio($(perl ser_parse_core.pl "$target"),'$checksum');"
 					
 					echo "$mycall" >> $LOG
 									
-					if [ ! -z "$(remove_punctuation $(combined_whitespace "$buffer"))" ]; then
+					if [ ! -z "$buffer" ]; then
 						echo "==> $filereferer" >> $TODO
 						echo "$target" >> $TODO
 						echo "$buffer" >> $TODO
