@@ -71,7 +71,7 @@ reventi+=')(.*)' #24
 reventi_max=24
 
 rdirezioni='(.*)((ENTRATA)|(USCITA))(.*)'
-rdirezioni_max=4
+rdirezioni_max=5
 
 # /regex
 
