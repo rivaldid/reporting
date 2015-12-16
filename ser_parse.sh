@@ -54,26 +54,29 @@ reventi+='(Transito[[:space:]]effettuato)|' #7
 reventi+='(Transito[[:space:]]non[[:space:]]consentito)|' #8
 reventi+='(Transito[[:space:]]lettore[[:space:]]disabilitato)|' #9
 reventi+='(Tessera[[:space:]]inesistente)|' #10
-reventi+='(Caduta[[:space:]]Linea[[:punct:]]?)|' #11
-reventi+='(Linea[[:space:]]Mini[[:space:]]Pulsar[[:punct:]])|' #12
+reventi+='(Tessera[[:space:]]fuori[[:space:]]orario)|' #11
+reventi+='(Tessera[[:space:]]sospesa)|' #12
+reventi+='(Caduta[[:space:]]Linea[[:punct:]]?)|' #13
+reventi+='(Linea[[:space:]]Mini[[:space:]]Pulsar[[:punct:]])|' #14
 
-reventi+='(Allarmi[[:space:]]Acquisiti[[:graph:]].*[[:graph:]]{2}[[:space:]])|' #13
-reventi+='(Allarme[[:space:]]Tamper)|' #14
+reventi+='(Allarmi[[:space:]]Acquisiti[[:graph:]].*[[:graph:]]{2}[[:space:]])|' #15
+reventi+='(Allarme[[:space:]]Tamper)|' #16
 
-reventi+='(Richiesta[[:space:]]Invio[[:space:]]Programmazione[[:space:]][[:punct:]][[:space:]])|' #15
-reventi+='(Fine[[:space:]]invio[[:space:]]dati[[:space:]]di[[:space:]]programmazione[[:punct:]])|' #16
-reventi+='(Comando[[:space:]]Cambio)|' #17
-reventi+='(Richiesta[[:space:]]Comando[[:space:]]Apertura[[:space:]]Varco)|' #18
-reventi+='(Apertura[[:space:]]varco[[:space:]]Console[[:punct:]])|' #19
-reventi+='(Allarme[[:space:]]ingresso[[:space:]][0-9])|' #20
-reventi+='(Fine[[:space:]]transito)|' #21
-reventi+='(Ripristino[[:space:]]Linea)|' #22
-reventi+='(Tastiera[[:space:]]Abilitata[[:punct:]])' #23
-reventi+=')(.*)' #24
-reventi_max=24
+reventi+='(Richiesta[[:space:]]Invio[[:space:]]Programmazione[[:space:]][[:punct:]][[:space:]])|' #17
+reventi+='(Fine[[:space:]]invio[[:space:]]dati[[:space:]]di[[:space:]]programmazione[[:punct:]])|' #18
+reventi+='(Comando[[:space:]]Cambio)|' #19
+reventi+='(Richiesta[[:space:]]Comando[[:space:]]Apertura[[:space:]]Varco)|' #20
+reventi+='(Apertura[[:space:]]varco[[:space:]]Console[[:punct:]])|' #21
+reventi+='(Allarme[[:space:]]ingresso[[:space:]][0-9])|' #22
+reventi+='(Fine[[:space:]]transito)|' #23
+reventi+='(Ripristino[[:space:]]Linea)|' #24
+reventi+='(Tastiera[[:space:]]Abilitata[[:punct:]])|' #25
+reventi+='(Coda[[:space:]]Piena[[:punct:]]Comando[[:space:]]perso[[:punct:]]6D[[:punct:]])' #26
+reventi+=')(.*)' #27
+reventi_max=27
 
-rdirezioni='(.*)((ENTRATA)|(USCITA))(.*)'
-rdirezioni_max=5
+rdirezioni='(.*)((ENTRATA)|(USCITA)|(INGRESSO)|(INTERNO)|(ESTERNO))(.*)'
+rdirezioni_max=8
 
 # /regex
 
@@ -166,9 +169,9 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					
 					if [[ -n $utenza ]]; then			
 						if [[ -n $ospite ]]; then
-							printf -v ospite "%s %s" "$ospite" $(echo "$utenza" | tr -d '[|]')
+							printf -v ospite "%s %s" "$ospite" "$(echo "$utenza" | tr -d '[|]')"
 						else
-							printf -v ospite "%s" $(echo "$utenza" | tr -d '[|]')
+							printf -v ospite "%s" "$(echo "$utenza" | tr -d '[|]')"
 						fi
 					fi
 					
@@ -184,7 +187,7 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					
 					# clean buffer from punctuation and whitespaces
 					#echo -n "buffer before: length"${#buffer}" ["$buffer"] <----> " >> $TODO
-					printf -v buffer "%s" "$(remove_punctuation $(combined_whitespaces "$buffer"))"
+					printf -v buffer "%s" "$(string_cleanup "$buffer")"
 									
 					mycall="CALL input_serchio('$data','$centrale','$seriale','$evento','$varco','$direzione','$ospite','$checksum');"
 					#echo "after: length"${#buffer}" ["$buffer"] | "$target" | "$mycall"" >> $TODO
@@ -199,9 +202,9 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 						echo "$buffer" >> $TODO
 						echo "--> unmatched: $buffer" >> $LOG
 						
-						echo "$target"
-						echo "$mycall"
-						echo "$buffer"
+						#echo "$target"
+						#echo "$mycall"
+						#echo "$buffer"
 						
 					fi
 					
