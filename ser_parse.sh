@@ -10,10 +10,12 @@ TODO=$PREFIX"/ser_parse_unmatched.log"
 
 MYARGS="-H -ureporting -preportuser -D reporting"
 
-leading_whitespace() { printf "$1" | sed -e 's/^[[:space:]]*//'; }
-trailing_whitespace() { printf "$1" | sed -e 's/[[:space:]]*$//'; }
-combined_whitespace() { leading_whitespace $(trailing_whitespace "$1"); }
+leading_whitespaces() { printf "$1" | sed -e 's/^[[:space:]]*//'; }
+trailing_whitespaces() { printf "$1" | sed -e 's/[[:space:]]*$//'; }
 remove_punctuation() { printf "$1" | tr -d '[:punct:]'; }
+
+combined_whitespaces() { leading_whitespaces "$(trailing_whitespaces "$1")"; }
+string_cleanup() { combined_whitespaces "$(remove_punctuation "$buffer")"; }
 
 # regex
 rdata='(.*)([0-9]{2}/[0-9]{2}/[0-9]{4}[[:space:]][0-9]{2}:[0-9]{2})(.*)'
@@ -181,11 +183,11 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					[[ -n $eventi_durata ]] && printf -v evento "%s %s" "$evento" "$eventi_durata"
 					
 					# clean buffer from punctuation and whitespaces
-					echo -n "buffer before: length"${#buffer}" ["$buffer"] <----> " >> $TODO
-					printf -v buffer "%s" "$(remove_punctuation $(combined_whitespace "$buffer"))"
+					#echo -n "buffer before: length"${#buffer}" ["$buffer"] <----> " >> $TODO
+					printf -v buffer "%s" "$(remove_punctuation $(combined_whitespaces "$buffer"))"
 									
 					mycall="CALL input_serchio('$data','$centrale','$seriale','$evento','$varco','$direzione','$ospite','$checksum');"
-					echo "after: length"${#buffer}" ["$buffer"] | "$target" | "$mycall"" >> $TODO
+					#echo "after: length"${#buffer}" ["$buffer"] | "$target" | "$mycall"" >> $TODO
 					
 					#mycall="CALL input_serchio($(perl ser_parse_core.pl "$target"),'$checksum');"
 					
