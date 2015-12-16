@@ -99,10 +99,10 @@ RETURN (SELECT STR_TO_DATE(CONCAT(in_data,' ',COALESCE(in_ora,'00:00')),'%d-%m-%
 END;
 $$
 
-CREATE FUNCTION `pre_ser_data`(in_data VARCHAR(45),in_ora VARCHAR(45))
+CREATE FUNCTION `pre_ser_data`(in_data VARCHAR(45))
 RETURNS DATETIME
 BEGIN
-RETURN (SELECT STR_TO_DATE(CONCAT(in_data,' ',COALESCE(in_ora,'00:00')),'%d/%m/%Y %H:%i'));
+RETURN (SELECT STR_TO_DATE(in_data,'%d/%m/%Y %H:%i'));
 END;
 $$
 

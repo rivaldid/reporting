@@ -15,7 +15,7 @@ trailing_whitespaces() { printf "$1" | sed -e 's/[[:space:]]*$//'; }
 remove_punctuation() { printf "$1" | tr -d '[:punct:]'; }
 
 combined_whitespaces() { leading_whitespaces "$(trailing_whitespaces "$1")"; }
-string_cleanup() { combined_whitespaces "$(remove_punctuation "$buffer")"; }
+string_cleanup() { combined_whitespaces "$(remove_punctuation "$1")"; }
 
 # regex
 rdata='(.*)([0-9]{2}/[0-9]{2}/[0-9]{4}[[:space:]][0-9]{2}:[0-9]{2})(.*)'
@@ -77,6 +77,8 @@ reventi_max=27
 
 rdirezioni='(.*)((ENTRATA)|(USCITA)|(INGRESSO)|(INTERNO)|(ESTERNO))(.*)'
 rdirezioni_max=8
+
+#rospite='(.*)([A-Z][[:punct:]][A-Z])(.*)'
 
 # /regex
 
@@ -145,7 +147,7 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					# trash
 					[[ $buffer =~ $rconcentratore ]] && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					
-					# componenti evento
+					# pieces
 					[[ $buffer =~ $qutenzeq ]] && utenza=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$qutenzeq_max]}
 					[[ $buffer =~ $utenze ]] && utenza=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$utenze_max]}
 					
@@ -163,17 +165,10 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					[[ $buffer =~ $rvarco ]] && varco=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					[[ $buffer =~ $reventi ]] && evento=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$reventi_max]}
 					[[ $buffer =~ $rdirezioni ]] && direzione=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$rdirezioni_max]}
+
 					
-					# concateno i componenti
-					# schema: EVENTO STATOLETTORE [DIS]ABILITATO DURATA
-					
-					if [[ -n $utenza ]]; then			
-						if [[ -n $ospite ]]; then
-							printf -v ospite "%s %s" "$ospite" "$(echo "$utenza" | tr -d '[|]')"
-						else
-							printf -v ospite "%s" "$(echo "$utenza" | tr -d '[|]')"
-						fi
-					fi
+					# chains
+					[[ -n $utenza ]] && printf -v ospite "%s" "$(string_cleanup "$utenza")"
 					
 					[[ -n $eventi_statolettore ]] && printf -v evento "%s %s" "$evento" "$eventi_statolettore"
 					
@@ -185,32 +180,35 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					
 					[[ -n $eventi_durata ]] && printf -v evento "%s %s" "$evento" "$eventi_durata"
 					
-					# clean buffer from punctuation and whitespaces
-					#echo -n "buffer before: length"${#buffer}" ["$buffer"] <----> " >> $TODO
 					printf -v buffer "%s" "$(string_cleanup "$buffer")"
-									
-					mycall="CALL input_serchio('$data','$centrale','$seriale','$evento','$varco','$direzione','$ospite','$checksum');"
-					#echo "after: length"${#buffer}" ["$buffer"] | "$target" | "$mycall"" >> $TODO
-					
-					#mycall="CALL input_serchio($(perl ser_parse_core.pl "$target"),'$checksum');"
-					
-					echo "$mycall" >> $LOG
-									
+								
+					# test buffer not empty to define ospite
 					if [ ! -z "$buffer" ]; then
-						echo "==> $filereferer" >> $TODO
-						echo "$target" >> $TODO
-						echo "$buffer" >> $TODO
-						echo "--> unmatched: $buffer" >> $LOG
+					
+						#echo "==> $filereferer" >> $TODO
+						#echo "$target" >> $TODO
+						#echo "$buffer" >> $TODO
+						#echo "--> unmatched: $buffer" >> $LOG
 						
-						#echo "$target"
-						#echo "$mycall"
-						#echo "$buffer"
+						if [[ -n $ospite ]]; then
+						
+							printf -v ospite "%s %s" "$ospite" "$buffer"
+						
+						else
+						
+							printf -v ospite "%s" "$buffer"
+						
+						fi
 						
 					fi
 					
-					#mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
+					#mycall="CALL input_serchio($(perl ser_parse_core.pl "$target"),'$checksum');"
+					mycall="CALL input_serchio('$data','$centrale','$seriale','$evento','$varco','$direzione','$ospite','$checksum');"
+					mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
+					
+					echo "$mycall" >> $LOG
 
-				fi
+				fi # end parser core
 
 			done < $subfile
 

@@ -80,7 +80,6 @@ $$
 
 CREATE PROCEDURE `input_serchio`(
 IN in_data VARCHAR(45),
-IN in_ora VARCHAR(45),
 IN in_centrale VARCHAR(45),
 IN in_seriale VARCHAR(45),
 IN in_evento VARCHAR(45),
@@ -107,7 +106,7 @@ SET @my_rid = (SELECT input_repo((SELECT NOW()),in_checksum));
 
 -- data
 IF (in_data IS NOT NULL) THEN
-	SET @my_data = (SELECT pre_ser_data(in_data,in_ora));
+	SET @my_data = (SELECT pre_ser_data(in_data));
 ELSE
 	SET @my_data = 0;
 END IF;
