@@ -12,10 +12,10 @@ DELETE FROM REPOSITORY WHERE Rid=@my_rid;
 END;
 $$
 
-CREATE PROCEDURE `clear_ser_bydate`(IN in_date DATETIME)
+CREATE PROCEDURE `clear_ser_bydate`(IN in_data DATETIME)
 BEGIN
 DECLARE my_rid INT;
-SET @my_rid = (SELECT Rid FROM SER_REPORT WHERE data>=in_data LIMIT 1);
+SET @my_rid = (SELECT Rid FROM SER_REPORT WHERE data>=in_data AND data<in_data + INTERVAL 1 DAY LIMIT 1);
 DELETE FROM SER_REPORT WHERE Rid=@my_rid;
 DELETE FROM REPOSITORY WHERE Rid=@my_rid;
 END;
