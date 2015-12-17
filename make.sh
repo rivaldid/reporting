@@ -41,6 +41,9 @@ mysql $MYARGS -e "source $PREFIX/functions.sql \W;" >> $LOG
 echo "--> Carico le procedure in ingresso dati" >> $LOG
 mysql $MYARGS -e "source $PREFIX/input.sql \W;" >> $LOG
 
+echo "--> Carico le procedure in eliminazione dati" >> $LOG
+mysql $MYARGS -e "source $PREFIX/uninput.sql \W;" >> $LOG
+
 echo "--> Carico le viste" >> $LOG
 mysql $MYARGS -e "source $PREFIX/view.sql \W;" >> $LOG
 

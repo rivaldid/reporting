@@ -45,6 +45,9 @@ reventi_dis='(.*)(DIS)(.*)'
 reventi_durata='(.*)([[:graph:]]durata[[:space:]][[:alnum:]]{2,4}[[:punct:]]{1,2}[[:alnum:]]{2,3}[[:punct:]]{1,2}[[:alnum:]]{2,3}[[:graph:]])(.*)'
 reventi_statolettore='(.*)(Stato[[:space:]]Lettore)(.*)'
 
+reventi_linee='(.*)(LINEA[[:space:]]((ON)|(OFF)))(.*)'
+reventi_linee_max=6
+
 reventi='(.*)(' # 1-2
 reventi+='(Scasso[[:space:]]varco)|' #3
 reventi+='(Varco[[:space:]]chiuso)|' #4
@@ -71,9 +74,10 @@ reventi+='(Allarme[[:space:]]ingresso[[:space:]][0-9])|' #22
 reventi+='(Fine[[:space:]]transito)|' #23
 reventi+='(Ripristino[[:space:]]Linea)|' #24
 reventi+='(Tastiera[[:space:]]Abilitata[[:punct:]])|' #25
-reventi+='(Coda[[:space:]]Piena[[:punct:]]Comando[[:space:]]perso[[:punct:]]6D[[:punct:]])' #26
-reventi+=')(.*)' #27
-reventi_max=27
+reventi+='(Coda[[:space:]]Piena[[:punct:]]Comando[[:space:]]perso[[:punct:]]6D[[:punct:]])|' #26
+reventi+='(HY[[:space:]][[:graph:]][0-9]{2}[[:graph:]])' #27
+reventi+=')(.*)' #28
+reventi_max=28
 
 rdirezioni='(.*)((ENTRATA)|(USCITA)|(INGRESSO)|(INTERNO)|(ESTERNO))(.*)'
 rdirezioni_max=8
@@ -157,6 +161,8 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					[[ $buffer =~ $reventi_durata ]] && eventi_durata=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					[[ $buffer =~ $reventi_statolettore ]] && eventi_statolettore=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					
+					[[ $buffer =~ $reventi_linee ]] && eventi_linee=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$reventi_linee_max]}
+					
 					# contents
 					[[ $buffer =~ $rdata ]] && data=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					[[ $buffer =~ $rcentrale ]] && centrale=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
@@ -171,6 +177,8 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					[[ -n $utenza ]] && printf -v ospite "%s" "$(string_cleanup "$utenza")"
 					
 					[[ -n $eventi_statolettore ]] && printf -v evento "%s %s" "$evento" "$eventi_statolettore"
+					
+					[[ -n $eventi_linee ]] && printf -v evento "%s %s" "$evento" "$eventi_linee"
 					
 					if [[ -n $eventi_dis ]]; then 
 						printf -v evento "%s %s%s" "$evento" "$eventi_dis" "$eventi_abilitato"
