@@ -15,7 +15,17 @@ trailing_whitespaces() { printf "$1" | sed -e 's/[[:space:]]*$//'; }
 remove_punctuation() { printf "$1" | tr -d '[:punct:]'; }
 
 combined_whitespaces() { leading_whitespaces "$(trailing_whitespaces "$1")"; }
-string_cleanup() { combined_whitespaces "$(remove_punctuation "$1")"; }
+string_cleanup() { 
+	regex_apos='(.*)([[:graph:]]apos[[:punct:]])(.*)'
+	if [[ "$1" =~ $regex_apos ]]; then
+		uno=$(combined_whitespaces "$(remove_punctuation "${BASH_REMATCH[1]}")")
+		due=${BASH_REMATC[2]}
+		tre=$(combined_whitespaces "$(remove_punctuation "${BASH_REMATCH[3]}")")
+		printf "%s %s %s " "$uno" "$due" "$tre"
+	else
+		combined_whitespaces "$(remove_punctuation "$1")"
+		
+}
 
 # regex
 rdata='(.*)([0-9]{2}/[0-9]{2}/[0-9]{4}[[:space:]][0-9]{2}:[0-9]{2})(.*)'
