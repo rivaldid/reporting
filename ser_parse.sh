@@ -21,16 +21,18 @@ rvarco='(.*)(H\([0-9]{2}\))(.*)'
 qutenzeq='(.*)(' #1-2
 qutenzeq+='([[:graph:]][[:space:]]ADMIN1[[:space:]][[:graph:]])|' #3
 qutenzeq+='([[:graph:]][[:space:]]ADMIN2[[:space:]][[:graph:]])|' #4
-qutenzeq+='([[:graph:]][[:space:]]VISUAL[[:space:]][[:graph:]])' #5
-qutenzeq+=')(.*)' #6
-qutenzeq_max=6
+qutenzeq+='([[:graph:]][[:space:]]VISUAL[[:space:]][[:graph:]])|' #5
+qutenzeq+='([[:graph:]][[:space:]]POSTE[[:space:]][[:graph:]])' #6
+qutenzeq+=')(.*)' #7
+qutenzeq_max=7
 
 utenze='(.*)(' #1-2
 utenze+='(ADMIN1)|' #3
 utenze+='(ADMIN2)|' #4
-utenze+='(VISUAL)' #5
-utenze+=')(.*)' #6
-utenze_max=6
+utenze+='(VISUAL)|' #5
+utenze+='(POSTE)' #6
+utenze+=')(.*)' #7
+utenze_max=7
 
 reventi_abilitato='(.*)(ABILITATO)(.*)'
 reventi_dis='(.*)(DIS)(.*)'
@@ -87,9 +89,9 @@ remove_punctuation() { printf "$1" | tr -d '[:punct:]'; }
 combined_whitespaces() { leading_whitespaces "$(trailing_whitespaces "$1")"; }
 string_cleanup() {
 	if [[ $1 =~ $rapos ]]; then
-		printf -v begin "$(combined_whitespaces "$(remove_punctuation "${BASH_REMATCH[1]}")")"
+		printf -v begin "$(leading_whitespaces "$(remove_punctuation "${BASH_REMATCH[1]}")")"
 		printf -v apos "${BASH_REMATCH[2]}"
-		printf -v end "$(combined_whitespaces "$(remove_punctuation "${BASH_REMATCH[3]}")")"
+		printf -v end "$(trailing_whitespaces "$(remove_punctuation "${BASH_REMATCH[3]}")")"
 		printf "%s%s%s" "$begin" "$apos" "$end"
 	else
 		combined_whitespaces "$(remove_punctuation "$1")"
@@ -106,6 +108,11 @@ touch $TODO
 if [ -d $TEMP_DIR ]; then rm -rf $TEMP_DIR; fi
 mkdir -p $TEMP_DIR
 
+
+# arguments: --partial /foo/bar/baz.xps
+[[ "$1" == "--help" ]] && { echo "Arguments: --partial /mnt/REPORT/foo/bar/baz"; exit; }
+[[ "$1" == "--partial" ]] && PARTIAL="${2##$REPORT}"
+
 if grep -qs "$REPORT" /proc/mounts; then
     echo "--> $REPORT mounted."
 else
@@ -113,7 +120,7 @@ else
 	sudo mount "$REPORT"
 fi
 
-for file in $(find $REPORT -name "*.xps" -type f); do
+for file in $(find $REPORT$PARTIAL -name "*.xps" -type f); do
 
 	INPUT="$file"	# current file from loop
 	filename="${INPUT##*/}" # simple filename.ext

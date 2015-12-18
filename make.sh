@@ -13,8 +13,9 @@ SER_HISTORY=$PREFIX"/ser_parse.history.log"
 
 reset=false
 history=false
-[ "$1" == "--reset" ] && reset=true
-[ "$2" == "--history" ] && history=true
+[[ "$1" == "--help" ]] && { echo "Arguments: [--reset [--history]]"; exit; }
+[[ "$1" == "--reset" ]] && reset=true
+[[ "$2" == "--history" ]] && history=true
 
 cd $PREFIX
 if [ -f $LOG ]; then rm $LOG; fi
