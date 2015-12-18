@@ -77,8 +77,6 @@ rdirezioni_max=8
 
 rapos='(.*)([[:graph:]]apos[[:punct:]])(.*)'
 
-#rospite='(.*)([A-Z][[:punct:]][A-Z])(.*)'
-
 # /regex
 
 
@@ -87,7 +85,7 @@ trailing_whitespaces() { printf "$1" | sed -e 's/[[:space:]]*$//'; }
 remove_punctuation() { printf "$1" | tr -d '[:punct:]'; }
 
 combined_whitespaces() { leading_whitespaces "$(trailing_whitespaces "$1")"; }
-string_cleanup() { 
+string_cleanup() {
 	if [[ $1 =~ $rapos ]]; then
 		printf -v begin "$(combined_whitespaces "$(remove_punctuation "${BASH_REMATCH[1]}")")"
 		printf -v apos "${BASH_REMATCH[2]}"
@@ -159,22 +157,22 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					#echo "$target"
 					unset buffer data centrale seriale evento varco direzione ospite eventi_dis eventi_abilitato eventi_durata utenza eventi_statolettore eventi_linee
 					printf -v buffer "$target"
-					
+
 					# trash
 					[[ $buffer =~ $rconcentratore ]] && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
-					
+
 					# pieces
 					[[ $buffer =~ $qutenzeq ]] && utenza=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$qutenzeq_max]}
 					[[ $buffer =~ $utenze ]] && utenza=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$utenze_max]}
-					
+
 					[[ $buffer =~ $reventi_abilitato ]] && eventi_abilitato=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					[[ $buffer =~ $reventi_dis ]] && eventi_dis=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
-					
+
 					[[ $buffer =~ $reventi_durata ]] && eventi_durata=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					[[ $buffer =~ $reventi_statolettore ]] && eventi_statolettore=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
-					
+
 					[[ $buffer =~ $reventi_linee ]] && eventi_linee=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$reventi_linee_max]}
-					
+
 					# contents
 					[[ $buffer =~ $rdata ]] && data=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					[[ $buffer =~ $rcentrale ]] && centrale=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
@@ -184,48 +182,48 @@ for file in $(find $REPORT -name "*.xps" -type f); do
 					[[ $buffer =~ $reventi ]] && evento=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$reventi_max]}
 					[[ $buffer =~ $rdirezioni ]] && direzione=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$rdirezioni_max]}
 
-					
+
 					# chains
 					[[ -n $utenza ]] && printf -v ospite "%s" "$(string_cleanup "$utenza")"
-					
+
 					[[ -n $eventi_statolettore ]] && printf -v evento "%s %s" "$evento" "$eventi_statolettore"
-					
+
 					[[ -n $eventi_linee ]] && printf -v evento "%s %s" "$evento" "$eventi_linee"
-					
-					if [[ -n $eventi_dis ]]; then 
+
+					if [[ -n $eventi_dis ]]; then
 						printf -v evento "%s %s%s" "$evento" "$eventi_dis" "$eventi_abilitato"
-					elif [[ -n $eventi_abilitato ]]; then 
+					elif [[ -n $eventi_abilitato ]]; then
 						printf -v evento "%s %s" "$evento" "$eventi_abilitato"
 					fi
-					
+
 					[[ -n $eventi_durata ]] && printf -v evento "%s %s" "$evento" "$eventi_durata"
-					
+
 					printf -v buffer "%s" "$(string_cleanup "$buffer")"
-								
+
 					# test buffer not empty to define ospite
 					if [ ! -z "$buffer" ]; then
-					
+
 						#echo "==> $filereferer" >> $TODO
 						#echo "$target" >> $TODO
 						#echo "$buffer" >> $TODO
 						#echo "--> unmatched: $buffer" >> $LOG
-						
+
 						if [[ -n $ospite ]]; then
-						
+
 							printf -v ospite "%s %s" "$ospite" "$buffer"
-						
+
 						else
-						
+
 							printf -v ospite "%s" "$buffer"
-						
+
 						fi
-						
+
 					fi
-					
+
 					#mycall="CALL input_serchio($(perl ser_parse_core.pl "$target"),'$checksum');"
 					mycall="CALL input_serchio('$data','$centrale','$seriale','$evento','$varco','$direzione','$ospite','$checksum');"
 					mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
-					
+
 					echo "$mycall" >> $LOG
 
 				fi # end parser core
