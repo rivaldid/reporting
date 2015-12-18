@@ -6,7 +6,8 @@ TRASH_PREFIX="/mnt/REPORT/Serchio"
 TEMP_DIR=$PREFIX"/TEMP"
 
 LOG=$PREFIX"/ser_parse.log"
-TODO=$PREFIX"/ser_parse_unmatched.log"
+#TODO=$PREFIX"/ser_parse_unmatched.log"
+SER_HISTORY=$PREFIX"/ser_parse.history.log"
 
 MYARGS="-H -ureporting -preportuser -D reporting"
 
@@ -99,18 +100,20 @@ string_cleanup() {
 }
 
 
-if [ -f $LOG ]; then rm $LOG; fi
+[[ -f $LOG ]] && rm $LOG
 touch $LOG
 
-if [ -f $TODO ]; then rm $TODO; fi
-touch $TODO
+#if [ -f $TODO ]; then rm $TODO; fi
+#touch $TODO
+
+[[ -f $SER_HISTORY ]] || touch $SER_HISTORY
 
 if [ -d $TEMP_DIR ]; then rm -rf $TEMP_DIR; fi
 mkdir -p $TEMP_DIR
 
 
 # arguments: --partial /foo/bar/baz.xps
-[[ "$1" == "--help" ]] && { echo "Arguments: --partial /mnt/REPORT/foo/bar/baz"; exit; }
+[[ "$1" == "--help" ]] && { echo "Arguments: [--partial /mnt/REPORT/Serchio/foo/bar/baz.xps]"; exit; }
 [[ "$1" == "--partial" ]] && PARTIAL="${2##$REPORT}"
 
 if grep -qs "$REPORT" /proc/mounts; then
@@ -253,3 +256,4 @@ for file in $(find $REPORT$PARTIAL -name "*.xps" -type f); do
 done
 
 sudo umount $REPORT
+cat "$LOG" >> "$SER_HISTORY"

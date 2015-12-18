@@ -18,8 +18,11 @@ history=false
 [[ "$2" == "--history" ]] && history=true
 
 cd $PREFIX
-if [ -f $LOG ]; then rm $LOG; fi
+[[ -f $LOG ]] && rm $LOG
 touch $LOG
+
+[[ -f $WIN_HISTORY ]] || touch $WIN_HISTORY
+[[ -f $SER_HISTORY ]] || touch $SER_HISTORY
 
 echo "*** BEGIN " $(date) "***" >> $LOG
 
