@@ -23,17 +23,19 @@ qutenzeq='(.*)(' #1-2
 qutenzeq+='([[:graph:]][[:space:]]ADMIN1[[:space:]][[:graph:]])|' #3
 qutenzeq+='([[:graph:]][[:space:]]ADMIN2[[:space:]][[:graph:]])|' #4
 qutenzeq+='([[:graph:]][[:space:]]VISUAL[[:space:]][[:graph:]])|' #5
-qutenzeq+='([[:graph:]][[:space:]]POSTE[[:space:]][[:graph:]])' #6
-qutenzeq+=')(.*)' #7
-qutenzeq_max=7
+qutenzeq+='([[:graph:]][[:space:]]POSTE[[:space:]][[:graph:]])|' #6
+qutenzeq+='([[:graph:]][[:space:]]TEST[[:space:]][[:graph:]])' #7
+qutenzeq+=')(.*)' #8
+qutenzeq_max=8
 
 utenze='(.*)(' #1-2
 utenze+='(ADMIN1)|' #3
 utenze+='(ADMIN2)|' #4
 utenze+='(VISUAL)|' #5
-utenze+='(POSTE)' #6
-utenze+=')(.*)' #7
-utenze_max=7
+utenze+='(POSTE)|' #6
+utenze+='(TEST)' #7
+utenze+=')(.*)' #8
+utenze_max=8
 
 reventi_abilitato='(.*)(ABILITATO)(.*)'
 reventi_dis='(.*)(DIS)(.*)'
@@ -108,7 +110,7 @@ touch $LOG
 
 [[ -f $SER_HISTORY ]] || touch $SER_HISTORY
 
-if [ -d $TEMP_DIR ]; then rm -rf $TEMP_DIR; fi
+[[ -d $TEMP_DIR ]] && rm -rf $TEMP_DIR
 mkdir -p $TEMP_DIR
 
 
@@ -230,7 +232,6 @@ for file in $(find $REPORT$PARTIAL -name "*.xps" -type f); do
 
 					fi
 
-					#mycall="CALL input_serchio($(perl ser_parse_core.pl "$target"),'$checksum');"
 					mycall="CALL input_serchio('$data','$centrale','$seriale','$evento','$varco','$direzione','$ospite','$checksum');"
 					mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
 
