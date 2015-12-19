@@ -19,23 +19,14 @@ rseriale='(.*)([0-9]{8})(.*)'
 rseriale_alt='(.*)([[:punct:]][0-9]{7})(.*)'
 rvarco='(.*)(H\([0-9]{2}\))(.*)'
 
-qutenzeq='(.*)(' #1-2
-qutenzeq+='([[:graph:]][[:space:]]ADMIN1[[:space:]][[:graph:]])|' #3
-qutenzeq+='([[:graph:]][[:space:]]ADMIN2[[:space:]][[:graph:]])|' #4
-qutenzeq+='([[:graph:]][[:space:]]VISUAL[[:space:]][[:graph:]])|' #5
-qutenzeq+='([[:graph:]][[:space:]]POSTE[[:space:]][[:graph:]])|' #6
-qutenzeq+='([[:graph:]][[:space:]]TEST[[:space:]][[:graph:]])' #7
-qutenzeq+=')(.*)' #8
-qutenzeq_max=8
-
-utenze='(.*)(' #1-2
-utenze+='(ADMIN1)|' #3
-utenze+='(ADMIN2)|' #4
-utenze+='(VISUAL)|' #5
-utenze+='(POSTE)|' #6
-utenze+='(TEST)' #7
-utenze+=')(.*)' #8
-utenze_max=8
+rutenze='(.*)(' #1-2
+rutenze+='([[:punct:]]?[[:space:]]ADMIN1[[:space:]][[:punct:]]?)|' #3
+rutenze+='([[:punct:]]?[[:space:]]ADMIN2[[:space:]][[:punct:]]?)|' #4
+rutenze+='([[:punct:]]?[[:space:]]VISUAL[[:space:]][[:punct:]]?)|' #5
+rutenze+='([[:punct:]]?[[:space:]]POSTE[[:space:]][[:punct:]]?)|' #6
+rutenze+='([[:punct:]]?[[:space:]]TEST[[:space:]][[:punct:]]?)' #7
+rutenze+=')(.*)' #8
+rutenze_max=8
 
 reventi_abilitato='(.*)(ABILITATO)(.*)'
 reventi_dis='(.*)(DIS)(.*)'
@@ -174,8 +165,10 @@ for file in $(find $REPORT$PARTIAL -name "*.xps" -type f); do
 					[[ $buffer =~ $rconcentratore ]] && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 
 					# pieces
-					[[ $buffer =~ $qutenzeq ]] && utenza=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$qutenzeq_max]}
-					[[ $buffer =~ $utenze ]] && utenza=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$utenze_max]}
+					
+					# utenze: capture 1st time. trash the 2nd
+					[[ $buffer =~ $rutenze ]] && utenza=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$rutenze_max]}
+					[[ $buffer =~ $rutenze ]] && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$rutenze_max]}
 
 					[[ $buffer =~ $reventi_abilitato ]] && eventi_abilitato=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					[[ $buffer =~ $reventi_dis ]] && eventi_dis=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
