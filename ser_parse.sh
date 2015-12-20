@@ -24,9 +24,10 @@ rutenze+='([[:punct:]]?[[:space:]]ADMIN1[[:space:]][[:punct:]]?)|' #3
 rutenze+='([[:punct:]]?[[:space:]]ADMIN2[[:space:]][[:punct:]]?)|' #4
 rutenze+='([[:punct:]]?[[:space:]]VISUAL[[:space:]][[:punct:]]?)|' #5
 rutenze+='([[:punct:]]?[[:space:]]POSTE[[:space:]][[:punct:]]?)|' #6
-rutenze+='([[:punct:]]?[[:space:]]TEST[[:space:]][[:punct:]]?)' #7
-rutenze+=')(.*)' #8
-rutenze_max=8
+rutenze+='([[:punct:]]?[[:space:]]TEST[[:space:]][[:punct:]]?)|' #7
+rutenze+='([[:punct:]]?[[:space:]]PROVA[[:space:]][[:punct:]]?)' #8
+rutenze+=')(.*)' #9
+rutenze_max=9
 
 reventi_abilitato='(.*)(ABILITATO)(.*)'
 reventi_dis='(.*)(DIS)(.*)'
