@@ -30,7 +30,7 @@ rutenze+=')(.*)' #9
 rutenze_max=9
 
 reventi_abilitato='(.*)(ABILITATO)(.*)'
-reventi_dis='(.*)(DIS)(.*)'
+reventi_dis='(.*)(([[:space:]]|[[:punct:]])DIS[[:space:]])(.*)'
 
 reventi_durata='(.*)([[:graph:]]durata[[:space:]][[:alnum:]]{2,4}[[:punct:]]{1,2}[[:alnum:]]{2,3}[[:punct:]]{1,2}[[:alnum:]]{2,3}[[:graph:]])(.*)'
 reventi_statolettore='(.*)(Stato[[:space:]]Lettore)(.*)'
@@ -197,7 +197,7 @@ for file in $(find $REPORT$PARTIAL -name "*.xps" -type f); do
 					[[ -n $eventi_linee ]] && printf -v evento "%s %s" "$evento" "$eventi_linee"
 
 					if [[ -n $eventi_dis ]]; then
-						printf -v evento "%s %s%s" "$evento" "$eventi_dis" "$eventi_abilitato"
+						printf -v evento "%s %s%s" "$evento" "$(string_cleanup "$eventi_dis")" "$eventi_abilitato"
 					elif [[ -n $eventi_abilitato ]]; then
 						printf -v evento "%s %s" "$evento" "$eventi_abilitato"
 					fi
@@ -209,10 +209,9 @@ for file in $(find $REPORT$PARTIAL -name "*.xps" -type f); do
 					# test buffer not empty to define ospite
 					if [ ! -z "$buffer" ]; then
 
-						#echo "==> $filereferer" >> $TODO
-						#echo "$target" >> $TODO
-						#echo "$buffer" >> $TODO
-						#echo "--> unmatched: $buffer" >> $LOG
+						# $filereferer: original filename
+						# $target: line being processed
+						# $buffer: target in processing and future ospite name
 
 						if [[ -n $ospite ]]; then
 
