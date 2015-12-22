@@ -5,10 +5,19 @@ REPORT="/mnt/tempRAS"
 TRASH_PREFIX="/mnt/tempRAS/"
 
 LOG=$PREFIX"/adc_parse.log"
+ADC_HISTORY=$PREFIX"/adc_parse.history.log"
+
 MYARGS="-H -ureporting -preportuser -D reporting"
 
-if [ -f $LOG ]; then rm $LOG; fi
+leading_whitespaces() { printf "$1" | sed -e 's/^[[:space:]]*//'; }
+trailing_whitespaces() { printf "$1" | sed -e 's/[[:space:]]*$//'; }
+combined_whitespaces() { leading_whitespaces "$(trailing_whitespaces "$1")"; }
+trim_doublequotes() { printf "$1" | tr -d '"'; }
+
+[[ -f $LOG ]] && rm $LOG
 touch $LOG
+
+[[ -f $ADC_HISTORY ]] || touch $ADC_HISTORY
 
 if grep -qs "$REPORT" /proc/mounts; then
     echo "--> $REPORT mounted."
@@ -74,7 +83,8 @@ for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 					else
 						#valore="${field[$i]}"
 						#valore="$(printf "$valore" | tr -d '\011\012\015' | sed -e 's/^ *//g;s/ *$//g' | tr -d '"')"
-						printf -v valore "%s" "$(echo "${field[$i]}" | tr -d '\011\012\015' | sed -e 's/^ *//g;s/ *$//g' | tr -d '"')"
+						#printf -v valore "%s" "$(echo "${field[$i]}" | tr -d '\011\012\015' | sed -e 's/^ *//g;s/ *$//g' | tr -d '"')"
+						printf -v valore "%s" "$(combined_whitespaces "$(trim_doublequotes "${field[$i]}")")"
 					fi
 				
 					case "$j" in
@@ -111,7 +121,7 @@ for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 			done < "$TEMP"
 			
 			printf -v mycall "CALL input_adc('$cognome','$nome','$societa','$tipo_doc','$num_doc','$scad_doc','$decorrenza','$scadenza','$badge','$gruppo','$note','$struttura','$profilo','$cf','$data_di_nascita','$nazionalita','$locali','$data_report','$checksum','$data_file');"
-			printf "$mycall" >> $LOG
+			echo "$mycall" >> $LOG
 			mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
 
 		done
@@ -129,3 +139,4 @@ for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 done
 
 sudo umount $REPORT
+cat "$LOG" >> "$ADC_HISTORY"
