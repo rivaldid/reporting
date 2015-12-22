@@ -29,8 +29,7 @@ rutenze+='([[:punct:]]?[[:space:]]PROVA[[:space:]][[:punct:]]?)' #8
 rutenze+=')(.*)' #9
 rutenze_max=9
 
-reventi_abilitato='(.*)(ABILITATO)(.*)'
-reventi_dis='(.*)(([[:space:]]|[[:punct:]])DIS[[:space:]])(.*)'
+reventi_abilitato='(.*)(([[:space:]]|[[:punct:]])(DIS)?ABILITATO([[:space:]]|[[:punct:]]))(.*)'
 
 reventi_durata='(.*)([[:graph:]]durata[[:space:]][[:alnum:]]{2,4}[[:punct:]]{1,2}[[:alnum:]]{2,3}[[:punct:]]{1,2}[[:alnum:]]{2,3}[[:graph:]])(.*)'
 reventi_statolettore='(.*)(Stato[[:space:]]Lettore)(.*)'
@@ -159,7 +158,7 @@ for file in $(find $REPORT$PARTIAL -name "*.xps" -type f); do
 					[[ ! "$target" =~ "- Stampa Report da" ]]; then
 
 					#echo "$target"
-					unset buffer data centrale seriale evento varco direzione ospite eventi_dis eventi_abilitato eventi_durata utenza eventi_statolettore eventi_linee
+					unset buffer data centrale seriale evento varco direzione ospite eventi_abilitato eventi_durata utenza eventi_statolettore eventi_linee
 					printf -v buffer "$target"
 
 					# trash
@@ -172,7 +171,6 @@ for file in $(find $REPORT$PARTIAL -name "*.xps" -type f); do
 					[[ $buffer =~ $rutenze ]] && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$rutenze_max]}
 
 					[[ $buffer =~ $reventi_abilitato ]] && eventi_abilitato=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
-					[[ $buffer =~ $reventi_dis ]] && eventi_dis=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 
 					[[ $buffer =~ $reventi_durata ]] && eventi_durata=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					[[ $buffer =~ $reventi_statolettore ]] && eventi_statolettore=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
