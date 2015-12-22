@@ -81,6 +81,7 @@ trailing_whitespaces() { printf "$1" | sed -e 's/[[:space:]]*$//'; }
 remove_punctuation() { printf "$1" | tr -d '[:punct:]'; }
 
 combined_whitespaces() { leading_whitespaces "$(trailing_whitespaces "$1")"; }
+
 string_cleanup() {
 	if [[ $1 =~ $rapos ]]; then
 		printf -v begin "$(leading_whitespaces "$(remove_punctuation "${BASH_REMATCH[1]}")")"
@@ -165,7 +166,7 @@ for file in $(find $REPORT$PARTIAL -name "*.xps" -type f); do
 					[[ $buffer =~ $rconcentratore ]] && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 
 					# pieces
-					
+
 					# utenze: capture 1st time. trash the 2nd
 					[[ $buffer =~ $rutenze ]] && utenza=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$rutenze_max]}
 					[[ $buffer =~ $rutenze ]] && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$rutenze_max]}
@@ -189,20 +190,13 @@ for file in $(find $REPORT$PARTIAL -name "*.xps" -type f); do
 
 					# chains
 					[[ -n $utenza ]] && printf -v ospite "%s" "$(string_cleanup "$utenza")"
-
 					[[ -n $eventi_statolettore ]] && printf -v evento "%s %s" "$evento" "$eventi_statolettore"
-
 					[[ -n $eventi_linee ]] && printf -v evento "%s %s" "$evento" "$eventi_linee"
-
-					if [[ -n $eventi_dis ]]; then
-						printf -v evento "%s %s%s" "$evento" "$(string_cleanup "$eventi_dis")" "$eventi_abilitato"
-					elif [[ -n $eventi_abilitato ]]; then
-						printf -v evento "%s %s" "$evento" "$eventi_abilitato"
-					fi
-
+					[[ -n $eventi_abilitato ]] && printf -v evento "%s %s" "$evento" "$(string_cleanup "$eventi_abilitato")"
 					[[ -n $eventi_durata ]] && printf -v evento "%s %s" "$evento" "$eventi_durata"
 
 					printf -v buffer "%s" "$(string_cleanup "$buffer")"
+					printf -v evento "%s" "$(combined_whitespaces "$evento")"
 
 					# test buffer not empty to define ospite
 					if [ ! -z "$buffer" ]; then
