@@ -5,10 +5,18 @@ REPORT="/mnt/REPORT"
 TRASH_PREFIX="/mnt/REPORT/WinWatch"
 
 LOG=$PREFIX"/win_parse.log"
+WIN_HISTORY=$PREFIX"/win_parse.history.log"
+
 MYARGS="-H -ureporting -preportuser -D reporting"
 
-if [ -f $LOG ]; then rm $LOG; fi
+[[ -f $LOG ]] && rm $LOG
 touch $LOG
+
+[[ -f $WIN_HISTORY ]] || touch $WIN_HISTORY
+
+# arguments: --partial /foo/bar/baz.xps
+[[ "$1" == "--help" ]] && { echo "Arguments: [--partial /mnt/REPORT/WinWatch/foo/bar/baz.csv]"; exit; }
+[[ "$1" == "--partial" ]] && PARTIAL="${2##$REPORT}"
 
 if grep -qs "$REPORT" /proc/mounts; then
     echo "--> $REPORT mounted."
@@ -17,9 +25,9 @@ else
 	sudo mount "$REPORT"
 fi
 
-for file in $(find $REPORT -name "*.csv" -type f); do
+for file in $(find $REPORT$PARTIAL -name "*.csv" -type f); do
 
-	INPUT=$file	# current file from loop
+	INPUT="$file"	# current file from loop
 	filename="${INPUT##*/}" # simple filename.ext
 	filereferer="${INPUT#$TRASH_PREFIX}" # full path without trash prefix
 	TEMP="$PREFIX/$filename.temp.csv" # conversion latin to utf (windows to linux)
@@ -92,3 +100,4 @@ for file in $(find $REPORT -name "*.csv" -type f); do
 done
 
 sudo umount $REPORT
+cat "$LOG" >> "$WIN_HISTORY"

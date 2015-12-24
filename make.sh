@@ -7,9 +7,10 @@ LOG=$PREFIX"/make.log"
 DUMPFILE=$PREFIX"/dumpfile.sql"
 MYARGS="-ureporting -preportuser -D reporting"
 
-# history 2015-11-29
+# history logfile
 WIN_HISTORY=$PREFIX"/win_parse.history.log"
 SER_HISTORY=$PREFIX"/ser_parse.history.log"
+ADC_HISTORY=$PREFIX"/adc_parse.history.log"
 
 reset=false
 history=false
@@ -23,6 +24,7 @@ touch $LOG
 
 [[ -f $WIN_HISTORY ]] || touch $WIN_HISTORY
 [[ -f $SER_HISTORY ]] || touch $SER_HISTORY
+[[ -f $ADC_HISTORY ]] || touch $ADC_HISTORY
 
 echo "*** BEGIN " $(date) "***" >> $LOG
 
@@ -64,6 +66,7 @@ if [ $history = true ]; then
 	echo "--> Ricarico gli archivi" >> $LOG
 	mysql $MYARGS -e "source $WIN_HISTORY \W;" >> $LOG
 	mysql $MYARGS -e "source $SER_HISTORY \W;" >> $LOG
+	mysql $MYARGS -e "source $ADC_HISTORY \W;" >> $LOG
 fi
 
 echo "--> Carico il routing" >> $LOG

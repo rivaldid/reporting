@@ -49,7 +49,7 @@ for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 
 	if [ "$report_not_done" = "0" ] && [ "$report_not_obsolete" = "0" ]; then
 	
-		echo "==> OK $INPUT da aggiungere" >> $LOG
+		echo "--> OK $INPUT da aggiungere" >> $LOG
 		echo "--> $TEMP in corso..."
 		
 		echo "--> Cleanup:" $(mysql -ureporting -preportuser -D reporting -s -N -e "SELECT clean_adc_garbage((SELECT pre_adc_data('$data_report')),'$data_file');") "record"
@@ -120,9 +120,10 @@ for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 				
 			done < "$TEMP"
 			
-			printf -v mycall "CALL input_adc('$cognome','$nome','$societa','$tipo_doc','$num_doc','$scad_doc','$decorrenza','$scadenza','$badge','$gruppo','$note','$struttura','$profilo','$cf','$data_di_nascita','$nazionalita','$locali','$data_report','$checksum','$data_file');"
-			echo "$mycall" >> $LOG
+			mycall="CALL input_adc('$cognome','$nome','$societa','$tipo_doc','$num_doc','$scad_doc','$decorrenza','$scadenza','$badge','$gruppo','$note','$struttura','$profilo','$cf','$data_di_nascita','$nazionalita','$locali','$data_report','$checksum','$data_file');"
 			mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
+			
+			echo "$mycall" >> $LOG
 
 		done
 		
