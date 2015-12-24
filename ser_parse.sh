@@ -32,7 +32,7 @@ rutenze_max=9
 reventi_abilitato='(.*)(([[:space:]]|[[:punct:]])(DIS)?ABILITATO([[:space:]]|[[:punct:]]))(.*)'
 reventi_durata='(.*)([[:graph:]]durata[[:space:]][[:alnum:]]{2,4}[[:punct:]]{1,2}[[:alnum:]]{2,3}[[:punct:]]{1,2}[[:alnum:]]{2,3}[[:graph:]])(.*)'
 reventi_statolettore='(.*)(Stato[[:space:]]Lettore)(.*)'
-reventi_varco_aperto='(.*)(VARCO[[:space:]]APERTO(.*)'
+reventi_varco_aperto='(.*)(VARCO[[:space:]]APERTO)(.*)'
 
 reventi_linee='(.*)(LINEA[[:space:]]((ON)|(OFF)))(.*)'
 reventi_linee_max=6
@@ -160,7 +160,7 @@ for file in $(find $REPORT$PARTIAL -name "*.xps" -type f); do
 					[[ ! "$target" =~ "- Stampa Report da" ]]; then
 
 					#echo "$target"
-					unset buffer data centrale seriale evento varco direzione ospite eventi_abilitato eventi_durata utenza eventi_statolettore eventi_linee
+					unset buffer data centrale seriale evento varco direzione ospite eventi_abilitato eventi_durata utenza eventi_statolettore eventi_linee eventi_varco_aperto
 					printf -v buffer "$target"
 
 					# trash
