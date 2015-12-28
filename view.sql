@@ -30,14 +30,14 @@ ORDER BY tipo DESC,LENGTH(numero),numero;
 CREATE VIEW `ADC` AS
 SELECT 
 ADC_REPORT.data_report AS Data,
-ADC_OSPITI.nome AS Ospite,
-ADC_REPORT.societa AS Societa,
+HTML_UnEncode(ADC_OSPITI.nome) AS Ospite,
+HTML_UnEncode(ADC_REPORT.societa) AS Societa,
 CONCAT_WS('|',ADC_DOCUMENTI.tipo,ADC_DOCUMENTI.numero,ADC_DOCUMENTI.scadenza) AS Documento,
 ADC_REPORT.decorrenza AS Decorrenza,
 ADC_REPORT.scadenza AS Scadenza,
 ADC_REPORT.badge AS Badge,
 ADC_REPORT.gruppo AS Gruppo_Badge,
-ADC_REPORT.note AS NOTE,
+HTML_UnEncode(ADC_REPORT.note) AS NOTE,
 ADC_STRUTTURE.label AS Struttura,
 ADC_PROFILI.label AS Profilo,
 ADC_OSPITI.cf AS Codice_Fiscale,
