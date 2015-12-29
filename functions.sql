@@ -129,14 +129,14 @@ RETURN (SELECT id_evento FROM WIN_EVENTI WHERE evento=in_evento);
 END;
 $$
 
-CREATE FUNCTION `test_win_messaggio`(in_messaggio VARCHAR(100))
+CREATE FUNCTION `test_win_messaggio`(in_messaggio VARCHAR(200))
 RETURNS TINYINT(1)
 BEGIN
 RETURN (SELECT EXISTS(SELECT 1 FROM WIN_MESSAGGI WHERE messaggio=in_messaggio));
 END;
 $$
 
-CREATE FUNCTION `get_win_messaggio`(in_messaggio VARCHAR(100))
+CREATE FUNCTION `get_win_messaggio`(in_messaggio VARCHAR(200))
 RETURNS INT(11)
 BEGIN
 RETURN (SELECT id_messaggio FROM WIN_MESSAGGI WHERE messaggio=in_messaggio);
@@ -512,7 +512,7 @@ RETURN @id_output;
 END;
 $$
 
-CREATE FUNCTION `input_win_messaggio`(in_messaggio VARCHAR(100))
+CREATE FUNCTION `input_win_messaggio`(in_messaggio VARCHAR(200))
 RETURNS INT(11)
 BEGIN
 DECLARE id_output INT(11);

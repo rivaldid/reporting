@@ -26,7 +26,7 @@ CREATE TABLE `WIN_EVENTI` (
 DROP TABLE IF EXISTS `WIN_MESSAGGI`;
 CREATE TABLE `WIN_MESSAGGI` (
   `id_messaggio` int(11) NOT NULL AUTO_INCREMENT,
-  `messaggio` varchar(100) NOT NULL,
+  `messaggio` varchar(200) NOT NULL,
   UNIQUE (`messaggio`),
   PRIMARY KEY (`id_messaggio`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

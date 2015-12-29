@@ -26,7 +26,7 @@ IN in_centrale VARCHAR(45),
 IN in_ora VARCHAR(45),
 IN in_data VARCHAR(45),
 IN in_evento VARCHAR(45),
-IN in_messaggio VARCHAR(100),
+IN in_messaggio VARCHAR(200),
 IN in_checksum CHAR(32)
 )
 BEGIN
