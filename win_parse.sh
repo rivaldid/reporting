@@ -9,6 +9,15 @@ WIN_HISTORY=$PREFIX"/win_parse.history.log"
 
 MYARGS="-H -ureporting -preportuser -D reporting"
 
+leading_whitespaces() { printf "%s\n" "$1" | sed -e 's/^[[:space:]]*//'; }
+trailing_whitespaces() { printf "%s\n" "$1" | sed -e 's/[[:space:]]*$//'; }
+apos_substitution() { printf "%s\n" "${1//\'/&apos;}"; }
+trim_doublespaces() { printf "%s\n" "$1" | tr -s ' '; }
+
+combined_whitespaces() { leading_whitespaces "$(trailing_whitespaces "$1")"; }
+string_cleanup() { combined_whitespaces "$(trim_doublespaces "$(apos_substitution "$1")")"; }
+
+
 [[ -f $LOG ]] && rm $LOG
 touch $LOG
 
@@ -48,24 +57,31 @@ for file in $(find $REPORT$PARTIAL -name "*.csv" -type f); do
 		while read line; do
 
 			while IFS=';' read -ra field; do
+			
+				# input
+				[[ -z "${field[0]}" ]] && printf -v centrale NULL || printf -v centrale "%s" "$(string_cleanup "${field[0]}")"
+				[[ -z "${field[1]}" ]] && printf -v ora NULL || printf -v ora "%s" "$(string_cleanup "${field[1]}")"
+				[[ -z "${field[2]}" ]] && printf -v data NULL || printf -v data "%s" "$(string_cleanup "${field[2]}")"
+				[[ -z "${field[3]}" ]] && printf -v evento NULL || printf -v evento "%s" "$(string_cleanup "${field[3]}")"
+				[[ -z "${field[4]}" ]] && printf -v messaggio NULL || printf -v messaggio "%s" "$(string_cleanup "${field[4]}")"
 
-				centrale="${field[0]}"
-				ora="${field[1]}"
-				data="${field[2]}"
-				evento="${field[3]}"
-				messaggio="${field[4]}"
+				#printf -v centrale "%s" "$(string_cleanup "${field[0]}")"
+				#printf -v ora "%s" "$(string_cleanup "${field[1]}")"
+				#printf -v data "%s" "$(string_cleanup "${field[2]}")"
+				#printf -v evento "%s" "$(string_cleanup "${field[3]}")"
+				#printf -v messaggio "%s" "$(string_cleanup "${field[4]}")"
 
-				if [ -z "${field[0]}" ];then centrale=NULL; fi
-				if [ -z "${field[1]}" ];then ora=NULL; fi
-				if [ -z "${field[2]}" ];then data=NULL; fi
-				if [ -z "${field[3]}" ];then evento=NULL; fi
-				if [ -z "${field[4]}" ];then messaggio=NULL; fi
+				#if [ -z "${field[0]}" ];then centrale=NULL; fi
+				#if [ -z "${field[1]}" ];then ora=NULL; fi
+				#if [ -z "${field[2]}" ];then data=NULL; fi
+				#if [ -z "${field[3]}" ];then evento=NULL; fi
+				#if [ -z "${field[4]}" ];then messaggio=NULL; fi
 
-				centrale="$(echo "$centrale" | tr -d '\n' | sed "s/'/ /g" | sed -e 's/^ *//g;s/ *$//g' |tr -s ' ')"
-				ora="$(echo "$ora" | tr -d '\n' | sed "s/'/ /g" | sed -e 's/^ *//g;s/ *$//g' | tr -s ' ')"
-				data="$(echo "$data" | tr -d '\n' | sed "s/'/ /g" | sed -e 's/^ *//g;s/ *$//g' | tr -s ' ')"
-				evento="$(echo "$evento" | tr -d '\n' | sed "s/'/ /g" | sed -e 's/^ *//g;s/ *$//g' | tr -s ' ')"
-				messaggio="$(echo "$messaggio" | tr -d '\n' | sed "s/'/ /g" |sed -e 's/^ *//g;s/ *$//g' | tr -s ' ')"
+				#centrale="$(echo "$centrale" | tr -d '\n' | sed "s/'/ /g" | sed -e 's/^ *//g;s/ *$//g' |tr -s ' ')"
+				#ora="$(echo "$ora" | tr -d '\n' | sed "s/'/ /g" | sed -e 's/^ *//g;s/ *$//g' | tr -s ' ')"
+				#data="$(echo "$data" | tr -d '\n' | sed "s/'/ /g" | sed -e 's/^ *//g;s/ *$//g' | tr -s ' ')"
+				#evento="$(echo "$evento" | tr -d '\n' | sed "s/'/ /g" | sed -e 's/^ *//g;s/ *$//g' | tr -s ' ')"
+				#messaggio="$(echo "$messaggio" | tr -d '\n' | sed "s/'/ /g" |sed -e 's/^ *//g;s/ *$//g' | tr -s ' ')"
 
 				# fix random wrong position
 				if [ "${centrale:2:1}" == ":" ] && [ "${ora:2:1}" == "-" ]; then
@@ -85,8 +101,6 @@ for file in $(find $REPORT$PARTIAL -name "*.csv" -type f); do
 		done < $TEMP
 
 		# cleanup
-		#mycall="CALL input_repo('winwatch','$filereferer');"
-		#mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
 		rm $TEMP
 
 		echo "ok!"
