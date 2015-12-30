@@ -20,6 +20,8 @@ touch $LOG
 
 [[ -f $ADC_HISTORY ]] || touch $ADC_HISTORY
 
+[[ "$1" == "--help" ]] && { echo "WATCH OUT: not a WinWatch or Serchio script!"; exit; }
+
 if grep -qs "$REPORT" /proc/mounts; then
     echo "--> $REPORT mounted."
 else

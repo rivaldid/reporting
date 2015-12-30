@@ -11,7 +11,7 @@ LEFT JOIN WIN_MESSAGGI USING(id_messaggio)
 ORDER BY Data DESC;
 
 CREATE VIEW `SERCHIO` AS
-SELECT Data,centrale,seriale,evento,CONCAT(COALESCE(varco,''),' ',COALESCE(direzione,'')) AS Messaggio,HTML_UnEncode(nome) AS Ospite,contatore 
+SELECT Data,centrale,seriale,evento,CONCAT(COALESCE(varco,''),' ',COALESCE(direzione,'')) AS Messaggio,HTML_UnEncode(nome) AS Ospite,contatore
 FROM SER_REPORT
 LEFT JOIN SER_TESSERE USING(id_tessera)
 LEFT JOIN SER_EVENTI USING(id_evento)
@@ -32,7 +32,7 @@ CREATE VIEW `SERCHIO_OSPITI` AS
 SELECT HTML_UnEncode(nome) AS Ospite FROM SER_OSPITI ORDER BY nome;
 
 CREATE VIEW `ADC` AS
-SELECT 
+SELECT
 ADC_REPORT.data_report AS Data,
 HTML_UnEncode(ADC_OSPITI.nome) AS Ospite,
 HTML_UnEncode(ADC_REPORT.societa) AS Societa,
@@ -48,9 +48,9 @@ ADC_OSPITI.cf AS Codice_Fiscale,
 ADC_OSPITI.data_di_nascita AS Data_di_Nascita,
 ADC_OSPITI.nazionalita AS Nazionalita,
 ADC_REPORT.locali AS Locali
-FROM ADC_REPORT 
-LEFT JOIN ADC_OSPITI USING(id_ospite) 
-LEFT JOIN ADC_DOCUMENTI USING(id_documento) 
-LEFT JOIN ADC_STRUTTURE USING(id_struttura) 
+FROM ADC_REPORT
+LEFT JOIN ADC_OSPITI USING(id_ospite)
+LEFT JOIN ADC_DOCUMENTI USING(id_documento)
+LEFT JOIN ADC_STRUTTURE USING(id_struttura)
 LEFT JOIN ADC_PROFILI USING(id_profilo)
 ORDER BY ADC_REPORT.data_report DESC,ADC_OSPITI.nome;

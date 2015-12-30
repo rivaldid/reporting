@@ -37,6 +37,8 @@ reventi_varco_aperto='(.*)(VARCO[[:space:]]APERTO)(.*)'
 reventi_linee='(.*)(LINEA[[:space:]]((ON)|(OFF)))(.*)'
 reventi_linee_max=6
 
+#reventi_versione_pulsar='(.*)(PULSAR[[:space:]]v[[:punct:]][0-9]{2}[[:punct:]][0-9]{2}[[:punct:]][0-9]{2})(.*)'
+
 reventi='(.*)(' # 1-2
 reventi+='(Scasso[[:space:]]varco)|' #3
 reventi+='(Varco[[:space:]]chiuso)|' #4
@@ -178,7 +180,7 @@ for file in $(find $REPORT$PARTIAL -name "*.xps" -type f); do
 					[[ $buffer =~ $reventi_statolettore ]] && eventi_statolettore=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 
 					[[ $buffer =~ $reventi_linee ]] && eventi_linee=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$reventi_linee_max]}
-					
+
 					[[ $buffer =~ $reventi_varco_aperto ]] && eventi_varco_aperto=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 
 					# contents

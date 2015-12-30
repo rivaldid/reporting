@@ -15,7 +15,7 @@ DROP PROCEDURE IF EXISTS `input_adc`;
 --		get stored id
 --		get stored rid
 --		update contatore++ where id,rid
---	end if		
+--	end if
 -- end
 
 DELIMITER $$

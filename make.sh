@@ -64,22 +64,22 @@ fi
 
 if [ $history = true ]; then
 	echo "--> Ricarico gli archivi" >> $LOG
-	
+
 	echo "--> WinWatch" >> $LOG
 	echo -n "--> Winwatch..."
 	mysql $MYARGS -e "source $WIN_HISTORY \W;" >> $LOG
 	echo "done"
-	
+
 	echo "--> Serchio" >> $LOG
 	echo -n "--> Serchio..."
 	mysql $MYARGS -e "source $SER_HISTORY \W;" >> $LOG
 	echo "done"
-	
+
 	echo "--> ADC" >> $LOG
 	echo -n "--> ADC..."
 	mysql $MYARGS -e "source $ADC_HISTORY \W;" >> $LOG
 	echo "done"
-	
+
 fi
 
 echo "--> Carico il routing" >> $LOG

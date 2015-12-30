@@ -123,7 +123,7 @@ CREATE TABLE `ADC_OSPITI` (
   CONSTRAINT localkey UNIQUE(`nome`,`cf`,`data_di_nascita`),
   PRIMARY KEY (`id_ospite`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-  
+
 DROP TABLE IF EXISTS `ADC_DOCUMENTI`;
 CREATE TABLE `ADC_DOCUMENTI` (
   `id_documento` int(11) NOT NULL AUTO_INCREMENT,
