@@ -5,7 +5,7 @@ DROP VIEW IF EXISTS `SERCHIO_OSPITI`;
 DROP VIEW IF EXISTS `ADC`;
 
 CREATE VIEW `WINWATCH` AS
-SELECT Centrale,Data,evento,messaggio,contatore FROM WIN_REPORT
+SELECT Centrale,Data,HTML_UnEncode(evento) AS Evento,HTML_UnEncode(messaggio) AS Messaggio,contatore FROM WIN_REPORT
 LEFT JOIN WIN_EVENTI USING(id_evento)
 LEFT JOIN WIN_MESSAGGI USING(id_messaggio)
 ORDER BY Data DESC;
