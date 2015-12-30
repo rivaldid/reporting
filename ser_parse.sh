@@ -96,6 +96,19 @@ string_cleanup() {
 	fi
 }
 
+confirm () {
+    # call with a prompt string or use a default
+    read -r -p "${1:-Are you sure? [y/N]} " response
+    case $response in
+        [yY][eE][sS]|[yY])
+            true
+            ;;
+        *)
+            false
+            ;;
+    esac
+}
+
 
 [[ -f $LOG ]] && rm $LOG
 touch $LOG
@@ -110,8 +123,19 @@ mkdir -p $TEMP_DIR
 
 
 # arguments: --partial /foo/bar/baz.xps
-[[ "$1" == "--help" ]] && { echo "Arguments: [--partial /mnt/REPORT/Serchio/foo/bar/baz.xps]"; exit; }
-[[ "$1" == "--partial" ]] && PARTIAL="${2##$REPORT}"
+if [[ ! -z "$1" ]]; then
+	[[ "$1" == "--help" ]] && { echo "Arguments: [--partial /mnt/REPORT/Serchio/foo/bar/baz.xps]"; exit; }
+	[[ "$1" == "--partial" ]] && PARTIAL="${2##$REPORT}" || { echo "What?"; exit; }
+
+	if [[ ! -z "$PARTIAL" ]]; then
+		confirm || { echo "Bye"; exit; }
+	else
+		echo "Doing nothing, bye"; exit 1
+	fi
+else
+	confirm || { echo "Bye"; exit; }
+fi
+
 
 if grep -qs "$REPORT" /proc/mounts; then
     echo "--> $REPORT mounted."

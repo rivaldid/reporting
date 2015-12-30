@@ -15,12 +15,26 @@ combined_whitespaces() { leading_whitespaces "$(trailing_whitespaces "$1")"; }
 trim_doublequotes() { printf "$1" | tr -d '"'; }
 apos_substitution() { printf "${1//\'/&apos;}"; }
 
+confirm () {
+    # call with a prompt string or use a default
+    read -r -p "${1:-Are you sure? [y/N]} " response
+    case $response in
+        [yY][eE][sS]|[yY])
+            true
+            ;;
+        *)
+            false
+            ;;
+    esac
+}
+
 [[ -f $LOG ]] && rm $LOG
 touch $LOG
 
 [[ -f $ADC_HISTORY ]] || touch $ADC_HISTORY
 
-[[ "$1" == "--help" ]] && { echo "WATCH OUT: not a WinWatch or Serchio script!"; exit; }
+[[ ! -z "$1" ]] && { echo "WATCH OUT: not a WinWatch or Serchio script!"; exit; }
+confirm || { echo "Bye"; exit; }
 
 if grep -qs "$REPORT" /proc/mounts; then
     echo "--> $REPORT mounted."
