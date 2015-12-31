@@ -33,6 +33,7 @@ reventi_abilitato='(.*)(([[:space:]]|[[:punct:]])(DIS)?ABILITATO([[:space:]]|[[:
 reventi_durata='(.*)([[:graph:]]durata[[:space:]][[:alnum:]]{2,4}[[:punct:]]{1,2}[[:alnum:]]{2,3}[[:punct:]]{1,2}[[:alnum:]]{2,3}[[:graph:]])(.*)'
 reventi_statolettore='(.*)(Stato[[:space:]]Lettore)(.*)'
 reventi_varco_aperto='(.*)(VARCO[[:space:]]APERTO)(.*)'
+reventi_sempre_abilitato='(.*)([[:punct:]]SEMPRE[[:space:]]ABILITATO[[:space:]]?[[:punct:]])(.*)'
 
 reventi_linee='(.*)(LINEA[[:space:]]((ON)|(OFF)))(.*)'
 reventi_linee_max=6
@@ -46,30 +47,34 @@ reventi+='(Varco[[:space:]]non[[:space:]]chiuso)|' #5
 reventi+='(Varco[[:space:]]non[[:space:]]aperto)|' #6
 reventi+='(Transito[[:space:]]effettuato)|' #7
 reventi+='(Transito[[:space:]]non[[:space:]]consentito)|' #8
-reventi+='(Transito[[:space:]]lettore[[:space:]]disabilitato)|' #9
-reventi+='(Tessera[[:space:]]inesistente)|' #10
-reventi+='(Tessera[[:space:]]fuori[[:space:]]orario)|' #11
-reventi+='(Tessera[[:space:]]sospesa)|' #12
-reventi+='(Caduta[[:space:]]Linea[[:punct:]]?)|' #13
-reventi+='(Linea[[:space:]]Mini[[:space:]]Pulsar[[:punct:]])|' #14
+reventi+='(Transito[[:space:]]lettore[[:space:]]abilitato)|' #9
+reventi+='(Transito[[:space:]]lettore[[:space:]]disabilitato)|' #10
+reventi+='(Tessera[[:space:]]inesistente)|' #11
+reventi+='(Tessera[[:space:]]fuori[[:space:]]orario)|' #12
+reventi+='(Tessera[[:space:]]sospesa)|' #13
+reventi+='(Caduta[[:space:]]Linea[[:punct:]]?)|' #14
+reventi+='(Linea[[:space:]]Mini[[:space:]]Pulsar[[:punct:]])|' #15
 
-reventi+='(Allarmi[[:space:]]Acquisiti[[:graph:]].*[[:graph:]]{2}[[:space:]])|' #15
-reventi+='(Allarme[[:space:]]Tamper)|' #16
+reventi+='(Allarmi[[:space:]]Acquisiti[[:graph:]].*[[:graph:]]{2}[[:space:]])|' #16
+reventi+='(Allarme[[:space:]]Tamper)|' #17
 
-reventi+='(Richiesta[[:space:]]Invio[[:space:]]Programmazione[[:space:]][[:punct:]][[:space:]])|' #17
-reventi+='(Fine[[:space:]]invio[[:space:]]dati[[:space:]]di[[:space:]]programmazione[[:punct:]])|' #18
-reventi+='(Comando[[:space:]]Cambio)|' #19
-reventi+='(Richiesta[[:space:]]Comando[[:space:]]Apertura[[:space:]]Varco)|' #20
-reventi+='(Apertura[[:space:]]varco[[:space:]]Console[[:punct:]])|' #21
-reventi+='(Chiusura[[:space:]]varco[[:space:]]Console[[:punct:]])|' #22
-reventi+='(Allarme[[:space:]]ingresso[[:space:]][0-9])|' #23
-reventi+='(Fine[[:space:]]transito)|' #24
-reventi+='(Ripristino[[:space:]]Linea)|' #25
-reventi+='(Tastiera[[:space:]]Abilitata[[:punct:]])|' #26
-reventi+='(Coda[[:space:]]Piena[[:punct:]]Comando[[:space:]]perso[[:punct:]]6D[[:punct:]])|' #27
-reventi+='(HY[[:space:]][[:graph:]][0-9]{2}[[:graph:]])' #28
-reventi+=')(.*)' #29
-reventi_max=29
+reventi+='(Richiesta[[:space:]]Invio[[:space:]]Programmazione[[:space:]][[:punct:]][[:space:]])|' #18
+reventi+='(Richiesta[[:space:]]cancellazione[[:space:]]programmazione[[:space:]]totale[[:punct:]])|' #19
+reventi+='(Fine[[:space:]]invio[[:space:]]dati[[:space:]]di[[:space:]]programmazione[[:punct:]])|' #20
+reventi+='(Comando[[:space:]]Cambio)|' #21
+reventi+='(Richiesta[[:space:]]Comando[[:space:]]Apertura[[:space:]]Varco)|' #22
+reventi+='(Apertura[[:space:]]varco[[:space:]]Console[[:punct:]])|' #23
+reventi+='(Chiusura[[:space:]]varco[[:space:]]Console[[:punct:]])|' #24
+reventi+='(Allarme[[:space:]]ingresso[[:space:]][0-9])|' #25
+reventi+='(Fine[[:space:]]transito)|' #26
+reventi+='(Ripristino[[:space:]]Linea)|' #27
+reventi+='(Tastiera[[:space:]]Abilitata[[:punct:]])|' #28
+reventi+='(Tastiera[[:space:]]Disabilitata[[:punct:]])|' #29
+reventi+='(Coda[[:space:]]Piena[[:punct:]]Comando[[:space:]]perso[[:punct:]]6D[[:punct:]])|' #30
+reventi+='(HY[[:space:]][[:graph:]][0-9]{2}[[:graph:]])|' #31
+reventi+='(Riposo[[:space:]]ingresso[[:space:]][0-9])' #32
+reventi+=')(.*)' #33
+reventi_max=33
 
 rdirezioni='(.*)((ENTRATA)|(USCITA)|(INGRESSO)|(INTERNO)|(ESTERNO))(.*)'
 rdirezioni_max=8
@@ -198,6 +203,7 @@ for file in $(find $REPORT$PARTIAL -name "*.xps" -type f); do
 					[[ $buffer =~ $rutenze ]] && utenza=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$rutenze_max]}
 					[[ $buffer =~ $rutenze ]] && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[$rutenze_max]}
 
+					[[ $buffer =~ $reventi_sempre_abilitato ]] && eventi_sempre_abilitato=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 					[[ $buffer =~ $reventi_abilitato ]] && eventi_abilitato=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
 
 					[[ $buffer =~ $reventi_durata ]] && eventi_durata=${BASH_REMATCH[2]} && buffer=${BASH_REMATCH[1]}${BASH_REMATCH[3]}
@@ -221,6 +227,7 @@ for file in $(find $REPORT$PARTIAL -name "*.xps" -type f); do
 					[[ -n $eventi_statolettore ]] && printf -v evento "%s %s" "$evento" "$eventi_statolettore"
 					[[ -n $eventi_linee ]] && printf -v evento "%s %s" "$evento" "$eventi_linee"
 					[[ -n $eventi_abilitato ]] && printf -v evento "%s %s" "$evento" "$(string_cleanup "$eventi_abilitato")"
+					[[ -n $eventi_sempre_abilitato ]] && printf -v evento "%s %s" "$evento" "$(string_cleanup "$eventi_sempre_abilitato")"
 					[[ -n $eventi_durata ]] && printf -v evento "%s %s" "$evento" "$eventi_durata"
 					[[ -n $eventi_varco_aperto ]] && printf -v evento "%s %s" "$evento" "$eventi_varco_aperto"
 
