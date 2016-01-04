@@ -2,12 +2,10 @@ DROP FUNCTION IF EXISTS `id2tessera`;
 DROP FUNCTION IF EXISTS `id2ospite`;
 DROP FUNCTION IF EXISTS `id2evento`;
 DROP FUNCTION IF EXISTS `id2varco`;
-DROP PROCEDURE IF EXISTS `routing`;
+DROP VIEW IF EXISTS `join_ser_report_repository`;
+DROP VIEW IF EXISTS `routing`;
 
 DELIMITER $$
-
--- PREPARE nextone FROM 'SELECT * FROM SER_REPORT WHERE Data>=? AND id_tessera=? AND id_ospite=? LIMIT 1';
-
 
 CREATE FUNCTION `id2tessera`(in_id_tessera INT) RETURNS VARCHAR(90)
 BEGIN
@@ -35,85 +33,16 @@ RETURN (SELECT label FROM SER_VARCHI WHERE id_varco=in_id_varco);
 END;
 $$
 
-CREATE PROCEDURE `routing`(IN in_start datetime)
-BEGIN
+CREATE VIEW `join_ser_report_repository` AS
+SELECT Sid,SER_REPORT.Data,REPOSITORY.data AS datafile,id_tessera,id_ospite,id_evento,id_varco,direzione
+FROM SER_REPORT JOIN REPOSITORY USING(Rid) WHERE id_tessera <> 1;
 
-DECLARE main_sid INT;
-DECLARE main_data datetime;
-DECLARE main_datafile datetime;
-DECLARE main_id_tessera INT;
-DECLARE main_ospite VARCHAR(45);
-DECLARE main_id_evento INT;
-DECLARE main_id_varco INT;
-DECLARE main_direzione VARCHAR(45);
-
-DECLARE sub_data datetime;
-DECLARE sub_id_evento INT;
-DECLARE sub_id_varco INT;
-DECLARE sub_direzione VARCHAR(45);
-
-DECLARE done INT DEFAULT FALSE;
-
--- DECLARE query CURSOR FOR SELECT Data,id_tessera,id_ospite,id_evento,id_varco,direzione FROM SER_REPORT WHERE Data>=in_start AND id_evento IN (4,7,11,20,24,25);
-
-DECLARE query CURSOR FOR 
-SELECT Sid,SER_REPORT.Data,REPOSITORY.data,id_tessera,HTML_UnEncode(SER_OSPITI.nome),id_evento,id_varco,direzione
-FROM SER_REPORT JOIN REPOSITORY USING(Rid) JOIN SER_OSPITI USING(id_ospite)
-WHERE SER_REPORT.Data>=in_start AND id_tessera <> 1;
-
-DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-CREATE TEMPORARY TABLE PASSAGGI(
-sid int,
-data datetime,
-durata int,
-ospite varchar(150),
-provenienza varchar(150),
-destinazione varchar(150));
-
-OPEN query;
-myloop: LOOP
-
-	FETCH query INTO main_sid,main_data,main_datafile,main_id_tessera,main_ospite,main_id_evento,main_id_varco,main_direzione;
-	
-	SELECT SER_REPORT.Data,id_evento,id_varco,direzione INTO sub_data,sub_id_evento,sub_id_varco,sub_direzione 
-	FROM SER_REPORT JOIN REPOSITORY USING(Rid) JOIN SER_OSPITI USING(id_ospite) WHERE 
-	REPOSITORY.data>=main_datafile AND 
-	SER_REPORT.Data>=main_data AND 
-	Sid>main_sid AND 
-	id_tessera=main_id_tessera AND
-	SUBSTRING(HTML_UnEncode(SER_OSPITI.nome),1,13)=SUBSTRING(main_ospite,1,13) LIMIT 1;
-	
-	INSERT INTO PASSAGGI(sid,data,durata,ospite,provenienza,destinazione) VALUES(
-	main_sid,
-	main_data,
-	TIMESTAMPDIFF(MINUTE,main_data,sub_data),
-	CONCAT_WS(' ',
-	(SELECT id2tessera(main_id_tessera)),
-	main_ospite),
-	CONCAT_WS(' ',
-	(SELECT id2evento(main_id_evento)),
-	(SELECT id2varco(main_id_varco)),
-	main_direzione),
-	CONCAT_WS(' ',
-	(SELECT id2evento(sub_id_evento)),
-	(SELECT id2varco(sub_id_varco)),
-	sub_direzione)
-	);
-
-	IF done THEN
-	LEAVE myloop;
-	END IF;
-
-END LOOP myloop;
-CLOSE query;
-
-SELECT data,durata,ospite,provenienza,destinazione FROM PASSAGGI ORDER BY Sid;
-DROP TEMPORARY TABLE PASSAGGI;
-
-END;
-$$
-
-
+CREATE VIEW `routing` AS
+SELECT
+MAIN.Sid,
+MAIN.Data,
+TIMESTAMPDIFF(MINUTE,MAIN.Data,SUB.Data),
+(SELECT * FROM join_ser_report_repository) AS MAIN
+(SELECT * FROM join_ser_report_repository) AS SUB
 
 DELIMITER ;
