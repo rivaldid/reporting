@@ -25,15 +25,16 @@ rutenze+='([[:punct:]]?[[:space:]]ADMIN2[[:space:]][[:punct:]]?)|' #4
 rutenze+='([[:punct:]]?[[:space:]]VISUAL[[:space:]][[:punct:]]?)|' #5
 rutenze+='([[:punct:]]?[[:space:]]POSTE[[:space:]][[:punct:]]?)|' #6
 rutenze+='([[:punct:]]?[[:space:]]TEST[[:space:]][[:punct:]]?)|' #7
-rutenze+='([[:punct:]]?[[:space:]]PROVA[[:space:]][[:punct:]]?)' #8
-rutenze+=')(.*)' #9
-rutenze_max=9
+rutenze+='([[:punct:]]?[[:space:]]PROVA[[:space:]][[:punct:]]?)|' #8
+rutenze+='([[:punct:]]?[[:space:]]ADM[[:space:]][[:punct:]]?)' #9
+rutenze+=')(.*)' #10
+rutenze_max=10
 
 reventi_abilitato='(.*)(([[:space:]]|[[:punct:]])(DIS)?ABILITATO([[:space:]]|[[:punct:]]))(.*)'
 reventi_durata='(.*)([[:graph:]]durata[[:space:]][[:alnum:]]{2,4}[[:punct:]]{1,2}[[:alnum:]]{2,3}[[:punct:]]{1,2}[[:alnum:]]{2,3}[[:graph:]])(.*)'
 reventi_statolettore='(.*)(Stato[[:space:]]Lettore)(.*)'
 reventi_varco_aperto='(.*)(VARCO[[:space:]]APERTO)(.*)'
-reventi_sempre_abilitato='(.*)([[:punct:]]SEMPRE[[:space:]]ABILITATO[[:space:]]?[[:punct:]])(.*)'
+reventi_sempre_abilitato='(.*)(([[:space:]]|[[:punct:]])SEMPRE[[:space:]]ABILITATO[[:punct:]]?)(.*)'
 
 reventi_linee='(.*)(LINEA[[:space:]]((ON)|(OFF)))(.*)'
 reventi_linee_max=6
@@ -191,7 +192,7 @@ for file in $(find $REPORT$PARTIAL -name "*.xps" -type f); do
 					[[ ! "$target" =~ "- Stampa Report da" ]]; then
 
 					#echo "$target"
-					unset buffer data centrale seriale evento varco direzione ospite eventi_abilitato eventi_durata utenza eventi_statolettore eventi_linee eventi_varco_aperto
+					unset buffer data centrale seriale evento varco direzione ospite eventi_sempre_abilitato eventi_abilitato eventi_durata utenza eventi_statolettore eventi_linee eventi_varco_aperto
 					printf -v buffer "$target"
 
 					# trash
