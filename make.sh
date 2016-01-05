@@ -58,7 +58,8 @@ mysql $MYARGS -e "source $PREFIX/dati.sql \W;" >> $LOG
 
 if [ $reset = false ]; then
 	echo "--> Ripristino il dump" >> $LOG
-	mysql $MYARGS -e "source $DUMPFILE \W;" >> $LOG
+	#mysql $MYARGS -e "source $DUMPFILE \W;" >> $LOG
+	pv "$DUMPFILE" | mysql $MYARGS >> $LOG
 	rm $DUMPFILE
 fi
 
