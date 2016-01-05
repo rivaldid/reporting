@@ -199,14 +199,14 @@ RETURN (SELECT id_tessera FROM SER_TESSERE WHERE seriale=in_seriale);
 END;
 $$
 
-CREATE FUNCTION `test_ser_evento`(in_evento VARCHAR(45))
+CREATE FUNCTION `test_ser_evento`(in_evento VARCHAR(100))
 RETURNS TINYINT(1)
 BEGIN
 RETURN (SELECT EXISTS(SELECT 1 FROM SER_EVENTI WHERE evento=in_evento));
 END;
 $$
 
-CREATE FUNCTION `get_ser_evento`(in_evento VARCHAR(45))
+CREATE FUNCTION `get_ser_evento`(in_evento VARCHAR(100))
 RETURNS INT(11)
 BEGIN
 RETURN (SELECT id_evento FROM SER_EVENTI WHERE evento=in_evento);
@@ -469,7 +469,7 @@ RETURN @id_output;
 END;
 $$
 
-CREATE FUNCTION `input_ser_evento`(in_evento VARCHAR(45))
+CREATE FUNCTION `input_ser_evento`(in_evento VARCHAR(100))
 RETURNS INT(11)
 BEGIN
 DECLARE id_output INT(11);

@@ -72,7 +72,7 @@ CREATE TABLE `SER_OSPITI` (
 DROP TABLE IF EXISTS `SER_EVENTI`;
 CREATE TABLE `SER_EVENTI` (
   `id_evento` int(11) NOT NULL AUTO_INCREMENT,
-  `evento` varchar(45) NOT NULL,
+  `evento` varchar(100) NOT NULL,
   UNIQUE (`evento`),
   PRIMARY KEY (`id_evento`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

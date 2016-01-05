@@ -82,7 +82,7 @@ CREATE PROCEDURE `input_serchio`(
 IN in_data VARCHAR(45),
 IN in_centrale VARCHAR(45),
 IN in_seriale VARCHAR(45),
-IN in_evento VARCHAR(45),
+IN in_evento VARCHAR(100),
 IN in_varco VARCHAR(45),
 IN in_direzione VARCHAR(45),
 IN in_ospite VARCHAR(45),

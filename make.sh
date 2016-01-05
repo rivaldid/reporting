@@ -66,19 +66,22 @@ if [ $history = true ]; then
 	echo "--> Ricarico gli archivi" >> $LOG
 
 	echo "--> WinWatch" >> $LOG
-	echo -n "--> Winwatch..."
-	mysql $MYARGS -e "source $WIN_HISTORY \W;" >> $LOG
-	echo "done"
+	#echo -n "--> Winwatch..."
+	#mysql $MYARGS -e "source $WIN_HISTORY \W;" >> $LOG
+	#echo "done"
+	pv "$WIN_HISTORY" | mysql $MYARGS >> $LOG
 
 	echo "--> Serchio" >> $LOG
-	echo -n "--> Serchio..."
-	mysql $MYARGS -e "source $SER_HISTORY \W;" >> $LOG
-	echo "done"
+	#echo -n "--> Serchio..."
+	#mysql $MYARGS -e "source $SER_HISTORY \W;" >> $LOG
+	#echo "done"
+	pv "$SER_HISTORY" | mysql $MYARGS >> $LOG
 
 	echo "--> ADC" >> $LOG
-	echo -n "--> ADC..."
-	mysql $MYARGS -e "source $ADC_HISTORY \W;" >> $LOG
-	echo "done"
+	#echo -n "--> ADC..."
+	#mysql $MYARGS -e "source $ADC_HISTORY \W;" >> $LOG
+	#echo "done"
+	pv "$ADC_HISTORY" | mysql $MYARGS >> $LOG
 
 fi
 
