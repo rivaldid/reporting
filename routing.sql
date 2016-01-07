@@ -2,9 +2,9 @@ DROP FUNCTION IF EXISTS `id2tessera`;
 DROP FUNCTION IF EXISTS `id2ospite`;
 DROP FUNCTION IF EXISTS `id2evento`;
 DROP FUNCTION IF EXISTS `id2varco`;
-DROP FUNCTION IF EXISTS `old_procedure_routing`;
-DROP VIEW IF EXISTS `join_ser_report_repository`;
-DROP VIEW IF EXISTS `routing`;
+DROP PROCEDURE IF EXISTS `old_procedure_routing`;
+DROP VIEW IF EXISTS `ser_reportstuff`;
+DROP PROCEDURE IF EXISTS `routing`;
 
 DELIMITER $$
 
@@ -114,50 +114,86 @@ END;
 $$
 
 
-CREATE VIEW `join_ser_report_repository` AS
-SELECT Sid,SER_REPORT.Data,REPOSITORY.data AS datafile,id_tessera,id_ospite,id_evento,id_varco,direzione
-FROM SER_REPORT JOIN REPOSITORY USING(Rid) WHERE id_tessera <> 1;
+CREATE VIEW `ser_reportstuff` AS
+SELECT REPOSITORY.data AS datafile,SER_REPORT.Data AS data,Sid,id_tessera,(SELECT id2ospite(id_ospite)) AS ospite,id_evento,id_varco,direzione
+FROM SER_REPORT LEFT JOIN REPOSITORY USING(Rid) WHERE id_tessera <> 1;
 $$
 
-CREATE VIEW `routing` AS
-SELECT
-MAIN.Sid,
-MAIN.Data,
-TIMESTAMPDIFF(MINUTE,MAIN.Data,SUB.Data),
-CONCAT_WS(
-	' ',
-	(SELECT id2tessera(MAIN.id_tessera)),
-	(SELECT id2ospite(MAIN_ospite))
-),
-CONCAT_WS(
-	' ',
-	(SELECT id2evento(MAIN.id_evento)),
-	(SELECT id2varco(MAIN.id_varco)),
-	MAIN.direzione
-),
-CONCAT_WS(
-	' ',
-	(SELECT id2evento(SUB.id_evento)),
-	(SELECT id2varco(SUB.id_varco)),
-	SUB.direzione
-)
-FROM
-(SELECT 
-Sid,SER_REPORT.Data,REPOSITORY.data AS datafile,id_tessera,id_ospite,id_evento,id_varco,direzione
-FROM SER_REPORT JOIN REPOSITORY USING(Rid)
-) AS MAIN
-LEFT JOIN
-(SELECT 
-Sid,SER_REPORT.Data,REPOSITORY.data AS datafile,id_tessera,id_ospite,id_evento,id_varco,direzione
-FROM SER_REPORT JOIN REPOSITORY USING(Rid)
-) AS SUB
-ON 
-(MAIN.datafile<=SUB.datafile) AND 
-(MAIN.Data<=SUB.Data) AND
-(MAIN.Sid<SUB.Sid) AND
-(MAIN.id_tessera=SUB.id_tessera) AND
-(SUBSTRING(HTML_UnEncode(MAIN.nome),1,13)=SUBSTRING(HTML_UnEncode(SUB.nome),1,13));
-WHERE id_tessera <> 1;
+CREATE PROCEDURE `routing`()
+BEGIN
+
+DECLARE my_datafile DATETIME;
+DECLARE my_data DATETIME;
+DECLARE my_sid INT;
+DECLARE my_id_tessera INT;
+DECLARE my_ospite VARCHAR(45);
+DECLARE my_id_evento INT;
+DECLARE my_id_varco INT;
+DECLARE my_direzione VARCHAR(45);
+
+DECLARE sub_data DATETIME;
+DECLARE sub_id_evento INT;
+DECLARE sub_id_varco INT;
+DECLARE sub_direzione VARCHAR(45);
+
+DECLARE done INT DEFAULT FALSE;
+DECLARE cursor_query CURSOR FOR (SELECT datafile,data,Sid,id_tessera,ospite,id_evento,id_varco,direzione FROM ser_reportstuff);
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+SET @SUBQ = "SELECT 
+		data,id_evento,id_varco,direzione INTO
+		@sub_data,@sub_id_evento,@sub_id_varco,@sub_direzione
+	FROM ser_reportstuff WHERE 
+		datafile >= ? AND 
+		data >= ? AND 
+		Sid > ? AND 
+		id_tessera = ? AND 
+		ospite LIKE CONCAT('%', ? ,'%') LIMIT 1";
+		
+PREPARE subquery FROM @SUBQ;
+
+OPEN cursor_query;
+
+	read_loop: LOOP
+		
+		FETCH cursor_query INTO my_datafile,my_data,my_sid,my_id_tessera,my_ospite,my_id_evento,my_id_varco,my_direzione;
+		
+		IF done THEN
+			LEAVE read_loop;
+		END IF;
+		
+		EXECUTE subquery USING 
+			my_datafile,
+			my_data,
+			my_sid,
+			my_id_tessera,
+			my_ospite,
+			my_id_evento,
+			my_id_varco,
+			my_direzione;
+		
+		SELECT
+			@my_data,
+			TIMESTAMPDIFF(MINUTE,my_data,@sub_data),
+			CONCAT_WS(' ',
+			(SELECT id2tessera(my_id_tessera)),
+			my_ospite),
+			CONCAT_WS(' ',
+			(SELECT id2evento(my_id_evento)),
+			(SELECT id2varco(my_id_varco)),
+			my_direzione),
+			CONCAT_WS(' ',
+			(SELECT id2evento(@sub_id_evento)),
+			(SELECT id2varco(@sub_id_varco)),
+			@sub_direzione);
+			
+	END LOOP read_loop;
+	
+CLOSE cursor_query;
+DEALLOCATE PREPARE subquery;
+
+END;
 $$
+
 
 DELIMITER ;
