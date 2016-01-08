@@ -34,7 +34,12 @@ RETURN (SELECT label FROM SER_VARCHI WHERE id_varco=in_id_varco);
 END;
 $$
 
-CREATE PROCEDURE `old_procedure_routing`(IN in_start datetime)
+CREATE VIEW `ser_reportstuff` AS
+SELECT REPOSITORY.data AS datafile,SER_REPORT.Data AS data,Sid,id_tessera,id2ospite(id_ospite) AS ospite,id_evento,id_varco,direzione
+FROM SER_REPORT LEFT JOIN REPOSITORY USING(Rid) WHERE id_tessera <> 1;
+$$
+
+CREATE PROCEDURE `routing`(IN in_start datetime)
 BEGIN
 
 DECLARE main_sid INT;
@@ -52,14 +57,7 @@ DECLARE sub_id_varco INT;
 DECLARE sub_direzione VARCHAR(45);
 
 DECLARE done INT DEFAULT FALSE;
-
--- DECLARE query CURSOR FOR SELECT Data,id_tessera,id_ospite,id_evento,id_varco,direzione FROM SER_REPORT WHERE Data>=in_start AND id_evento IN (4,7,11,20,24,25);
-
-DECLARE query CURSOR FOR 
-SELECT Sid,SER_REPORT.Data,REPOSITORY.data,id_tessera,HTML_UnEncode(SER_OSPITI.nome),id_evento,id_varco,direzione
-FROM SER_REPORT JOIN REPOSITORY USING(Rid) JOIN SER_OSPITI USING(id_ospite)
-WHERE SER_REPORT.Data>=in_start AND id_tessera <> 1;
-
+DECLARE query CURSOR FOR SELECT * FROM ser_reportstuff WHERE data>=in_start;
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 CREATE TEMPORARY TABLE PASSAGGI(
@@ -73,15 +71,18 @@ destinazione varchar(150));
 OPEN query;
 myloop: LOOP
 
-	FETCH query INTO main_sid,main_data,main_datafile,main_id_tessera,main_ospite,main_id_evento,main_id_varco,main_direzione;
-	
-	SELECT SER_REPORT.Data,id_evento,id_varco,direzione INTO sub_data,sub_id_evento,sub_id_varco,sub_direzione 
-	FROM SER_REPORT JOIN REPOSITORY USING(Rid) JOIN SER_OSPITI USING(id_ospite) WHERE 
-	REPOSITORY.data>=main_datafile AND 
-	SER_REPORT.Data>=main_data AND 
-	Sid>main_sid AND 
-	id_tessera=main_id_tessera AND
-	SUBSTRING(HTML_UnEncode(SER_OSPITI.nome),1,13)=SUBSTRING(main_ospite,1,13) LIMIT 1;
+	FETCH query INTO main_datafile,main_data,main_sid,main_id_tessera,main_ospite,main_id_evento,main_id_varco,main_direzione;
+
+	SET @subsel = "SELECT data,id_evento,id_varco,direzione INTO sub_data,sub_id_evento,sub_id_varco,sub_direzione
+				FROM ser_reportstuff WHERE
+				datafile >= main_datafile AND
+				data >= main_data AND
+				Sid > main_sid AND
+				id_tessera = main_id_tessera AND
+				SUBSTRING(ospite,1,13) = SUBSTRING( main_ospite ,1,13) LIMIT 1;";
+
+	PREPARE stmt FROM @subsel;
+	EXECUTE stmt;
 	
 	INSERT INTO PASSAGGI(sid,data,durata,ospite,provenienza,destinazione) VALUES(
 	main_sid,
@@ -99,9 +100,11 @@ myloop: LOOP
 	(SELECT id2varco(sub_id_varco)),
 	sub_direzione)
 	);
+	
+	DEALLOCATE PREPARE stmt;
 
 	IF done THEN
-	LEAVE myloop;
+		LEAVE myloop;
 	END IF;
 
 END LOOP myloop;
@@ -113,61 +116,5 @@ DROP TEMPORARY TABLE PASSAGGI;
 END;
 $$
 
-
-CREATE VIEW `ser_reportstuff` AS
-SELECT REPOSITORY.data AS datafile,SER_REPORT.Data AS data,Sid,id_tessera,id2ospite(id_ospite) AS ospite,id_evento,id_varco,direzione
-FROM SER_REPORT LEFT JOIN REPOSITORY USING(Rid) WHERE id_tessera <> 1;
-$$
-
-CREATE PROCEDURE `routing`()
-BEGIN
-
-DECLARE main_sid INT;
-DECLARE main_datafile datetime;
-DECLARE main_data datetime;
-DECLARE main_id_tessera INT;
-DECLARE main_ospite VARCHAR(45);
-
-DECLARE sub_sid INT;
-
-DECLARE done INT DEFAULT FALSE;
-DECLARE crquery CURSOR FOR SELECT datafile,data,Sid,id_tessera,ospite FROM ser_reportstuff;
-DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-OPEN crquery;
-read_loop: LOOP
-	
-	FETCH crquery INTO main_sid,main_datafile,main_data,main_id_tessera,main_ospite;
-	
-	sub_sid=(SELECT Sid	FROM ser_reportstuff WHERE
-	ser_reportstuff.datafile >= main_datafile AND
-	ser_reportstuff.data >= main_data AND
-	ser_reportstuff.Sid > main_sid AND
-	ser_reportstuff.id_tessera = main_id_tessera AND
-	SUBSTRING(ser_reportstuff.ospite,1,13) = SUBSTRING(main_ospite,1,13)
-	LIMIT 1);
-	
-	SELECT main_sid,sub_sid;
-	
-	IF done THEN
-		LEAVE read_loop;
-	END IF;
-
-END LOOP read_loop;
-CLOSE crquery;
-
-END;
-$$
-
-
-SELECT Sid,subsel.Sid FROM ser_reportstuff 
-JOIN (SELECT Sid FROM SER_REPORT
-LEFT JOIN REPOSITORY USING(Rid)
-WHERE
-SER_REPORT.datafile>=ser_reportstuff.datafile AND
-SER_REPORT.data>=ser_reportstuff.data AND
-SER_REPORT.Sid>ser_reportstuff.sid AND
-SER_REPORT.id_tessera>ser_reportstuff.id_tessera
-LIMIT 1) AS subsel;
 
 DELIMITER ;
