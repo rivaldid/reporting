@@ -10,7 +10,7 @@ DELIMITER $$
 
 CREATE FUNCTION `id2tessera`(in_id_tessera INT) RETURNS VARCHAR(90)
 BEGIN
-RETURN (SELECT 
+RETURN (SELECT
 CONCAT(CASE tipo WHEN 1 THEN (SELECT 'ESTERNI') WHEN 2 THEN (SELECT 'POSTE') ELSE (SELECT 'SCONOSCIUTO') END,' ',numero)
 FROM SER_TESSERE WHERE id_tessera=in_id_tessera);
 END;
@@ -55,7 +55,7 @@ DECLARE done INT DEFAULT FALSE;
 
 -- DECLARE query CURSOR FOR SELECT Data,id_tessera,id_ospite,id_evento,id_varco,direzione FROM SER_REPORT WHERE Data>=in_start AND id_evento IN (4,7,11,20,24,25);
 
-DECLARE query CURSOR FOR 
+DECLARE query CURSOR FOR
 SELECT Sid,SER_REPORT.Data,REPOSITORY.data,id_tessera,HTML_UnEncode(SER_OSPITI.nome),id_evento,id_varco,direzione
 FROM SER_REPORT JOIN REPOSITORY USING(Rid) JOIN SER_OSPITI USING(id_ospite)
 WHERE SER_REPORT.Data>=in_start AND id_tessera <> 1;
@@ -74,15 +74,15 @@ OPEN query;
 myloop: LOOP
 
 	FETCH query INTO main_sid,main_data,main_datafile,main_id_tessera,main_ospite,main_id_evento,main_id_varco,main_direzione;
-	
-	SELECT SER_REPORT.Data,id_evento,id_varco,direzione INTO sub_data,sub_id_evento,sub_id_varco,sub_direzione 
-	FROM SER_REPORT JOIN REPOSITORY USING(Rid) JOIN SER_OSPITI USING(id_ospite) WHERE 
-	REPOSITORY.data>=main_datafile AND 
-	SER_REPORT.Data>=main_data AND 
-	Sid>main_sid AND 
+
+	SELECT SER_REPORT.Data,id_evento,id_varco,direzione INTO sub_data,sub_id_evento,sub_id_varco,sub_direzione
+	FROM SER_REPORT JOIN REPOSITORY USING(Rid) JOIN SER_OSPITI USING(id_ospite) WHERE
+	REPOSITORY.data>=main_datafile AND
+	SER_REPORT.Data>=main_data AND
+	Sid>main_sid AND
 	id_tessera=main_id_tessera AND
 	SUBSTRING(HTML_UnEncode(SER_OSPITI.nome),1,13)=SUBSTRING(main_ospite,1,13) LIMIT 1;
-	
+
 	INSERT INTO PASSAGGI(sid,data,durata,ospite,provenienza,destinazione) VALUES(
 	main_sid,
 	main_data,
@@ -137,58 +137,59 @@ DECLARE sub_id_varco INT;
 DECLARE sub_direzione VARCHAR(45);
 
 DECLARE done INT DEFAULT FALSE;
-DECLARE cursor_query CURSOR FOR (SELECT datafile,data,Sid,id_tessera,ospite,id_evento,id_varco,direzione FROM ser_reportstuff);
+DECLARE cursor_query CURSOR FOR SELECT * FROM ser_reportstuff;
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-SET @SUBQ = "SELECT 
-		data,id_evento,id_varco,direzione INTO
-		@sub_data,@sub_id_evento,@sub_id_varco,@sub_direzione
-	FROM ser_reportstuff WHERE 
-		datafile >= ? AND 
-		data >= ? AND 
-		Sid > ? AND 
-		id_tessera = ? AND 
-		ospite LIKE CONCAT('%', ? ,'%') LIMIT 1";
-		
+SET @SUBQ = "SELECT
+	data,id_evento,id_varco,direzione INTO
+	@sub_data,@sub_id_evento,@sub_id_varco,@sub_direzione FROM
+	ser_reportstuff WHERE
+	datafile >= ? AND
+	data >= ? AND
+	Sid > ? AND
+	id_tessera = ? AND
+	ospite LIKE CONCAT('%', ? ,'%') LIMIT 1";
+
 PREPARE subquery FROM @SUBQ;
 
 OPEN cursor_query;
 
-	read_loop: LOOP
-		
-		FETCH cursor_query INTO my_datafile,my_data,my_sid,my_id_tessera,my_ospite,my_id_evento,my_id_varco,my_direzione;
-		
-		IF done THEN
-			LEAVE read_loop;
-		END IF;
-		
-		EXECUTE subquery USING 
-			my_datafile,
-			my_data,
-			my_sid,
-			my_id_tessera,
-			my_ospite,
-			my_id_evento,
-			my_id_varco,
-			my_direzione;
-		
-		SELECT
-			@my_data,
-			TIMESTAMPDIFF(MINUTE,my_data,@sub_data),
-			CONCAT_WS(' ',
-			(SELECT id2tessera(my_id_tessera)),
-			my_ospite),
-			CONCAT_WS(' ',
-			(SELECT id2evento(my_id_evento)),
-			(SELECT id2varco(my_id_varco)),
-			my_direzione),
-			CONCAT_WS(' ',
-			(SELECT id2evento(@sub_id_evento)),
-			(SELECT id2varco(@sub_id_varco)),
-			@sub_direzione);
-			
-	END LOOP read_loop;
-	
+read_loop: LOOP
+
+	FETCH cursor_query INTO
+		@my_datafile,
+		@my_data,
+		@my_sid,
+		@my_id_tessera,
+		@my_ospite,
+		@my_id_evento,
+		@my_id_varco,
+		@my_direzione;
+
+	EXECUTE subquery USING
+		@my_datafile,
+		@my_data,
+		@my_sid,
+		@my_id_tessera,
+		@my_ospite;
+
+	SELECT
+		my_data,
+		TIMESTAMPDIFF(MINUTE,@my_data,@sub_data),
+		CONCAT_WS(' ',
+		(SELECT id2tessera(@my_id_tessera)),
+		@my_ospite),
+		CONCAT_WS(' ',
+		(SELECT id2evento(@my_id_evento)),
+		(SELECT id2varco(@my_id_varco)),
+		@my_direzione),
+		CONCAT_WS(' ',
+		(SELECT id2evento(@sub_id_evento)),
+		(SELECT id2varco(@sub_id_varco)),
+		@sub_direzione);
+
+END LOOP;
+
 CLOSE cursor_query;
 DEALLOCATE PREPARE subquery;
 
