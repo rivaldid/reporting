@@ -122,83 +122,52 @@ $$
 CREATE PROCEDURE `routing`()
 BEGIN
 
-DECLARE my_datafile DATETIME;
-DECLARE my_data DATETIME;
-DECLARE my_sid INT;
-DECLARE my_id_tessera INT;
-DECLARE my_ospite VARCHAR(45);
-DECLARE my_id_evento INT;
-DECLARE my_id_varco INT;
-DECLARE my_direzione VARCHAR(45);
+DECLARE main_sid INT;
+DECLARE main_datafile datetime;
+DECLARE main_data datetime;
+DECLARE main_id_tessera INT;
+DECLARE main_ospite VARCHAR(45);
 
-DECLARE sub_data DATETIME;
-DECLARE sub_id_evento INT;
-DECLARE sub_id_varco INT;
-DECLARE sub_direzione VARCHAR(45);
+DECLARE sub_sid INT;
 
 DECLARE done INT DEFAULT FALSE;
-DECLARE cursor_query CURSOR FOR SELECT * FROM ser_reportstuff;
+DECLARE crquery CURSOR FOR SELECT datafile,data,Sid,id_tessera,ospite FROM ser_reportstuff;
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-SET @SUBQ = "SELECT 
-	data,id_evento,id_varco,direzione INTO 
-	@sub_data,@sub_id_evento,@sub_id_varco,@sub_direzione FROM 
-	ser_reportstuff WHERE 
-	datafile >= ? AND 
-	data >= ? AND 
-	Sid > ? AND 
-	id_tessera = ? AND 
-	ospite LIKE CONCAT('%', ? ,'%') LIMIT 1";
-		
-PREPARE subquery FROM @SUBQ;
-
-OPEN cursor_query;
-
+OPEN crquery;
 read_loop: LOOP
 	
-	FETCH cursor_query INTO 
-		@my_datafile,
-		@my_data,
-		@my_sid, 
-		@my_id_tessera, 
-		@my_ospite, 
-		@my_id_evento, 
-		@my_id_varco, 
-		@my_direzione;
+	FETCH crquery INTO main_sid,main_datafile,main_data,main_id_tessera,main_ospite;
 	
-	EXECUTE subquery USING 
-		@my_datafile,
-		@my_data,
-		@my_sid,
-		@my_id_tessera,
-		@my_ospite;
+	sub_sid=(SELECT Sid	FROM ser_reportstuff WHERE
+	ser_reportstuff.datafile >= main_datafile AND
+	ser_reportstuff.data >= main_data AND
+	ser_reportstuff.Sid > main_sid AND
+	ser_reportstuff.id_tessera = main_id_tessera AND
+	SUBSTRING(ser_reportstuff.ospite,1,13) = SUBSTRING(main_ospite,1,13)
+	LIMIT 1);
 	
-	SELECT
-		@my_data,
-		TIMESTAMPDIFF(MINUTE,@my_data,@sub_data),
-		CONCAT_WS(' ',
-		(SELECT id2tessera(@my_id_tessera)),
-		@my_ospite),
-		CONCAT_WS(' ',
-		(SELECT id2evento(@my_id_evento)),
-		(SELECT id2varco(@my_id_varco)),
-		@my_direzione),
-		CONCAT_WS(' ',
-		(SELECT id2evento(@sub_id_evento)),
-		(SELECT id2varco(@sub_id_varco)),
-		@sub_direzione);
+	SELECT main_sid,sub_sid;
 	
 	IF done THEN
-	LEAVE read_loop;
+		LEAVE read_loop;
 	END IF;
-		
-END LOOP;
-	
-CLOSE cursor_query;
-DEALLOCATE PREPARE subquery;
+
+END LOOP read_loop;
+CLOSE crquery;
 
 END;
 $$
 
+
+SELECT Sid,subsel.Sid FROM ser_reportstuff 
+JOIN (SELECT Sid FROM SER_REPORT
+LEFT JOIN REPOSITORY USING(Rid)
+WHERE
+SER_REPORT.datafile>=ser_reportstuff.datafile AND
+SER_REPORT.data>=ser_reportstuff.data AND
+SER_REPORT.Sid>ser_reportstuff.sid AND
+SER_REPORT.id_tessera>ser_reportstuff.id_tessera
+LIMIT 1) AS subsel;
 
 DELIMITER ;
