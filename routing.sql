@@ -57,7 +57,7 @@ DECLARE sub_id_varco INT;
 DECLARE sub_direzione VARCHAR(45);
 
 DECLARE done INT DEFAULT FALSE;
-DECLARE query CURSOR FOR SELECT * FROM ser_reportstuff WHERE data>=in_start;
+DECLARE query CURSOR FOR SELECT * FROM ser_reportstuff WHERE data BETWEEN in_start AND in_start + INTERVAL 1 DAY;
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 CREATE TEMPORARY TABLE PASSAGGI(
@@ -73,17 +73,14 @@ myloop: LOOP
 
 	FETCH query INTO main_datafile,main_data,main_sid,main_id_tessera,main_ospite,main_id_evento,main_id_varco,main_direzione;
 
-	SET @subsel = "SELECT data,id_evento,id_varco,direzione INTO sub_data,sub_id_evento,sub_id_varco,sub_direzione
-				FROM ser_reportstuff WHERE
-				datafile >= main_datafile AND
-				data >= main_data AND
-				Sid > main_sid AND
-				id_tessera = main_id_tessera AND
-				SUBSTRING(ospite,1,13) = SUBSTRING( main_ospite ,1,13) LIMIT 1;";
+	SELECT data,id_evento,id_varco,direzione INTO sub_data,sub_id_evento,sub_id_varco,sub_direzione
+	FROM ser_reportstuff WHERE
+	datafile >= main_datafile AND
+	data >= main_data AND
+	Sid > main_sid AND
+	id_tessera = main_id_tessera AND
+	SUBSTRING(ospite,1,13) = SUBSTRING( main_ospite ,1,13) LIMIT 1;
 
-	PREPARE stmt FROM @subsel;
-	EXECUTE stmt;
-	
 	INSERT INTO PASSAGGI(sid,data,durata,ospite,provenienza,destinazione) VALUES(
 	main_sid,
 	main_data,
@@ -101,8 +98,6 @@ myloop: LOOP
 	sub_direzione)
 	);
 	
-	DEALLOCATE PREPARE stmt;
-
 	IF done THEN
 		LEAVE myloop;
 	END IF;
