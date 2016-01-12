@@ -10,7 +10,7 @@ DELIMITER $$
 
 CREATE FUNCTION `id2tessera`(in_id_tessera INT) RETURNS VARCHAR(90)
 BEGIN
-RETURN (SELECT 
+RETURN (SELECT
 CONCAT(CASE tipo WHEN 1 THEN (SELECT 'ESTERNI') WHEN 2 THEN (SELECT 'POSTE') ELSE (SELECT 'SCONOSCIUTO') END,' ',numero)
 FROM SER_TESSERE WHERE id_tessera=in_id_tessera);
 END;
@@ -97,7 +97,7 @@ myloop: LOOP
 	(SELECT id2varco(sub_id_varco)),
 	sub_direzione)
 	);
-	
+
 	IF done THEN
 		LEAVE myloop;
 	END IF;
