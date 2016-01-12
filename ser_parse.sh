@@ -10,6 +10,7 @@ LOG=$PREFIX"/ser_parse.log"
 SER_HISTORY=$PREFIX"/ser_parse.history.log"
 
 MYARGS="-H -ureporting -preportuser -D reporting"
+SKIPTEST=1
 
 # regex
 rdata='(.*)([0-9]{2}/[0-9]{2}/[0-9]{4}[[:space:]][0-9]{2}:[0-9]{2})(.*)'
@@ -127,20 +128,43 @@ touch $LOG
 [[ -d $TEMP_DIR ]] && rm -rf $TEMP_DIR
 mkdir -p $TEMP_DIR
 
+case "$1" in
+	--help) 
+		echo "Arguments: [--partial /mnt/REPORT/Serchio/foo/bar/baz.xps] OR [--skip]"
+		exit
+		;;
+	--partial)
+		PARTIAL="${2##$REPORT}"
+		if [[ -z "$PARTIAL" ]]; then
+			echo "Doing nothing, bye"
+			exit 1 
+		fi
+		;;
+	--skip)
+		SKIPTEST=0
+		;;
+	*) 
+		echo "--> Nessun parametro in ingresso"
+		;;
+esac
 
-# arguments: --partial /foo/bar/baz.xps
-if [[ ! -z "$1" ]]; then
-	[[ "$1" == "--help" ]] && { echo "Arguments: [--partial /mnt/REPORT/Serchio/foo/bar/baz.xps]"; exit; }
-	[[ "$1" == "--partial" ]] && PARTIAL="${2##$REPORT}" || { echo "What?"; exit; }
-
-	if [[ ! -z "$PARTIAL" ]]; then
-		confirm || { echo "Bye"; exit; }
-	else
-		echo "Doing nothing, bye"; exit 1
-	fi
-else
+if [[ "$SKIPTEST" == "1" ]]; then
 	confirm || { echo "Bye"; exit; }
 fi
+
+# arguments: --partial /foo/bar/baz.xps
+#if [[ ! -z "$1" ]]; then
+#	[[ "$1" == "--help" ]] && { echo "Arguments: [--partial /mnt/REPORT/Serchio/foo/bar/baz.xps]"; exit; }
+#	[[ "$1" == "--partial" ]] && PARTIAL="${2##$REPORT}" || { echo "What?"; exit; }
+
+#	if [[ ! -z "$PARTIAL" ]]; then
+#		confirm || { echo "Bye"; exit; }
+#	else
+#		echo "Doing nothing, bye"; exit 1
+#	fi
+#else
+#	confirm || { echo "Bye"; exit; }
+#fi
 
 
 if grep -qs "$REPORT" /proc/mounts; then

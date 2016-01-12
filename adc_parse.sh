@@ -8,6 +8,7 @@ LOG=$PREFIX"/adc_parse.log"
 ADC_HISTORY=$PREFIX"/adc_parse.history.log"
 
 MYARGS="-H -ureporting -preportuser -D reporting"
+SKIPTEST=1
 
 leading_whitespaces() { printf "$1" | sed -e 's/^[[:space:]]*//'; }
 trailing_whitespaces() { printf "$1" | sed -e 's/[[:space:]]*$//'; }
@@ -33,8 +34,25 @@ touch $LOG
 
 [[ -f $ADC_HISTORY ]] || touch $ADC_HISTORY
 
-[[ ! -z "$1" ]] && { echo "WATCH OUT: not a WinWatch or Serchio script!"; exit; }
-confirm || { echo "Bye"; exit; }
+case "$1" in
+	--help) 
+		echo "Arguments: [--skip]"
+		exit
+		;;
+	--skip)
+		SKIPTEST=0
+		;;
+	*) 
+		echo "--> Nessun parametro in ingresso"
+		;;
+esac
+
+if [[ "$SKIPTEST" == "1" ]]; then
+	confirm || { echo "Bye"; exit; }
+fi
+
+#[[ ! -z "$1" ]] && { echo "WATCH OUT: not a WinWatch or Serchio script!"; exit; }
+#confirm || { echo "Bye"; exit; }
 
 if grep -qs "$REPORT" /proc/mounts; then
     echo "--> $REPORT mounted."

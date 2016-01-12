@@ -10,7 +10,7 @@ touch $LOG
 echo "*** BEGIN " $(date) "***" >> $LOG
 
 echo "==> win_parse" >> $LOG
-{ time ./win_parse.sh >> $LOG; } 2>> $LOG
+{ time ./win_parse.sh --skip >> $LOG; } 2>> $LOG
 if [ $? -eq 0 ]; then
 	echo "--> winparse terminato con successo" >> $LOG
 else
@@ -18,7 +18,7 @@ else
 fi
 
 echo "==> ser_parse" >> $LOG
-{ time ./ser_parse.sh >> $LOG; } 2>> $LOG
+{ time ./ser_parse.sh --skip >> $LOG; } 2>> $LOG
 if [ $? -eq 0 ]; then
 	echo "--> serparse terminato con successo" >> $LOG
 else
@@ -26,7 +26,7 @@ else
 fi
 
 echo "==> adc_parse" >> $LOG
-{ time ./adc_parse.sh >> $LOG; } 2>> $LOG
+{ time ./adc_parse.sh --skip >> $LOG; } 2>> $LOG
 if [ $? -eq 0 ]; then
 	echo "--> adcparse terminato con successo" >> $LOG
 else

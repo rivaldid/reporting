@@ -8,6 +8,7 @@ LOG=$PREFIX"/win_parse.log"
 WIN_HISTORY=$PREFIX"/win_parse.history.log"
 
 MYARGS="-H -ureporting -preportuser -D reporting"
+SKIPTEST=1
 
 leading_whitespaces() { printf "%s\n" "$1" | sed -e 's/^[[:space:]]*//'; }
 trailing_whitespaces() { printf "%s\n" "$1" | sed -e 's/[[:space:]]*$//'; }
@@ -36,19 +37,45 @@ touch $LOG
 
 [[ -f $WIN_HISTORY ]] || touch $WIN_HISTORY
 
-# arguments: --partial /foo/bar/baz.xps
-if [[ ! -z "$1" ]]; then
-	[[ "$1" == "--help" ]] && { echo "Arguments: [--partial /mnt/REPORT/WinWatch/foo/bar/baz.xps]"; exit; }
-	[[ "$1" == "--partial" ]] && PARTIAL="${2##$REPORT}" || { echo "What?"; exit; }
+case "$1" in
+	--help) 
+		echo "Arguments: [--partial /mnt/REPORT/WinWatch/foo/bar/baz.xps] OR [--skip]"
+		exit
+		;;
+	--partial)
+		PARTIAL="${2##$REPORT}"
+		if [[ -z "$PARTIAL" ]]; then
+			echo "Doing nothing, bye"
+			exit 1 
+		fi
+		;;
+	--skip)
+		SKIPTEST=0
+		;;
+	*) 
+		echo "--> Nessun parametro in ingresso"
+		;;
+esac
 
-	if [[ ! -z "$PARTIAL" ]]; then
-		confirm || { echo "Bye"; exit; }
-	else
-		echo "Doing nothing, bye"; exit 1
-	fi
-else
+if [[ "$SKIPTEST" == "1" ]]; then
 	confirm || { echo "Bye"; exit; }
 fi
+		
+
+# arguments: --partial /foo/bar/baz.xps
+#if [[ ! -z "$1" ]]; then
+#	[[ "$1" == "--help" ]] && { echo "Arguments: [--partial /mnt/REPORT/WinWatch/foo/bar/baz.xps] OR [--skip]"; exit; }
+#	[[ "$1" == "--partial" ]] && PARTIAL="${2##$REPORT}" || { echo "What?"; exit; }
+#	[[ "$1" == "--skip"]] && SKIP=0
+
+#	if [[ ! -z "$PARTIAL" ]]; then
+#		confirm || { echo "Bye"; exit; }
+#	else
+#		echo "Doing nothing, bye"; exit 1
+#	fi
+#else
+#	confirm || { echo "Bye"; exit; }
+#fi
 
 if grep -qs "$REPORT" /proc/mounts; then
     echo "--> $REPORT mounted."
