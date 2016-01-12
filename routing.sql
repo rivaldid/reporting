@@ -39,7 +39,7 @@ SELECT REPOSITORY.data AS datafile,SER_REPORT.Data AS data,Sid,id_tessera,id2osp
 FROM SER_REPORT LEFT JOIN REPOSITORY USING(Rid) WHERE id_tessera <> 1;
 $$
 
-CREATE PROCEDURE `routing`(IN in_start datetime)
+CREATE PROCEDURE `routing`(IN in_start datetime, IN in_ospite VARCHAR(45))
 BEGIN
 
 DECLARE main_sid INT;
@@ -57,7 +57,7 @@ DECLARE sub_id_varco INT;
 DECLARE sub_direzione VARCHAR(45);
 
 DECLARE done INT DEFAULT FALSE;
-DECLARE query CURSOR FOR SELECT * FROM ser_reportstuff WHERE data BETWEEN in_start AND in_start + INTERVAL 1 DAY;
+DECLARE query CURSOR FOR SELECT * FROM ser_reportstuff WHERE data BETWEEN in_start AND in_start + INTERVAL 1 DAY AND ospite LIKE CONCAT('%',in_ospite,'%');
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 CREATE TEMPORARY TABLE PASSAGGI(
