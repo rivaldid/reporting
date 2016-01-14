@@ -40,11 +40,13 @@ SELECT REPOSITORY.data AS datafile,SER_REPORT.Data AS data,Sid,id_tessera,id2osp
 FROM SER_REPORT LEFT JOIN REPOSITORY USING(Rid) WHERE id_tessera <> 1;
 $$
 
-CREATE FUNCTION `routing_core`(in_data DATETIME,in_id_tessera INT,in_ospite VARCHAR(45)) RETURNS INT
+CREATE FUNCTION `routing_core`(in_sid INT,in_data DATETIME,in_id_tessera INT,in_ospite VARCHAR(45)) RETURNS INT
 BEGIN
 RETURN (SELECT Sid FROM ser_reportstuff WHERE 
-data > in_data AND
-(id_tessera = in_id_tessera OR SUBSTRING(ospite,1,13) = SUBSTRING(in_ospite ,1,13)) 
+data >= in_data AND
+Sid > in_sid AND
+id_tessera = in_id_tessera AND 
+SUBSTRING(ospite,1,13) = SUBSTRING(in_ospite ,1,13)
 LIMIT 1);
 END;
 $$
@@ -84,7 +86,7 @@ OPEN query;
 myloop: LOOP
 
 	FETCH query INTO main_data,main_sid,main_id_tessera,main_ospite,main_id_evento,main_id_varco,main_direzione;
-	SET sub_sid = (SELECT routing_core(main_data,main_id_tessera,main_ospite));
+	SET sub_sid = (SELECT routing_core(main_sid,main_data,main_id_tessera,main_ospite));
 	
 	SELECT data,id_evento,id_varco,direzione INTO sub_data,sub_id_evento,sub_id_varco,sub_direzione FROM ser_reportstuff WHERE Sid = sub_sid;
 	
