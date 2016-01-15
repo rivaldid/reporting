@@ -72,8 +72,8 @@ DECLARE sub_id_varco INT;
 DECLARE sub_direzione VARCHAR(45);
 
 DECLARE done INT DEFAULT FALSE;
--- DECLARE query CURSOR FOR SELECT data,Sid,id_tessera,ospite,id_evento,id_varco,direzione FROM ser_reportstuff WHERE data BETWEEN in_start AND in_start + INTERVAL 1 DAY AND ospite LIKE CONCAT('%',in_ospite,'%');
-DECLARE query CURSOR FOR SELECT data,Sid,id_tessera,ospite,id_evento,id_varco,direzione FROM ser_reportstuff WHERE data LIKE CONCAT(in_start,'%') AND ospite LIKE CONCAT(in_ospite,'%');
+DECLARE query CURSOR FOR SELECT data,Sid,id_tessera,ospite,id_evento,id_varco,direzione FROM ser_reportstuff WHERE data BETWEEN in_start AND in_start + INTERVAL 1 DAY AND ospite LIKE CONCAT('%',in_ospite,'%');
+-- DECLARE query CURSOR FOR SELECT data,Sid,id_tessera,ospite,id_evento,id_varco,direzione FROM ser_reportstuff WHERE data LIKE CONCAT(in_start,'%') AND ospite LIKE CONCAT(in_ospite,'%');
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 CREATE TEMPORARY TABLE passaggi(
