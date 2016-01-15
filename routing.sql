@@ -73,7 +73,7 @@ DECLARE sub_direzione VARCHAR(45);
 
 DECLARE done INT DEFAULT FALSE;
 -- DECLARE query CURSOR FOR SELECT data,Sid,id_tessera,ospite,id_evento,id_varco,direzione FROM ser_reportstuff WHERE data BETWEEN in_start AND in_start + INTERVAL 1 DAY AND ospite LIKE CONCAT('%',in_ospite,'%');
-DECLARE query CURSOR FOR SELECT data,Sid,id_tessera,ospite,id_evento,id_varco,direzione FROM ser_reportstuff WHERE data LIKE CONCAT(in_start,'%') AND ospite LIKE CONCAT('%',in_ospite,'%');
+DECLARE query CURSOR FOR SELECT data,Sid,id_tessera,ospite,id_evento,id_varco,direzione FROM ser_reportstuff WHERE data LIKE CONCAT(in_start,'%') AND ospite LIKE CONCAT(in_ospite,'%');
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 CREATE TEMPORARY TABLE passaggi(
@@ -85,10 +85,10 @@ provenienza varchar(150),
 destinazione varchar(150));
 
 OPEN query;
-myloop: LOOP
+read_loop: LOOP
 
 	FETCH query INTO main_data,main_sid,main_id_tessera,main_ospite,main_id_evento,main_id_varco,main_direzione;
-	SET sub_sid = (SELECT routing_core(main_sid,main_data,main_id_tessera,main_ospite));
+	SET sub_sid = routing_core(main_sid,main_data,main_id_tessera,main_ospite);
 	
 	SELECT data,id_evento,id_varco,direzione INTO sub_data,sub_id_evento,sub_id_varco,sub_direzione FROM ser_reportstuff WHERE Sid = sub_sid;
 	
@@ -102,10 +102,10 @@ myloop: LOOP
 	);
 	
 	IF done THEN
-		LEAVE myloop;
+		LEAVE read_loop;
 	END IF;
 
-END LOOP myloop;
+END LOOP read_loop;
 CLOSE query;
 
 SELECT data,durata,ospite,provenienza,destinazione FROM passaggi ORDER BY data ASC;
