@@ -4,7 +4,7 @@ DROP FUNCTION IF EXISTS `id2evento`;
 DROP FUNCTION IF EXISTS `id2varco`;
 DROP VIEW IF EXISTS `ser_reportstuff`;
 
-DROP FUNCTION IF EXISTS `routing_core`;
+DROP FUNCTION IF EXISTS `ser_routing`;
 DROP PROCEDURE IF EXISTS `PASSAGGI`;
 
 DELIMITER $$
@@ -40,7 +40,7 @@ SELECT REPOSITORY.data AS datafile,SER_REPORT.Data AS data,Sid,id_tessera,id2osp
 FROM SER_REPORT LEFT JOIN REPOSITORY USING(Rid) WHERE id_tessera <> 1;
 $$
 
-CREATE FUNCTION `routing_core`(in_sid INT,in_data DATETIME,in_id_tessera INT,in_ospite VARCHAR(45)) RETURNS INT
+CREATE FUNCTION `ser_routing`(in_sid INT,in_data DATETIME,in_id_tessera INT,in_ospite VARCHAR(45)) RETURNS INT
 BEGIN
 RETURN (SELECT Sid FROM ser_reportstuff WHERE 
 data >= in_data AND
@@ -90,7 +90,7 @@ OPEN query;
 read_loop: LOOP
 
 	FETCH query INTO main_data,main_sid,main_id_tessera,main_ospite,main_id_evento,main_id_varco,main_direzione;
-	SET sub_sid = routing_core(main_sid,main_data,main_id_tessera,main_ospite);
+	SET sub_sid = ser_routing(main_sid,main_data,main_id_tessera,main_ospite);
 	
 	-- SET sub_data = sub_id_evento = sub_id_varco = sub_direzione = NULL;
 	
