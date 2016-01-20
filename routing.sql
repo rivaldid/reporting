@@ -41,14 +41,12 @@ CREATE VIEW `ser_reportstuff` AS
 SELECT SER_REPORT.Data AS data,Sid,id_tessera,id2ospite(id_ospite) AS ospite,id_evento,id_varco,direzione FROM SER_REPORT WHERE id_tessera <> 1;
 $$
 
-CREATE FUNCTION `ser_routing`(in_sid INT,in_data DATETIME,in_id_tessera INT,in_ospite VARCHAR(45)) RETURNS INT
+CREATE FUNCTION `ser_routing`(in_sid INT,in_data DATETIME,in_ospite VARCHAR(45)) RETURNS INT
 BEGIN
 RETURN (SELECT Sid FROM ser_reportstuff WHERE 
 data >= in_data AND
 Sid > in_sid AND
--- id_tessera = in_id_tessera AND 
--- SUBSTRING(ospite,1,13) = SUBSTRING(in_ospite ,1,13)
-CONCAT('%',ospite,'%') LIKE CONCAT('%',in_ospite,'%')
+CONCAT('%',in_ospite,'%') LIKE CONCAT('%',ospite,'%')
 LIMIT 1);
 END;
 $$
@@ -91,10 +89,7 @@ OPEN query;
 read_loop: LOOP
 
 	FETCH query INTO main_data,main_sid,main_id_tessera,main_ospite,main_id_evento,main_id_varco,main_direzione;
-	SET sub_sid = ser_routing(main_sid,main_data,main_id_tessera,main_ospite);
-	
-	-- SELECT main_data;
-	-- SET sub_data = sub_id_evento = sub_id_varco = sub_direzione = NULL;
+	SET sub_sid = ser_routing(main_sid,main_data,main_ospite);
 	
 	SELECT data,id_evento,id_varco,direzione INTO sub_data,sub_id_evento,sub_id_varco,sub_direzione FROM ser_reportstuff WHERE Sid = sub_sid;
 	
