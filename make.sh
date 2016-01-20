@@ -5,7 +5,9 @@
 PREFIX="/home/vilardid/reporting"
 LOG=$PREFIX"/make.log"
 DUMPFILE=$PREFIX"/dumpfile.sql"
-MYARGS="-ureporting -preportuser -D reporting"
+
+source /home/vilardid/account_db.txt
+MYARGS="-ureporting -p$pass_reporting -D reporting"
 
 # history logfile
 WIN_HISTORY=$PREFIX"/win_parse.history.log"

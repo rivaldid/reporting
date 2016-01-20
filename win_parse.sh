@@ -7,7 +7,9 @@ TRASH_PREFIX="/mnt/REPORT/WinWatch"
 LOG=$PREFIX"/win_parse.log"
 WIN_HISTORY=$PREFIX"/win_parse.history.log"
 
-MYARGS="-H -ureporting -preportuser -D reporting"
+source /home/vilardid/account_db.txt
+MYARGS="-ureporting -p$pass_reporting -D reporting"
+
 SKIPTEST=1
 
 leading_whitespaces() { printf "%s\n" "$1" | sed -e 's/^[[:space:]]*//'; }
