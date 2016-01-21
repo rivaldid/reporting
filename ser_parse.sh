@@ -9,7 +9,8 @@ LOG=$PREFIX"/ser_parse.log"
 #TODO=$PREFIX"/ser_parse_unmatched.log"
 SER_HISTORY=$PREFIX"/ser_parse.history.log"
 
-source /home/vilardid/account_db.txt
+FILE_PASSWORD="/home/vilardid/account_db.txt"
+source "$FILE_PASSWORD"
 MYARGS="-ureporting -p$pass_reporting -D reporting"
 
 SKIPTEST=1

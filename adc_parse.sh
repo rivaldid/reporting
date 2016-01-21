@@ -7,7 +7,8 @@ TRASH_PREFIX="/mnt/tempRAS/"
 LOG=$PREFIX"/adc_parse.log"
 ADC_HISTORY=$PREFIX"/adc_parse.history.log"
 
-source /home/vilardid/account_db.txt
+FILE_PASSWORD="/home/vilardid/account_db.txt"
+source "$FILE_PASSWORD"
 MYARGS="-ureporting -p$pass_reporting -D reporting"
 
 SKIPTEST=1

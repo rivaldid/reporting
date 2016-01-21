@@ -7,7 +7,8 @@ TRASH_PREFIX="/mnt/REPORT/WinWatch"
 LOG=$PREFIX"/win_parse.log"
 WIN_HISTORY=$PREFIX"/win_parse.history.log"
 
-source /home/vilardid/account_db.txt
+FILE_PASSWORD="/home/vilardid/account_db.txt"
+source "$FILE_PASSWORD"
 MYARGS="-ureporting -p$pass_reporting -D reporting"
 
 SKIPTEST=1

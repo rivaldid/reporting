@@ -19,7 +19,7 @@ $$
 
 CREATE FUNCTION `id2ospite`(in_id_ospite INT) RETURNS VARCHAR(45)
 BEGIN
-RETURN (SELECT HTML_UnEncode(nome) AS nome FROM SER_OSPITI WHERE id_ospite=in_id_ospite);
+RETURN (SELECT nome AS nome FROM SER_OSPITI WHERE id_ospite=in_id_ospite);
 END;
 $$
 
@@ -36,8 +36,6 @@ END;
 $$
 
 CREATE VIEW `ser_reportstuff` AS
--- SELECT REPOSITORY.data AS datafile,SER_REPORT.Data AS data,Sid,id_tessera,id2ospite(id_ospite) AS ospite,id_evento,id_varco,direzione 
--- FROM SER_REPORT LEFT JOIN REPOSITORY USING(Rid) WHERE id_tessera <> 1;
 SELECT SER_REPORT.Data AS data,Sid,id_tessera,id2ospite(id_ospite) AS ospite,id_evento,id_varco,direzione FROM SER_REPORT WHERE id_tessera <> 1;
 $$
 
