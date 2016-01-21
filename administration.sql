@@ -7,16 +7,16 @@ USE `administration`;
 DROP PROCEDURE IF EXISTS `drop_user`;
 DELIMITER $$
 
-CREATE PROCEDURE `drop_user`(IN in_user VARCHAR(45))
+CREATE PROCEDURE `drop_user`(IN in_user VARCHAR(45), OUT res VARCHAR(45))
 BEGIN
 IF (SELECT EXISTS (SELECT DISTINCT user FROM mysql.user WHERE user = in_user)) THEN
 	SET @A = (SELECT Result FROM (SELECT GROUP_CONCAT("DROP USER"," ",in_user,"@'%'") AS Result) AS Q LIMIT 1);
 	PREPARE STMT FROM @A;
 	EXECUTE STMT;
 	FLUSH PRIVILEGES;
-	SELECT CONCAT("DROPPED USER ",in_user);
+	SET res = CONCAT("DROPPED USER ",in_user);
 ELSE
-	SELECT CONCAT("USER ",in_user," NOT FOUND");
+	SET res = CONCAT("USER ",in_user," NOT FOUND");
 END IF;
 END;
 $$

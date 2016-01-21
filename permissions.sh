@@ -15,7 +15,7 @@ touch $LOG
 
 # user
 mysql $MYARGS -e "source administration.sql \W;" >> $LOG
-mysql $MYARGS -e "CALL administration.drop_user('webreporting');" >> $LOG
+mysql $MYARGS -e "CALL administration.drop_user('webreporting',@res); SELECT @res;" >> $LOG
 mysql $MYARGS -e "CREATE USER 'webreporting'@'%' IDENTIFIED BY 'webuser';" >> $LOG
 
 # private
