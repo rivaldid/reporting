@@ -1,0 +1,21 @@
+DROP DATABASE IF EXISTS `administration`;
+CREATE DATABASE `administration`
+	DEFAULT CHARACTER SET utf8
+	DEFAULT COLLATE utf8_general_ci;
+USE `administration`;
+
+DROP PROCEDURE IF EXISTS `drop_user`;
+DELIMITER $$
+
+CREATE PROCEDURE `drop_user`(IN in_user VARCHAR(45))
+BEGIN
+IF (SELECT EXISTS (SELECT DISTINCT user FROM mysql.user WHERE user = in_user)) THEN
+	DROP USER in_user;
+	SELECT "DROPPED USER in_user";
+ELSE
+	SELECT "USER in_user NOT FOUND";
+END IF;
+END;
+$$
+
+DELIMITER ;
