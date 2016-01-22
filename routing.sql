@@ -41,8 +41,8 @@ $$
 
 CREATE FUNCTION `ser_routing`(in_sid INT,in_data DATETIME,in_ospite VARCHAR(45)) RETURNS INT
 BEGIN
-RETURN (SELECT Sid FROM ser_reportstuff WHERE 
-data >= in_data AND Sid > in_sid AND 
+RETURN (SELECT Sid FROM ser_reportstuff WHERE
+data >= in_data AND Sid > in_sid AND
 SUBSTRING(ospite,1,13) = SUBSTRING(in_ospite,1,13) LIMIT 1);
 END;
 $$
@@ -85,17 +85,18 @@ OPEN query;
 read_loop: LOOP
 
 	FETCH query INTO main_data,main_sid,main_id_tessera,main_ospite,main_id_evento,main_id_varco,main_direzione;
-	
+
 	IF done THEN
 		LEAVE read_loop;
 	END IF;
-	
+
 	SET sub_sid = ser_routing(main_sid,main_data,main_ospite);
 
 	SET sub_data = NULL;
 	SET sub_id_evento = NULL;
 	SET sub_id_varco = NULL;
 	SET sub_direzione = NULL;
+
 	IF (sub_sid IS NOT NULL) THEN
 		SELECT data,id_evento,id_varco,direzione INTO sub_data,sub_id_evento,sub_id_varco,sub_direzione FROM ser_reportstuff WHERE Sid = sub_sid;
 	END IF;
