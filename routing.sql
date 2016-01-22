@@ -19,7 +19,7 @@ $$
 
 CREATE FUNCTION `id2ospite`(in_id_ospite INT) RETURNS VARCHAR(45)
 BEGIN
-RETURN (SELECT nome AS nome FROM SER_OSPITI WHERE id_ospite=in_id_ospite);
+RETURN (SELECT HTML_UnEncode(nome) AS nome FROM SER_OSPITI WHERE id_ospite=in_id_ospite);
 END;
 $$
 
@@ -39,12 +39,11 @@ CREATE VIEW `ser_reportstuff` AS
 SELECT SER_REPORT.Data AS data,Sid,id_tessera,id2ospite(id_ospite) AS ospite,id_evento,id_varco,direzione FROM SER_REPORT WHERE id_tessera <> 1;
 $$
 
-CREATE FUNCTION `ser_routing`(in_data DATETIME,in_ospite VARCHAR(45)) RETURNS INT
+CREATE FUNCTION `ser_routing`(in_sid INT,in_data DATETIME,in_ospite VARCHAR(45)) RETURNS INT
 BEGIN
-DECLARE nextsid INT;
-SELECT Sid INTO nextsid FROM ser_reportstuff WHERE data > in_data AND SUBSTRING(ospite,1,13) = SUBSTRING(in_ospite,1,13) LIMIT 1;
-RETURN IF(nextsid IS NULL OR nextsid = '',0,nextsid);
--- RETURN (SELECT Sid FROM ser_reportstuff WHERE data > in_data AND SUBSTRING(ospite,1,13) = SUBSTRING(in_ospite,1,13) LIMIT 1);
+RETURN (SELECT Sid FROM ser_reportstuff WHERE 
+data >= in_data AND Sid > in_sid AND 
+SUBSTRING(ospite,1,13) = SUBSTRING(in_ospite,1,13) LIMIT 1);
 END;
 $$
 
@@ -86,10 +85,21 @@ OPEN query;
 read_loop: LOOP
 
 	FETCH query INTO main_data,main_sid,main_id_tessera,main_ospite,main_id_evento,main_id_varco,main_direzione;
-	SET sub_sid = ser_routing(main_data,main_ospite);
 	
-	SELECT data,id_evento,id_varco,direzione INTO sub_data,sub_id_evento,sub_id_varco,sub_direzione FROM ser_reportstuff WHERE Sid = sub_sid;
+	IF done THEN
+		LEAVE read_loop;
+	END IF;
 	
+	SET sub_sid = ser_routing(main_sid,main_data,main_ospite);
+
+	SET sub_data = NULL;
+	SET sub_id_evento = NULL;
+	SET sub_id_varco = NULL;
+	SET sub_direzione = NULL;
+	IF (sub_sid IS NOT NULL) THEN
+		SELECT data,id_evento,id_varco,direzione INTO sub_data,sub_id_evento,sub_id_varco,sub_direzione FROM ser_reportstuff WHERE Sid = sub_sid;
+	END IF;
+
 	INSERT INTO passaggi(sid,data,durata,ospite,provenienza,destinazione) VALUES(
 	main_sid,
 	main_data,
@@ -98,17 +108,13 @@ read_loop: LOOP
 	CONCAT_WS(' ',IF(id2evento(main_id_evento)='Transito effettuato','OK','ERR'),id2varco(main_id_varco),main_direzione),
 	CONCAT_WS(' ',IF(id2evento(sub_id_evento)='Transito effettuato','OK','ERR'),id2varco(sub_id_varco),sub_direzione)
 	);
-	
-	IF done THEN
-		LEAVE read_loop;
-	END IF;
 
 END LOOP read_loop;
 -- UNTIL done END REPEAT;
 
 CLOSE query;
 
-SELECT data,durata,ospite,provenienza,destinazione FROM passaggi ORDER BY data ASC;
+SELECT data,durata,ospite,provenienza,destinazione FROM passaggi;
 
 END;
 $$
