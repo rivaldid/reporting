@@ -9,6 +9,7 @@ DUMPFILE=$PREFIX"/dumpfile.sql"
 FILE_PASSWORD="/home/vilardid/account_db.txt"
 source "$FILE_PASSWORD"
 MYARGS="-ureporting -p$pass_reporting -D reporting"
+MYARGSroot="-uroot -p$pass_root"
 
 # history logfile
 WIN_HISTORY=$PREFIX"/win_parse.history.log"
@@ -33,10 +34,17 @@ echo "*** BEGIN " $(date) "***" >> $LOG
 
 if [ $reset = false ]; then
 	echo "--> Dumping del db" >> $LOG
-	mysqldump -ureporting -preportuser reporting > $DUMPFILE
+	mysqldump -ureporting -p"$pass_reporting" reporting > $DUMPFILE
 else
 	echo "--> NO DUMP DB" >> $LOG
 fi
+
+echo "--> Utenza con relativi permessi" >> $LOG
+mysql $MYARGSroot -e "source administration.sql \W;" >> $LOG
+mysql $MYARGSroot -e "CALL administration.drop_user('reporting',@res); SELECT @res;" >> $LOG
+mysql $MYARGSroot -e "CREATE USER 'reporting'@'%' IDENTIFIED BY '$pass_reporting';" >> $LOG
+mysql $MYARGSroot -e "GRANT ALL PRIVILEGES ON reporting.* TO 'reporting'@'%';" >> $LOG
+mysql $MYARGSroot -e "FLUSH PRIVILEGES;" >> $LOG
 
 echo "--> Carico la base" >> $LOG
 mysql $MYARGS -e "source $PREFIX/base.sql \W;" >> $LOG
@@ -94,6 +102,9 @@ fi
 
 echo "--> Carico il routing" >> $LOG
 mysql $MYARGS -e "source $PREFIX/routing.sql \W;" >> $LOG
+
+echo "--> Utente web e permessi" >> $LOG
+"$PREFIX/webpermissions.sh"
 
 echo "*** END " $(date) "***" >> $LOG
 
