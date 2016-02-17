@@ -36,7 +36,10 @@ END;
 $$
 
 CREATE VIEW `ser_reportstuff` AS
-SELECT SER_REPORT.Data AS data,Sid,id_tessera,id2ospite(id_ospite) AS ospite,id_evento,id_varco,direzione FROM SER_REPORT WHERE id_tessera <> 1;
+SELECT SER_REPORT.Data AS data,Sid,id_tessera,HTML_UnEncode(SER_OSPITI.nome) AS ospite,id_evento,id_varco,direzione 
+FROM SER_REPORT 
+JOIN SER_OSPITI USING(id_ospite)
+WHERE id_tessera <> 1;
 $$
 
 CREATE FUNCTION `ser_routing`(in_sid INT,in_data DATETIME,in_ospite VARCHAR(45)) RETURNS INT

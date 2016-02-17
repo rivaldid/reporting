@@ -104,7 +104,7 @@ echo "--> Carico il routing" >> $LOG
 mysql $MYARGS -e "source $PREFIX/routing.sql \W;" >> $LOG
 
 echo "--> Utente web e permessi" >> $LOG
-"$PREFIX/webpermissions.sh"
+source "$PREFIX/webpermissions.sh"
 
 echo "*** END " $(date) "***" >> $LOG
 
