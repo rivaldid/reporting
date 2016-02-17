@@ -1,3 +1,5 @@
+USE `reporting`;
+
 DROP FUNCTION IF EXISTS `id2tessera`;
 DROP FUNCTION IF EXISTS `id2ospite`;
 DROP FUNCTION IF EXISTS `id2evento`;

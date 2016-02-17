@@ -1,3 +1,5 @@
+USE `reporting`;
+
 DROP PROCEDURE IF EXISTS `clear_ser_bychecksum`;
 DROP PROCEDURE IF EXISTS `clear_ser_bydate`;
 

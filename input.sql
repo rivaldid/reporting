@@ -1,3 +1,5 @@
+USE `reporting`;
+
 DROP PROCEDURE IF EXISTS `input_winwatch`;
 DROP PROCEDURE IF EXISTS `input_serchio`;
 DROP PROCEDURE IF EXISTS `input_adc`;

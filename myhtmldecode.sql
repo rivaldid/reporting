@@ -1,3 +1,5 @@
+USE `reporting`;
+
 DROP FUNCTION IF EXISTS `HTML_UnEncode`;
 
 DELIMITER $$

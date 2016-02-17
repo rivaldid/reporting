@@ -1,3 +1,5 @@
+USE `reporting`;
+
 SELECT input_ser_tessera('',NULL,NULL);
 SELECT input_ser_varco('',NULL,NULL,NULL,NULL,NULL);
 SELECT input_ser_evento('');

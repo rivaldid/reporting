@@ -1,3 +1,5 @@
+USE `reporting`;
+
 DROP FUNCTION IF EXISTS `test_repo`;
 DROP FUNCTION IF EXISTS `get_repo`;
 
