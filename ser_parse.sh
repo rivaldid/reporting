@@ -1,12 +1,13 @@
 #!/bin/bash
 
-source "config.sh"
+PREFIX="/home/vilardid/reporting"
+source "$PREFIX/config.sh"
+
 REPORT="/mnt/REPORT"
 TRASH_PREFIX="$REPORT/Serchio"
 TEMP_DIR="$PREFIX/TEMP"
 
 LOG="$PREFIX/ser_parse.log"
-SER_HISTORY="$PREFIX/ser_parse.history.log"
 
 SKIPTEST=1
 
@@ -127,7 +128,7 @@ touch $LOG
 mkdir -p $TEMP_DIR
 
 case "$1" in
-	--help) 
+	--help)
 		echo "Arguments: [--partial /mnt/REPORT/Serchio/foo/bar/baz.xps] OR [--skip]"
 		exit
 		;;
@@ -135,13 +136,13 @@ case "$1" in
 		PARTIAL="${2##$REPORT}"
 		if [[ -z "$PARTIAL" ]]; then
 			echo "Doing nothing, bye"
-			exit 1 
+			exit 1
 		fi
 		;;
 	--skip)
 		SKIPTEST=0
 		;;
-	*) 
+	*)
 		echo "--> Nessun parametro in ingresso"
 		;;
 esac

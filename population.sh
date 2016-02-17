@@ -1,7 +1,9 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 PREFIX="/home/vilardid/reporting"
-LOG=$PREFIX"/population.log"
+source "$PREFIX/config.sh"
+
+LOG="$PREFIX/population.log"
 
 cd $PREFIX
 if [ -f $LOG ]; then rm $LOG; fi

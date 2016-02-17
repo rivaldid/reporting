@@ -1,11 +1,12 @@
 #!/bin/bash
 
-source "config.sh"
+PREFIX="/home/vilardid/reporting"
+source "$PREFIX/config.sh"
+
 REPORT="/mnt/REPORT"
 TRASH_PREFIX="/mnt/REPORT/WinWatch"
 
 LOG="$PREFIX/win_parse.log"
-WIN_HISTORY="$PREFIX/win_parse.history.log"
 
 SKIPTEST=1
 
@@ -37,7 +38,7 @@ touch $LOG
 [[ -f $WIN_HISTORY ]] || touch $WIN_HISTORY
 
 case "$1" in
-	--help) 
+	--help)
 		echo "Arguments: [--partial /mnt/REPORT/WinWatch/foo/bar/baz.xps] OR [--skip]"
 		exit
 		;;
@@ -45,13 +46,13 @@ case "$1" in
 		PARTIAL="${2##$REPORT}"
 		if [[ -z "$PARTIAL" ]]; then
 			echo "Doing nothing, bye"
-			exit 1 
+			exit 1
 		fi
 		;;
 	--skip)
 		SKIPTEST=0
 		;;
-	*) 
+	*)
 		echo "--> Nessun parametro in ingresso"
 		;;
 esac
@@ -59,7 +60,7 @@ esac
 if [[ "$SKIPTEST" == "1" ]]; then
 	confirm || { echo "Bye"; exit; }
 fi
-		
+
 
 # arguments: --partial /foo/bar/baz.xps
 #if [[ ! -z "$1" ]]; then

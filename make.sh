@@ -1,20 +1,12 @@
-#!/usr/bin/bash
+#!/bin/bash
 # USAGE ./make.sh --reset --history
 # --history force reload data after --reset
 
 PREFIX="/home/vilardid/reporting"
-LOG=$PREFIX"/make.log"
-DUMPFILE=$PREFIX"/dumpfile.sql"
+source "$PREFIX/config.sh"
 
-FILE_PASSWORD="/home/vilardid/account_db.txt"
-source "$FILE_PASSWORD"
-MYARGS="-ureporting -p$pass_reporting -D reporting"
-MYARGSroot="-uroot -p$pass_root"
-
-# history logfile
-WIN_HISTORY=$PREFIX"/win_parse.history.log"
-SER_HISTORY=$PREFIX"/ser_parse.history.log"
-ADC_HISTORY=$PREFIX"/adc_parse.history.log"
+LOG="$PREFIX/make.log"
+DUMPFILE="$PREFIX/dumpfile.sql"
 
 reset=false
 history=false
@@ -40,11 +32,11 @@ else
 fi
 
 echo "--> Utenza con relativi permessi" >> $LOG
-mysql $MYARGSroot -e "source administration.sql \W;" >> $LOG
-mysql $MYARGSroot -e "CALL administration.drop_user('reporting',@res); SELECT @res;" >> $LOG
-mysql $MYARGSroot -e "CREATE USER 'reporting'@'%' IDENTIFIED BY '$pass_reporting';" >> $LOG
-mysql $MYARGSroot -e "GRANT ALL PRIVILEGES ON reporting.* TO 'reporting'@'%';" >> $LOG
-mysql $MYARGSroot -e "FLUSH PRIVILEGES;" >> $LOG
+mysql $MYARGS1 -e "source administration.sql \W;" >> $LOG
+mysql $MYARGS1 -e "CALL administration.drop_user('reporting',@res); SELECT @res;" >> $LOG
+mysql $MYARGS1 -e "CREATE USER 'reporting'@'%' IDENTIFIED BY '$pass_reporting';" >> $LOG
+mysql $MYARGS1 -e "GRANT ALL PRIVILEGES ON reporting.* TO 'reporting'@'%';" >> $LOG
+mysql $MYARGS1 -e "FLUSH PRIVILEGES;" >> $LOG
 
 echo "--> Carico la base" >> $LOG
 mysql $MYARGS -e "source $PREFIX/base.sql \W;" >> $LOG

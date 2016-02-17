@@ -1,11 +1,12 @@
 #!/bin/bash
 
-source "config.sh"
+PREFIX="/home/vilardid/reporting"
+source "$PREFIX/config.sh"
+
 REPORT="/mnt/tempRAS"
 TRASH_PREFIX="/mnt/tempRAS/"
 
 LOG="$PREFIX/adc_parse.log"
-ADC_HISTORY="$PREFIX/adc_parse.history.log"
 
 SKIPTEST=1
 
@@ -34,14 +35,14 @@ touch $LOG
 [[ -f $ADC_HISTORY ]] || touch $ADC_HISTORY
 
 case "$1" in
-	--help) 
+	--help)
 		echo "Arguments: [--skip]"
 		exit
 		;;
 	--skip)
 		SKIPTEST=0
 		;;
-	*) 
+	*)
 		echo "--> Nessun parametro in ingresso"
 		;;
 esac

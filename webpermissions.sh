@@ -1,7 +1,9 @@
-#!/usr/bin/bash
+#!/bin/bash
 
-source "config.sh"
-LOG1=$PREFIX"/webpermissions.log"
+PREFIX="/home/vilardid/reporting"
+source "$PREFIX/config.sh"
+
+LOG1="$PREFIX/webpermissions.log"
 
 MYARGS1="-uroot -p$pass_root"
 

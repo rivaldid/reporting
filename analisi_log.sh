@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 PREFIX="/home/vilardid/reporting"
 LOG=$1
