@@ -1,15 +1,11 @@
-#!/usr/bin/bash
+#!/bin/bash
 
-PREFIX="/home/vilardid/reporting"
+source "config.sh"
 REPORT="/mnt/tempRAS"
 TRASH_PREFIX="/mnt/tempRAS/"
 
-LOG=$PREFIX"/adc_parse.log"
-ADC_HISTORY=$PREFIX"/adc_parse.history.log"
-
-FILE_PASSWORD="/home/vilardid/account_db.txt"
-source "$FILE_PASSWORD"
-MYARGS="-ureporting -p$pass_reporting -D reporting"
+LOG="$PREFIX/adc_parse.log"
+ADC_HISTORY="$PREFIX/adc_parse.history.log"
 
 SKIPTEST=1
 

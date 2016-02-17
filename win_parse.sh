@@ -1,15 +1,11 @@
-#!/usr/bin/bash
+#!/bin/bash
 
-PREFIX="/home/vilardid/reporting"
+source "config.sh"
 REPORT="/mnt/REPORT"
 TRASH_PREFIX="/mnt/REPORT/WinWatch"
 
-LOG=$PREFIX"/win_parse.log"
-WIN_HISTORY=$PREFIX"/win_parse.history.log"
-
-FILE_PASSWORD="/home/vilardid/account_db.txt"
-source "$FILE_PASSWORD"
-MYARGS="-ureporting -p$pass_reporting -D reporting"
+LOG="$PREFIX/win_parse.log"
+WIN_HISTORY="$PREFIX/win_parse.history.log"
 
 SKIPTEST=1
 

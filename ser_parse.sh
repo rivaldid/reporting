@@ -1,17 +1,12 @@
-#!/usr/bin/bash
+#!/bin/bash
 
-PREFIX="/home/vilardid/reporting"
+source "config.sh"
 REPORT="/mnt/REPORT"
-TRASH_PREFIX="/mnt/REPORT/Serchio"
-TEMP_DIR=$PREFIX"/TEMP"
+TRASH_PREFIX="$REPORT/Serchio"
+TEMP_DIR="$PREFIX/TEMP"
 
-LOG=$PREFIX"/ser_parse.log"
-#TODO=$PREFIX"/ser_parse_unmatched.log"
-SER_HISTORY=$PREFIX"/ser_parse.history.log"
-
-FILE_PASSWORD="/home/vilardid/account_db.txt"
-source "$FILE_PASSWORD"
-MYARGS="-ureporting -p$pass_reporting -D reporting"
+LOG="$PREFIX/ser_parse.log"
+SER_HISTORY="$PREFIX/ser_parse.history.log"
 
 SKIPTEST=1
 
