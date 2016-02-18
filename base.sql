@@ -1,5 +1,5 @@
-DROP DATABASE `reporting`;
-CREATE DATABASE IF NOT EXISTS `reporting`
+DROP DATABASE IF EXISTS `reporting`;
+CREATE DATABASE `reporting`
 	DEFAULT CHARACTER SET utf8
 	DEFAULT COLLATE utf8_general_ci;
 USE `reporting`;
