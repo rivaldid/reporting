@@ -7,11 +7,11 @@ FILE_PASSWORD="/home/vilardid/account_db.txt"
 source "$FILE_PASSWORD"
 
 # mysql arguments user
-MYARGS="-h 127.0.0.1 -P 3306 -ureporting -p$pass_reporting -D reporting"
+MYARGS="-ureporting -p$pass_reporting"
+#MYARGS="--login-path=reporting"
 # mysql arguments root
-MYARGS1="-h 127.0.0.1 -P 3306 -uroot -p$pass_root"
-# mysql arguments dump
-MYARGS2="-h 127.0.0.1 -P 3306 -ureporting -p$pass_reporting reporting"
+MYARGS1="-uroot -p$pass_root"
+#MYARGS1="--login-path=root"
 
 # history logfile
 WIN_HISTORY="$PREFIX/win_parse.history.log"

@@ -26,7 +26,7 @@ echo "*** BEGIN " $(date) "***" >> $LOG
 
 if [ $reset = false ]; then
 	echo "--> Dumping del db" >> $LOG
-	mysqldump $MYARGS2 > $DUMPFILE
+	mysqldump $MYARGS reporting > $DUMPFILE
 else
 	echo "--> NO DUMP DB" >> $LOG
 fi
@@ -62,7 +62,7 @@ mysql $MYARGS -e "source $PREFIX/dati.sql \W;" >> $LOG
 if [ $reset = false ]; then
 	echo "--> Ripristino il dump" >> $LOG
 	#mysql $MYARGS -e "source $DUMPFILE \W;" >> $LOG
-	pv "$DUMPFILE" | mysql $MYARGS >> $LOG
+	pv "$DUMPFILE" | mysql $MYARGS -D reporting >> $LOG
 	rm $DUMPFILE
 fi
 
@@ -74,21 +74,21 @@ if [ $history = true ]; then
 	#echo -n "--> Winwatch..."
 	#mysql $MYARGS -e "source $WIN_HISTORY \W;" >> $LOG
 	#echo "done"
-	pv "$WIN_HISTORY" | mysql $MYARGS >> $LOG
+	pv "$WIN_HISTORY" | mysql $MYARGS -D reporting >> $LOG
 
 	echo "--> Serchio" >> $LOG
 	echo "--> Serchio"
 	#echo -n "--> Serchio..."
 	#mysql $MYARGS -e "source $SER_HISTORY \W;" >> $LOG
 	#echo "done"
-	pv "$SER_HISTORY" | mysql $MYARGS >> $LOG
+	pv "$SER_HISTORY" | mysql $MYARGS -D reporting  >> $LOG
 
 	echo "--> ADC" >> $LOG
 	echo "--> ADC"
 	#echo -n "--> ADC..."
 	#mysql $MYARGS -e "source $ADC_HISTORY \W;" >> $LOG
 	#echo "done"
-	pv "$ADC_HISTORY" | mysql $MYARGS >> $LOG
+	pv "$ADC_HISTORY" | mysql $MYARGS -D reporting >> $LOG
 
 fi
 
