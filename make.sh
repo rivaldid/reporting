@@ -26,7 +26,7 @@ echo "*** BEGIN " $(date) "***" >> $LOG
 
 if [ $reset = false ]; then
 	echo "--> Dumping del db" >> $LOG
-	mysqldump -ureporting -p"$pass_reporting" reporting > $DUMPFILE
+	mysqldump $MYARGS2 > $DUMPFILE
 else
 	echo "--> NO DUMP DB" >> $LOG
 fi
