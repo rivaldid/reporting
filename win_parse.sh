@@ -130,7 +130,7 @@ for file in $(find $REPORT$PARTIAL -name "*.csv" -type f); do
 
 			mycall="CALL input_winwatch('$centrale','$ora','$data','$evento','$messaggio','$checksum');"
 			echo $mycall >> $LOG
-			mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
+			mysql $MYARGS -D reporting -e "$mycall \W;" >> $LOG 2>&1
 
 		done < $TEMP
 

@@ -280,7 +280,7 @@ for file in $(find $REPORT$PARTIAL -name "*.xps" -type f); do
 					fi
 
 					mycall="CALL input_serchio('$data','$centrale','$seriale','$evento','$varco','$direzione','$ospite','$checksum');"
-					mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
+					mysql $MYARGS -D reporting -e "$mycall \W;" >> $LOG 2>&1
 
 					echo "$mycall" >> $LOG
 

@@ -160,7 +160,7 @@ for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 			done < "$TEMP"
 
 			mycall="CALL input_adc('$cognome','$nome','$societa','$tipo_doc','$num_doc','$scad_doc','$decorrenza','$scadenza','$badge','$gruppo','$note','$struttura','$profilo','$cf','$data_di_nascita','$nazionalita','$locali','$data_report','$checksum','$data_file');"
-			mysql $MYARGS -e "$mycall \W;" >> $LOG 2>&1
+			mysql $MYARGS -D reporting -e "$mycall \W;" >> $LOG 2>&1
 
 			echo "$mycall" >> $LOG
 
