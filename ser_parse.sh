@@ -193,7 +193,7 @@ for file in $(find $REPORT$PARTIAL -name "*.xps" -type f); do
 
 		unzip $INPUT -d $TEMP_DIR &>/dev/null
 
-		for subfile in $(find $TEMP_DIR -name "*.fpage" -type f); do
+		for subfile in $(find $TEMP_DIR -name "*.fpage" -type f | sort --version-sort); do
 
 			while IFS=$'\n' read -ra line; do
 
