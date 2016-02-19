@@ -95,7 +95,7 @@ for file in $(find $REPORT$PARTIAL -name "*.csv" -type f); do
 
 	checksum=$(md5sum ${INPUT} | awk '{ print $1 }')
 
-	report_done=$(mysql -ureporting -preportuser -D reporting -s -N -e "SELECT test_repo('$checksum');")
+	report_done=$(mysql $MYARGS -D reporting -s -N -e "SELECT test_repo('$checksum');")
 
 	if [ "$report_done" = "0" ]; then
 
