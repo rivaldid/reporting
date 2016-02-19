@@ -3,10 +3,12 @@
 PREFIX="/home/vilardid/reporting"
 source "$PREFIX/config.sh"
 
-REPORT="/mnt/REPORT"
+# mountpoint for different os
+[[ $system =~ $redhat ]] && REPORT="/mnt2/REPORT"
+[[ $system =~ $centos ]] && REPORT="/mnt/REPORT"
+
 TRASH_PREFIX="$REPORT/Serchio"
 TEMP_DIR="$PREFIX/TEMP"
-
 LOG="$PREFIX/ser_parse.log"
 
 SKIPTEST=1

@@ -3,9 +3,11 @@
 PREFIX="/home/vilardid/reporting"
 source "$PREFIX/config.sh"
 
-REPORT="/mnt/REPORT"
-TRASH_PREFIX="/mnt/REPORT/WinWatch"
+# mountpoint for different os
+[[ $system =~ $redhat ]] && REPORT="/mnt2/REPORT"
+[[ $system =~ $centos ]] && REPORT="/mnt/REPORT"
 
+TRASH_PREFIX="/mnt/REPORT/WinWatch"
 LOG="$PREFIX/win_parse.log"
 
 SKIPTEST=1

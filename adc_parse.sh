@@ -3,9 +3,11 @@
 PREFIX="/home/vilardid/reporting"
 source "$PREFIX/config.sh"
 
-REPORT="/mnt/tempRAS"
-TRASH_PREFIX="/mnt/tempRAS/"
+# mountpoint for different os
+[[ $system =~ $redhat ]] && REPORT="/mnt2/tempRAS"
+[[ $system =~ $centos ]] && REPORT="/mnt/tempRAS"
 
+TRASH_PREFIX="/mnt/tempRAS/"
 LOG="$PREFIX/adc_parse.log"
 
 SKIPTEST=1
