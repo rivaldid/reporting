@@ -86,7 +86,7 @@ for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 
 	if [ "$report_not_done" = "0" ] && [ "$report_not_obsolete" = "0" ]; then
 
-		echo "--> OK $INPUT da aggiungere" >> $LOG
+		echo "-- > OK $INPUT da aggiungere" >> $LOG
 		echo "--> $TEMP in corso..."
 
 		echo "--> Cleanup:" $(mysql $MYARGS -D reporting -s -N -e "SELECT clean_adc_garbage((SELECT pre_adc_data('$data_report')),'$data_file');") "record"
@@ -173,7 +173,7 @@ for file in $(find $REPORT -name "ReportGiornaliero_TO1*.xls" -type f); do
 
 	#else
 
-		#echo "--> NO $INPUT aggiunto" >> $LOG
+		#echo "-- > NO $INPUT aggiunto" >> $LOG
 	fi
 
 done

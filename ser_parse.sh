@@ -187,7 +187,7 @@ for file in $(find $REPORT$PARTIAL -name "*.xps" -type f); do
 
 	if [ "$report_done" = "0" ]; then
 
-		echo "--> OK $INPUT da aggiungere" >> $LOG
+		echo "-- > OK $INPUT da aggiungere" >> $LOG
 
 		echo -n "Working $filereferer..."
 
@@ -297,7 +297,7 @@ for file in $(find $REPORT$PARTIAL -name "*.xps" -type f); do
 
 	#else
 
-		#echo "--> NO $INPUT aggiunto" >> $LOG
+		#echo "-- > NO $INPUT aggiunto" >> $LOG
 
 	fi
 

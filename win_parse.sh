@@ -99,7 +99,7 @@ for file in $(find $REPORT$PARTIAL -name "*.csv" -type f); do
 
 	if [ "$report_done" = "0" ]; then
 
-		echo "--> OK $INPUT da aggiungere" >> $LOG
+		echo "-- > OK $INPUT da aggiungere" >> $LOG
 		#echo "--> $TEMP in corso..." >> $LOG
 
 		echo -n "Working $filereferer..."
@@ -141,7 +141,7 @@ for file in $(find $REPORT$PARTIAL -name "*.csv" -type f); do
 
 	#else
 
-		#echo "--> NO $INPUT aggiunto" >> $LOG
+		#echo "-- > NO $INPUT aggiunto" >> $LOG
 
 	fi
 
