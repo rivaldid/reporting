@@ -2,17 +2,6 @@
 
 # basic configs
 
-# passwords
-#FILE_PASSWORD="/home/vilardid/account_db.txt"
-#source "$FILE_PASSWORD"
-
-# mysql arguments user
-#MYARGS="-ureporting -p$pass_reporting"
-#MYARGS="--login-path=reporting"
-# mysql arguments root
-#MYARGS1="-uroot -p$pass_root"
-#MYARGS1="--login-path=root"
-
 system="$(cat /etc/system-release)"
 redhat='Red[[:space:]]Hat[[:space:]]Enterprise[[:space:]]Linux[[:space:]]Server'
 centos='CentOS[[:space:]]Linux'

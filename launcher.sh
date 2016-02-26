@@ -1,9 +1,9 @@
 #!/bin/bash
 
-echo -n "fase1... "
+echo "==> Sync server"
 . /home/vilardid/reporting/sync_report.sh
-echo "ok!"
+echo "==> Sync server done!"
 
-echo -n "fase2... "
+echo "==> Parse data"
 ssh vilardid@dcserver2 "/home/vilardid/reporting/population.sh"
-echo "ok!"
+echo "==> Parse data done!"
