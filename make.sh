@@ -92,6 +92,9 @@ fi
 echo "--> Carico il routing" >> $LOG
 mysql $MYARGS -e "source $PREFIX/routing.sql \W;" >> $LOG
 
+echo "--> Carico le viste di criticita'" >> $LOG
+mysql $MYARGS -e "source $PREFIX/critical.sql \W;" >> $LOG
+
 echo "--> Utente web e permessi" >> $LOG
 mysql $MYARGS1 -e "source $PREFIX/make_webuser.sql \W;" >> $LOG
 
