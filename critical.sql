@@ -20,6 +20,6 @@ DATE(Data) DateOnly,
 CONCAT_WS(' ',evento,'PULSAR',centrale,Messaggio,COALESCE(seriale,''),COALESCE(Ospite,'')) Critical,
 SUM(contatore) tot
 FROM `SERCHIO` WHERE
-`evento` NOT REGEXP '(TRANSITO|CHIUSO|ABILITATA|ACQUISITI)'
+`evento` NOT REGEXP '(TRANSITO EFFETTUATO|VARCO CHIUSO|TASTIERA ABILITATA|ALLARMI ACQUISITI)'
 GROUP BY DateOnly,centrale,evento,Messaggio
 ORDER BY DateOnly DESC;
