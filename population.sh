@@ -27,13 +27,13 @@ else
 	echo "--> serparse terminato senza lavoro" >> $LOG
 fi
 
-echo "==> adc_parse" >> $LOG
-{ time ./adc_parse.sh --skip >> $LOG; } 2>> $LOG
-if [ $? -eq 0 ]; then
-	echo "--> adcparse terminato con successo" >> $LOG
-else
-	echo "--> adcparse terminato senza lavoro" >> $LOG
-fi
+#echo "==> adc_parse" >> $LOG
+#{ time ./adc_parse.sh --skip >> $LOG; } 2>> $LOG
+#if [ $? -eq 0 ]; then
+#	echo "--> adcparse terminato con successo" >> $LOG
+#else
+#	echo "--> adcparse terminato senza lavoro" >> $LOG
+#fi
 
 echo "*** END " $(date) "***" >> $LOG
 
