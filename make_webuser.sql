@@ -12,4 +12,5 @@ GRANT SELECT ON reporting.ADC TO 'webreporting'@'%';
 GRANT EXECUTE ON PROCEDURE reporting.PASSAGGI TO 'webreporting'@'%';
 GRANT SELECT ON reporting.CRITICAL_WINWATCH TO 'webreporting'@'%';
 GRANT SELECT ON reporting.CRITICAL_SERCHIO TO 'webreporting'@'%';
+GRANT SELECT ON reporting.CRITICAL TO 'webreporting'@'%';
 FLUSH PRIVILEGES;
