@@ -7,7 +7,7 @@ DROP VIEW IF EXISTS `CRITICAL`;
 CREATE VIEW `CRITICAL_WINWATCH` AS
 SELECT
 DATE(Data) DateOnly,
-CONCAT_WS(' ',Evento,'PULSAR',RIGHT(Centrale,1),Messaggio) Critical,
+CONCAT_WS(' ',Messaggio,'PULSAR',RIGHT(Centrale,1),Evento) Critical,
 SUM(contatore) tot
 FROM `WINWATCH` WHERE
 `Centrale` != 'UC' AND
