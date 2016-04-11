@@ -13,5 +13,7 @@ GRANT EXECUTE ON PROCEDURE reporting.PASSAGGI TO 'webreporting'@'%';
 GRANT SELECT ON reporting.CRITICAL_WINWATCH TO 'webreporting'@'%';
 GRANT SELECT ON reporting.CRITICAL_SERCHIO TO 'webreporting'@'%';
 GRANT SELECT ON reporting.CRITICAL TO 'webreporting'@'%';
-GRANT SELECT ON reporting.REPORT TO 'webreporting'@'%';
+GRANT SELECT ON reporting.WINWATCH_remap TO 'webreporting'@'%';
+GRANT SELECT ON reporting.SERCHIO_remap TO 'webreporting'@'%';
+GRANT SELECT ON reporting.REPORT_remap TO 'webreporting'@'%';
 FLUSH PRIVILEGES;
