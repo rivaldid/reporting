@@ -1,6 +1,8 @@
 #!/bin/bash
 
 FILE_PASS="/home/vilardid/account_ad.txt"
+
+PREFIX="/home/vilardid/reporting"
 source "$PREFIX/config.sh"
 
 echo "==> Step1: Sync password da locale a remoto"
