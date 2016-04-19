@@ -16,4 +16,5 @@ GRANT SELECT ON reporting.CRITICAL TO 'webreporting'@'%';
 GRANT SELECT ON reporting.WINWATCH_remap TO 'webreporting'@'%';
 GRANT SELECT ON reporting.SERCHIO_remap TO 'webreporting'@'%';
 GRANT SELECT ON reporting.REPORT_remap TO 'webreporting'@'%';
+GRANT SELECT ON reporting.search_serchio_ospiti TO 'webreporting'@'%';
 FLUSH PRIVILEGES;
