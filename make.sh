@@ -98,6 +98,9 @@ mysql $MYARGS -e "source $PREFIX/critical.sql \W;" >> $LOG
 echo "--> Carico le viste rimappate'" >> $LOG
 mysql $MYARGS -e "source $PREFIX/remap.sql \W;" >> $LOG
 
+echo "--> Ricerca accessi" >> $LOG
+mysql $MYARGS -e "source $PREFIX/access.sql \W;" >> $LOG
+
 echo "--> Utente web e permessi" >> $LOG
 mysql $MYARGS1 -e "source $PREFIX/make_webuser.sql \W;" >> $LOG
 
