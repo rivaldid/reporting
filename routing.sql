@@ -38,8 +38,8 @@ END;
 $$
 
 CREATE VIEW `ser_reportstuff` AS
-SELECT SER_REPORT.Data AS data,Sid,id_tessera,HTML_UnEncode(SER_OSPITI.nome) AS ospite,id_evento,id_varco,direzione 
-FROM SER_REPORT 
+SELECT SER_REPORT.Data AS data,Sid,id_tessera,HTML_UnEncode(SER_OSPITI.nome) AS ospite,id_evento,id_varco,direzione
+FROM SER_REPORT
 JOIN SER_OSPITI USING(id_ospite)
 WHERE id_tessera <> 1;
 $$

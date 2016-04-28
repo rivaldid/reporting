@@ -22,32 +22,34 @@ ospite varchar(45),
 ingresso time,
 uscita time);
 
-SELECT MAX(DATE(Data)) INTO max_data FROM SERCHIO;
+SET max_data = COALESCE((SELECT MAX(DATE(Data)) FROM SERCHIO),CURDATE());
 
 REPEAT
 
-	SELECT 
-	DATE(Data) DateOnly, 
-	Ospite, 
-	MIN(DATE_FORMAT(Data,'%H:%i:%s')) INGRESSO, 
-	MAX(DATE_FORMAT(Data,'%H:%i:%s')) USCITA 
+	SELECT
+	DATE(Data) DateOnly,
+	Ospite,
+	MIN(DATE_FORMAT(Data,'%H:%i:%s')) INGRESSO,
+	MAX(DATE_FORMAT(Data,'%H:%i:%s')) USCITA
 	INTO
 	temp_data,
 	temp_ospite,
 	temp_in,
 	temp_out
-	FROM SERCHIO 
-	WHERE 
+	FROM SERCHIO
+	WHERE
 	DATE(Data) = in_data AND
-	Ospite <> '' AND 
+	Ospite <> '' AND
 	Ospite LIKE CONCAT(in_ospite,'%')
 	GROUP BY DateOnly, Ospite;
 
-	INSERT INTO accessi(data,ospite,ingresso,uscita) VALUES(temp_data,temp_ospite,temp_in,temp_out);
-	
-	SET in_data = (SELECT in_data + INTERVAL 1 DAY);
+	IF (temp_in IS NOT NULL) THEN
+		INSERT INTO accessi(data,ospite,ingresso,uscita) VALUES(temp_data,temp_ospite,temp_in,temp_out);
+	END IF;
 
-UNTIL (in_data <= max_data) END REPEAT;
+	SET in_data = DATE_ADD(in_data, INTERVAL 1 DAY);
+
+UNTIL in_data > max_data END REPEAT;
 
 SELECT * FROM accessi;
 
