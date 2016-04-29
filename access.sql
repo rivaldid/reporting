@@ -45,6 +45,7 @@ REPEAT
 
 	IF (temp_in IS NOT NULL) THEN
 		INSERT INTO accessi(data,ospite,ingresso,uscita) VALUES(temp_data,temp_ospite,temp_in,temp_out);
+		SET temp_in = NULL;
 	END IF;
 
 	SET in_data = DATE_ADD(in_data, INTERVAL 1 DAY);
