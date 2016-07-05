@@ -1,4 +1,10 @@
 #!/bin/bash
+# Script pensato per intervenire alla sincronizzazione dei report
+# da macchina file server (rto1y11co13) a server (sgedcdb01v)
+# aggiornando anche la password del profilo utente.
+# A regime ci sarà un utente locale quindi niente sincronizzazione password
+# e report gia' sul server quindi niente sincronizzazione report,
+# quindi a regime vi sara' solo il population.
 
 FILE_PASS="/home/vilardid/account_ad.txt"
 
@@ -20,3 +26,7 @@ echo "==> Step4: Parse ADC su locale"
 #echo "==> Step5: Sync risultati ADC Parse su remoto"
 #scp "$ADC_HISTORY" vilardid@dcserver2:"$ADC_HISTORY"
 #ssh vilardid@dcserver2 "pv \"$ADC_HISTORY\" | mysql \"$MYARGS\" -D reporting"
+
+# A REGIME SOLO POPULATION 
+#echo "==> Step unico: parse report"
+#. /home/vilardid/reporting/population.sh
